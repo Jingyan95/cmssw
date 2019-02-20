@@ -306,9 +306,14 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
     
   // ----------------------------------------------------------------------------------------------------------------
   // Practice: fake/pri/sec
-  TH1F* h_trk_eta_fake   = new TH1F("trk_all_vspt",       ";Track p_{T} [GeV]; ",50,-2.5,2.5);
-  TH1F* h_trk_eta_pri    = new TH1F("trk_genuine_vspt",   ";Track p_{T} [GeV]; ",100,-2.5,2.5);
-  TH1F* h_trk_eta_sec    = new TH1F("tp_vspt",            ";TP p_{T} [GeV]; ",   100,-2.5,2.5);
+  TH1F* h_trk_eta_fake   = new TH1F("trk_eta_fake",       ";Fake Tracks #eta; ",50,-2.5,2.5);
+  TH1F* h_trk_eta_pri    = new TH1F("trk_eta_pri",   ";Primary interaction #eta; ",50,-2.5,2.5);
+  TH1F* h_trk_eta_sec    = new TH1F("trk_eta_sec",            ";Pileup #eta; ",   50,-2.5,2.5);
+  TH1F* h_trk_chi2       = new TH1F("trk_chi2",            ";All tracks #chi^{2}; ",   50,0,150);
+  TH1F* h_matchtrk_chi2  = new TH1F("matchtrk_chi2",            ";Matched tracks #chi^{2}; ",   50,0,150);
+  TH1F* h_trk_nstub      = new TH1F("trk_nstub",            ";number of stubs (all tracks); ",   50,0,10);
+  TH1F* h_tp_nstub       = new TH1F("tp_nstub",            ";number of stubs (tracking particles); ",   50,0,15);
+  TH1F* h_matchtrk_nstub = new TH1F("matchtrk_nstub",            ";number of stubs (matched tracks); ",   50,0,10);
 
 
 
@@ -345,6 +350,8 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
 	ntrk_pt2++;
 	ntrkevt_pt2++;
 	h_trk_all_vspt->Fill(trk_pt->at(it));
+    h_trk_chi2->Fill(trk_chi2->at(it));
+    h_trk_nstub->Fill(trk_nstub->at(it));
 	if (trk_genuine->at(it) == 1) {
 	  h_trk_genuine_vspt->Fill(trk_pt->at(it));
 	}
@@ -409,6 +416,7 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
 	else n_all_eta2p5++;
 	
 	h_tp_eta->Fill(tp_eta->at(it));
+    h_tp_nstub->Fill(tp_nstub->at(it));
 	if (tp_pt->at(it) < 8.0) h_tp_eta_L->Fill(tp_eta->at(it));
 	else h_tp_eta_H->Fill(tp_eta->at(it));
 	
@@ -431,7 +439,9 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
       
       // ----------------------------------------------------------------------------------------------------------------
       // fill matched track histograms
-
+      
+      h_matchtrk_chi2->Fill(matchtrk_chi2->at(it));
+      h_matchtrk_nstub->Fill(matchtrk_nstub->at(it));
       h_match_tp_pt->Fill(tp_pt->at(it));
       if (tp_pt->at(it) < 8.0) h_match_tp_pt_L->Fill(tp_pt->at(it));
       else h_match_tp_pt_H->Fill(tp_pt->at(it));
@@ -685,25 +695,47 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
     
   h_trk_eta_fake->Draw();
   h_trk_eta_fake->Write();
-  h_trk_eta_fake->GetXaxis()->SetTitle("eta");
-  sprintf(ctxt,"tracks that are fake");
-  mySmallText(0.5,0.79,4,ctxt);
-  c.SaveAs(DIR+type+"_eta_fake.pdf");
+  c.SaveAs(DIR+type+"_eta_fake.png");
   
   h_trk_eta_pri->Draw();
   h_trk_eta_pri->Write();
-  h_trk_eta_pri->GetXaxis()->SetTitle("eta");
-  sprintf(ctxt,"tracks that are from primary interaction");
-  mySmallText(0.5,0.79,4,ctxt);
-  c.SaveAs(DIR+type+"_eta_pri.pdf");
+  c.SaveAs(DIR+type+"_eta_pri.png");
     
   h_trk_eta_sec->Draw();
   h_trk_eta_sec->Write();
-  h_trk_eta_sec->GetXaxis()->SetTitle("eta");
-  sprintf(ctxt,"tracks that are from secondary interaction");
-  mySmallText(0.5,0.79,4,ctxt);
-  c.SaveAs(DIR+type+"_eta_sec.pdf");
+  c.SaveAs(DIR+type+"_eta_sec.png");
+    
+  h_tp_eta_H->Draw("hist");
+  h_tp_eta_H->Write();
+  sprintf(ctxt,"p_{T} > 8 GeV");
+  mySmallText(0.45,0.5,1,ctxt);
+  c.SaveAs(DIR+type+"_tp_eta_H.png");
+    
+  h_tp_eta_L->Draw("hist");
+  h_tp_eta_L->Write();
+  sprintf(ctxt,"p_{T} < 8 GeV");
+  mySmallText(0.45,0.5,1,ctxt);
+  c.SaveAs(DIR+type+"_tp_eta_L.png");
+    
+  h_trk_chi2->Draw("hist");
+  h_trk_chi2->Write();
+  c.SaveAs(DIR+type+"_trk_chi2.png");
+    
+  h_matchtrk_chi2->Draw("hist");
+  h_matchtrk_chi2->Write();
+  c.SaveAs(DIR+type+"_matchtrk_chi2.png");
+    
+  h_trk_nstub->Draw("hist");
+  h_trk_nstub->Write();
+  c.SaveAs(DIR+type+"_trk_nstub.png");
 
+  h_tp_nstub->Draw("hist");
+  h_tp_nstub->Write();
+  c.SaveAs(DIR+type+"_tp_nstub.png");
+    
+  h_matchtrk_nstub->Draw("hist");
+  h_matchtrk_nstub->Write();
+  c.SaveAs(DIR+type+"_matchtrk_nstub.png");
   
   
 
