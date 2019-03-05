@@ -40,7 +40,7 @@ void makeResidualIntervalPlot( TString type, TString dir, TString variable, TH1F
 // ----------------------------------------------------------------------------------------------------------------
 
 
-void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_eventid=0, 
+void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_eventid=0,
 			    float TP_minPt=2.0, float TP_maxPt=100.0, float TP_maxEta=2.4) {
 
   // type:              this is the input file you want to process (minus ".root" extension)
@@ -54,6 +54,8 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   gErrorIgnoreLevel = kWarning;
   
   SetPlotStyle();
+    
+  TFile* fout = new TFile("output_"+type+".root","recreate"); 
   
   
   // ----------------------------------------------------------------------------------------------------------------
@@ -151,7 +153,8 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   TBranch* b_trk_pt; 
   TBranch* b_trk_eta; 
   TBranch* b_trk_phi; 
-  TBranch* b_trk_chi2; 
+  TBranch* b_trk_chi2;
+  TBranch* b_trk_chi2_fake;
   TBranch* b_trk_nstub; 
   //TBranch* b_trk_seed; 
   TBranch* b_trk_fake; 
@@ -218,6 +221,32 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   tree->SetBranchAddress("trk_fake",    &trk_fake,    &b_trk_fake);
   tree->SetBranchAddress("trk_genuine", &trk_genuine, &b_trk_genuine);
   tree->SetBranchAddress("trk_loose",   &trk_loose,   &b_trk_loose);
+    
+  // Make TTree object
+  TTree *t_fake = new TTree("t_fake","tree for fake track variables");
+  TTree *t_real = new TTree("t_real","tree for real track variables");
+  // variable
+  float pt_fake;
+  float eta_fake;
+  float chi2_fake;
+  int   nstub_fake;
+
+  float pt_real;
+  float eta_real;
+  float chi2_real;
+  int   nstub_real;
+
+  // Tree branch
+    
+  t_fake->Branch("pt", &pt_fake, "Transverse Momentum/F");
+  t_fake->Branch("eta", &eta_fake, "Pseudorapidity/F");
+  t_fake->Branch("nstub", &nstub_fake, "Number of Stubs/I");
+  t_fake->Branch("chi2", &chi2_fake, "Chi squared/F");
+    
+  t_real->Branch("pt", &pt_real, "Transverse Momentum/F");
+  t_real->Branch("eta", &eta_real, "Pseudorapidity/F");
+  t_real->Branch("nstub", &nstub_real, "Number of Stubs/I");
+  t_real->Branch("chi2", &chi2_real, "Chi squared/F");
   
 
   // ----------------------------------------------------------------------------------------------------------------
@@ -314,8 +343,22 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   TH1F* h_trk_nstub      = new TH1F("trk_nstub",            ";number of stubs (all tracks); ",   50,0,10);
   TH1F* h_tp_nstub       = new TH1F("tp_nstub",            ";number of stubs (tracking particles); ",   50,0,15);
   TH1F* h_matchtrk_nstub = new TH1F("matchtrk_nstub",            ";number of stubs (matched tracks); ",   50,0,10);
-
-
+    
+  // ----------------------------------------------------------------------------------------------------------------
+  //   Practice 2: fake/pri/sec
+  TH1F* h_trk_chi2_fake   = new TH1F("trk_chi2_fake",       ";Fake Tracks #chi^{2}; ",50,0,150);
+  TH1F* h_trk_chi2_pri    = new TH1F("trk_chi2_pri",   ";Primary interaction #chi^{2}; ",50,0,150);
+  TH1F* h_trk_chi2_sec    = new TH1F("trk_chi2_sec",            ";Pileup #chi^{2}; ",   50,0,150);
+  TH1F* h_trk_nstub_fake  = new TH1F("trk_nstub_fake",       ";Fake Tracks nstub; ",50,0,10);
+  TH1F* h_trk_nstub_pri   = new TH1F("trk_nstub_pri",   ";Primary interaction nstub; ",50,0,10);
+  TH1F* h_trk_nstub_sec   = new TH1F("trk_nstub_sec",            ";Pileup nstub; ",   50,0,10);
+  TH1F* h_trk_eta_H_fake  = new TH1F("trk_eta_H_fake",       ";Fake Tracks #eta; ",50,-2.5,2.5);
+  TH1F* h_trk_eta_H_pri   = new TH1F("trk_eta_H_pri",   ";Primary interaction #eta; ",50,-2.5,2.5);
+  TH1F* h_trk_eta_H_sec   = new TH1F("trk_eta_H_sec",            ";Pileup #eta; ",   50,-2.5,2.5);
+  TH1F* h_trk_eta_L_fake  = new TH1F("trk_eta_L_fake",       ";Fake Tracks #eta; ",50,-2.5,2.5);
+  TH1F* h_trk_eta_L_pri   = new TH1F("trk_eta_L_pri",   ";Primary interaction #eta; ",50,-2.5,2.5);
+  TH1F* h_trk_eta_L_sec   = new TH1F("trk_eta_L_sec",            ";Pileup #eta; ",   50,-2.5,2.5);
+    
 
   // ----------------------------------------------------------------------------------------------------------------
   //        * * * * *     S T A R T   O F   A C T U A L   R U N N I N G   O N   E V E N T S     * * * * *
@@ -344,6 +387,8 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
 
       // basic kinematic selection criteria 
       if (fabs(trk_eta->at(it)) > TP_maxEta) continue;
+      //only machine learning
+      if (trk_pt->at(it) > TP_maxPt) continue;
       if (trk_pt->at(it) < TP_minPt) continue;
 
       if (trk_pt->at(it) > 2.0) {
@@ -355,9 +400,41 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
 	if (trk_genuine->at(it) == 1) {
 	  h_trk_genuine_vspt->Fill(trk_pt->at(it));
 	}
-      if (trk_fake->at(it)==0) h_trk_eta_fake->Fill(trk_eta->at(it));
-      else if (trk_fake->at(it)==1) h_trk_eta_pri->Fill(trk_eta->at(it));
-      else h_trk_eta_sec->Fill(trk_eta->at(it));
+          if (trk_fake->at(it)==0) {h_trk_eta_fake->Fill(trk_eta->at(it));
+      h_trk_chi2_fake->Fill(trk_chi2->at(it));
+
+              h_trk_nstub_fake->Fill(trk_nstub->at(it));
+          }
+          if (trk_fake->at(it)==1) {h_trk_eta_pri->Fill(trk_eta->at(it));
+      h_trk_chi2_pri->Fill(trk_chi2->at(it));
+              h_trk_nstub_pri->Fill(trk_nstub->at(it));
+          }
+          if (trk_fake->at(it)==2) {h_trk_eta_sec->Fill(trk_eta->at(it));
+      h_trk_chi2_sec->Fill(trk_chi2->at(it));
+              h_trk_nstub_sec->Fill(trk_nstub->at(it));
+          }
+          
+          if (trk_fake->at(it)==0) {eta_fake=(trk_eta->at(it));
+              chi2_fake=trk_chi2->at(it);
+              nstub_fake=trk_nstub->at(it);
+              pt_fake=trk_pt->at(it);
+              t_fake->Fill();
+          }
+          if (trk_fake->at(it)>0) {eta_real=(trk_eta->at(it));
+              chi2_real=trk_chi2->at(it);
+              nstub_real=trk_nstub->at(it);
+              pt_real=trk_pt->at(it);
+              t_real->Fill();
+          }
+          
+          if (trk_pt->at(it)>=5.0) {
+          if (trk_fake->at(it)==0) h_trk_eta_H_fake->Fill(trk_eta->at(it));
+          else if (trk_fake->at(it)==1) h_trk_eta_H_pri->Fill(trk_eta->at(it));
+          else h_trk_eta_H_sec->Fill(trk_eta->at(it));}
+          if (trk_pt->at(it)<=5.0) {
+          if (trk_fake->at(it)==0) h_trk_eta_L_fake->Fill(trk_eta->at(it));
+          else if (trk_fake->at(it)==1) h_trk_eta_L_pri->Fill(trk_eta->at(it));
+          else h_trk_eta_L_sec->Fill(trk_eta->at(it));}
       
       }
       if (trk_pt->at(it) > 3.0) {
@@ -486,7 +563,7 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   // resolution vs. eta histograms (68 / 90 / 99% residuals)
   TH1F* h2_resVsEta_eta_68  = new TH1F("resVsEta_eta_68",   ";Tracking particle |#eta|; #eta resolution", nETARANGE,0,2.4);
   TH1F* h2_resVsEta_eta_90  = new TH1F("resVsEta_eta_90",   ";Tracking particle |#eta|; #eta resolution", nETARANGE,0,2.4);
-  TH1F* h2_resVsEta_eta_99  = new TH1F("resVsEta_eta_99",   ";Tracking particle |#eta|; #eta resolution", nETARANGE,0,2.4);
+  TH1F* h2_resVsEta_eta_99  = new TH1F("resVsEta_eta_99",   ";Tracking particle |#eta|; #e ta resolution", nETARANGE,0,2.4);
 
   TH1F* h2_resVsEta_z0_68   = new TH1F("resVsEta_z0_68",   ";Tracking particle |#eta|; z_{0} resolution [cm]", nETARANGE,0,2.4);
   TH1F* h2_resVsEta_z0_90   = new TH1F("resVsEta_z0_90",   ";Tracking particle |#eta|; z_{0} resolution [cm]", nETARANGE,0,2.4);
@@ -539,8 +616,6 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
     sprintf(pttxt,"_pt%.0f",TP_minPt);
     type = type+pttxt;
   }
-
-  TFile* fout = new TFile("output_"+type+".root","recreate");  
 
   
   // -------------------------------------------------------------------------------------------
@@ -650,94 +725,160 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   gPad->SetGridx();
   gPad->SetGridy();
 
-  // draw and save plots
-  h_eff_pt->Draw();
-  h_eff_pt->Write();
-  c.SaveAs(DIR+type+"_eff_pt.pdf");
+//  // draw and save plots
+//  h_eff_pt->Draw();
+//  h_eff_pt->Write();
+//  c.SaveAs(DIR+type+"_eff_pt.pdf");
+//
+//  if (type.Contains("Mu")) {
+//    h_eff_pt->GetYaxis()->SetRangeUser(0.8,1.01); // zoomed-in plot
+//    c.SaveAs(DIR+type+"_eff_pt_zoom.pdf");
+//  }
+//
+//  h_eff_pt_L->Draw();
+//  h_eff_pt_L->Write();
+//  sprintf(ctxt,"p_{T} < 8 GeV");
+//  mySmallText(0.45,0.5,1,ctxt);
+//  c.SaveAs(DIR+type+"_eff_pt_L.pdf");
+//
+//  h_eff_pt_H->Draw();
+//  h_eff_pt_H->Write();
+//  sprintf(ctxt,"p_{T} > 8 GeV");
+//  mySmallText(0.45,0.5,1,ctxt);
+//  c.SaveAs(DIR+type+"_eff_pt_H.pdf");
+//
+//  h_eff_eta->Draw();
+//  h_eff_eta->Write();
+//  c.SaveAs(DIR+type+"_eff_eta.pdf");
+//
+//  if (type.Contains("Mu")) {
+//    h_eff_eta->GetYaxis()->SetRangeUser(0.8,1.01); // zoomed-in plot
+//    c.SaveAs(DIR+type+"_eff_eta_zoom.pdf");
+//  }
+//
+//  h_eff_eta_L->Draw();
+//  h_eff_eta_L->Write();
+//  sprintf(ctxt,"p_{T} < 8 GeV");
+//  mySmallText(0.45,0.5,1,ctxt);
+//  c.SaveAs(DIR+type+"_eff_eta_L.pdf");
+//
+//  h_eff_eta_H->Draw();
+//  h_eff_eta_H->Write();
+//  sprintf(ctxt,"p_{T} > 8 GeV");
+//  mySmallText(0.45,0.5,1,ctxt);
+//  c.SaveAs(DIR+type+"_eff_eta_H.pdf");
+//
+//  h_trk_eta_fake->Draw();
+//  h_trk_eta_fake->Write();
+//  c.SaveAs(DIR+type+"_eta_fake.pdf");
+//
+//  h_trk_eta_pri->Draw();
+//  h_trk_eta_pri->Write();
+//  c.SaveAs(DIR+type+"_eta_pri.pdf");
+//
+//  h_trk_eta_sec->Draw();
+//  h_trk_eta_sec->Write();
+//  c.SaveAs(DIR+type+"_eta_sec.pdf");
+//
+//  h_tp_eta_H->Draw("hist");
+//  h_tp_eta_H->Write();
+//  sprintf(ctxt,"p_{T} > 8 GeV");
+//  mySmallText(0.45,0.5,1,ctxt);
+//  c.SaveAs(DIR+type+"_tp_eta_H.pdf");
+//
+//  h_tp_eta_L->Draw("hist");
+//  h_tp_eta_L->Write();
+//  sprintf(ctxt,"p_{T} < 8 GeV");
+//  mySmallText(0.45,0.5,1,ctxt);
+//  c.SaveAs(DIR+type+"_tp_eta_L.pdf");
+//
+//  h_trk_chi2->Draw("hist");
+//  h_trk_chi2->Write();
+//  c.SaveAs(DIR+type+"_trk_chi2.pdf");
+//
+//  h_matchtrk_chi2->Draw("hist");
+//  h_matchtrk_chi2->Write();
+//  c.SaveAs(DIR+type+"_matchtrk_chi2.pdf");
+//
+//  h_trk_nstub->Draw("hist");
+//  h_trk_nstub->Write();
+//  c.SaveAs(DIR+type+"_trk_nstub.pdf");
+//
+//  h_tp_nstub->Draw("hist");
+//  h_tp_nstub->Write();
+//  c.SaveAs(DIR+type+"_tp_nstub.pdf");
+//
+//  h_matchtrk_nstub->Draw("hist");
+//  h_matchtrk_nstub->Write();
+//  c.SaveAs(DIR+type+"_matchtrk_nstub.pdf");
+//
+////  TCanvas *c1 = new TCanvas("c1","#chi^{2}",500, 600,500,800);
+////  c1->Divide(1,3);
+////  c1->cd(1);
+//  h_trk_chi2_fake->Draw("hist");
+//  h_trk_chi2_fake->Write();
+//  c.SaveAs(DIR+type+"_trk_chi2_fake.png");
+////  c1->cd(2);
+//  h_trk_chi2_pri->Draw("hist");
+//  h_trk_chi2_pri->Write();
+//  c.SaveAs(DIR+type+"_trk_chi2_pri.png");
+////  c1->cd(3);
+//  h_trk_chi2_sec->Draw("hist");
+//  h_trk_chi2_sec->Write();
+//  c.SaveAs(DIR+type+"_trk_chi2_sec.png");
+//
+//    h_trk_nstub_fake->Draw("hist");
+//    h_trk_nstub_fake->Write();
+//    c.SaveAs(DIR+type+"_trk_nstub_fake.png");
+//    //  c1->cd(2);
+//    h_trk_nstub_pri->Draw("hist");
+//    h_trk_nstub_pri->Write();
+//    c.SaveAs(DIR+type+"_trk_nstub_pri.png");
+//    //  c1->cd(3);
+//    h_trk_nstub_sec->Draw("hist");
+//    h_trk_nstub_sec->Write();
+//    c.SaveAs(DIR+type+"_trk_nstub_sec.png");
+//
+//    h_trk_eta_H_fake->Draw("hist");
+//    h_trk_eta_H_fake->Write();
+//    sprintf(ctxt,"p_{T} > 5 GeV");
+//    mySmallText(0.45,0.5,1,ctxt);
+//    c.SaveAs(DIR+type+"_trk_eta_H_fake.png");
+//    //  c1->cd(2);
+//    h_trk_eta_H_pri->Draw("hist");
+//    h_trk_eta_H_pri->Write();
+//    sprintf(ctxt,"p_{T} > 5 GeV");
+//    mySmallText(0.45,0.5,1,ctxt);
+//    c.SaveAs(DIR+type+"_trk_eta_H_pri.png");
+//    //  c1->cd(3);
+//    h_trk_eta_H_sec->Draw("hist");
+//    h_trk_eta_H_sec->Write();
+//    sprintf(ctxt,"p_{T} > 5 GeV");
+//    mySmallText(0.45,0.5,1,ctxt);
+//    c.SaveAs(DIR+type+"_trk_eta_H_sec.png");
+//
+//    h_trk_eta_L_fake->Draw("hist");
+//    h_trk_eta_L_fake->Write();
+//    sprintf(ctxt,"p_{T} < 5 GeV");
+//    mySmallText(0.45,0.5,1,ctxt);
+//    c.SaveAs(DIR+type+"_trk_eta_L_fake.png");
+//    //  c1->cd(2);
+//    h_trk_eta_L_pri->Draw("hist");
+//    h_trk_eta_L_pri->Write();
+//    sprintf(ctxt,"p_{T} < 5 GeV");
+//    mySmallText(0.45,0.5,1,ctxt);
+//    c.SaveAs(DIR+type+"_trk_eta_L_pri.png");
+//    //  c1->cd(3);
+//    h_trk_eta_L_sec->Draw("hist");
+//    h_trk_eta_L_sec->Write();
+//    sprintf(ctxt,"p_{T} < 5 GeV");
+//    mySmallText(0.45,0.5,1,ctxt);
+//    c.SaveAs(DIR+type+"_trk_eta_L_sec.png");
+    
+//  TCanvas *c2 = new TCanvas("c2","nstub",900,700);
+//  TCanvas *c3 = new TCanvas("c3","#eta_H",900,700);
+//  TCanvas *c4 = new TCanvas("c4","#eta_L",900,700);
 
-  if (type.Contains("Mu")) {
-    h_eff_pt->GetYaxis()->SetRangeUser(0.8,1.01); // zoomed-in plot
-    c.SaveAs(DIR+type+"_eff_pt_zoom.pdf");
-  }
-
-  h_eff_pt_L->Draw();
-  h_eff_pt_L->Write();
-  sprintf(ctxt,"p_{T} < 8 GeV");
-  mySmallText(0.45,0.5,1,ctxt);
-  c.SaveAs(DIR+type+"_eff_pt_L.pdf");
-  
-  h_eff_pt_H->Draw();
-  h_eff_pt_H->Write();
-  sprintf(ctxt,"p_{T} > 8 GeV");
-  mySmallText(0.45,0.5,1,ctxt);
-  c.SaveAs(DIR+type+"_eff_pt_H.pdf");
-  
-  h_eff_eta->Draw();
-  h_eff_eta->Write();
-  c.SaveAs(DIR+type+"_eff_eta.pdf");
-  
-  if (type.Contains("Mu")) {
-    h_eff_eta->GetYaxis()->SetRangeUser(0.8,1.01); // zoomed-in plot
-    c.SaveAs(DIR+type+"_eff_eta_zoom.pdf");
-  }
-
-  h_eff_eta_L->Draw();
-  h_eff_eta_L->Write();
-  sprintf(ctxt,"p_{T} < 8 GeV");
-  mySmallText(0.45,0.5,1,ctxt);
-  c.SaveAs(DIR+type+"_eff_eta_L.pdf");
-  
-  h_eff_eta_H->Draw();
-  h_eff_eta_H->Write();
-  sprintf(ctxt,"p_{T} > 8 GeV");
-  mySmallText(0.45,0.5,1,ctxt);
-  c.SaveAs(DIR+type+"_eff_eta_H.pdf");
-    
-  h_trk_eta_fake->Draw();
-  h_trk_eta_fake->Write();
-  c.SaveAs(DIR+type+"_eta_fake.png");
-  
-  h_trk_eta_pri->Draw();
-  h_trk_eta_pri->Write();
-  c.SaveAs(DIR+type+"_eta_pri.png");
-    
-  h_trk_eta_sec->Draw();
-  h_trk_eta_sec->Write();
-  c.SaveAs(DIR+type+"_eta_sec.png");
-    
-  h_tp_eta_H->Draw("hist");
-  h_tp_eta_H->Write();
-  sprintf(ctxt,"p_{T} > 8 GeV");
-  mySmallText(0.45,0.5,1,ctxt);
-  c.SaveAs(DIR+type+"_tp_eta_H.png");
-    
-  h_tp_eta_L->Draw("hist");
-  h_tp_eta_L->Write();
-  sprintf(ctxt,"p_{T} < 8 GeV");
-  mySmallText(0.45,0.5,1,ctxt);
-  c.SaveAs(DIR+type+"_tp_eta_L.png");
-    
-  h_trk_chi2->Draw("hist");
-  h_trk_chi2->Write();
-  c.SaveAs(DIR+type+"_trk_chi2.png");
-    
-  h_matchtrk_chi2->Draw("hist");
-  h_matchtrk_chi2->Write();
-  c.SaveAs(DIR+type+"_matchtrk_chi2.png");
-    
-  h_trk_nstub->Draw("hist");
-  h_trk_nstub->Write();
-  c.SaveAs(DIR+type+"_trk_nstub.png");
-
-  h_tp_nstub->Draw("hist");
-  h_tp_nstub->Write();
-  c.SaveAs(DIR+type+"_tp_nstub.png");
-    
-  h_matchtrk_nstub->Draw("hist");
-  h_matchtrk_nstub->Write();
-  c.SaveAs(DIR+type+"_matchtrk_nstub.png");
-  
-  
 
   gPad->SetGridx(0);
   gPad->SetGridy(0);
@@ -769,9 +910,9 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   h_trk_all_vspt->Draw("same,hist");
   h_tp_vspt->Draw("same,hist");
 
-  h_trk_all_vspt->Write();
-  h_trk_genuine_vspt->Write();
-  h_tp_vspt->Write();
+//  h_trk_all_vspt->Write();
+//  h_trk_genuine_vspt->Write();
+//  h_tp_vspt->Write();
 
   char txt[500];
   sprintf(txt,"# tracks/event = %.1f",h_trk_all_vspt->GetSum());
@@ -792,9 +933,16 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
 
 
   // nbr tracks per event 
-  h_ntrk_pt2->Write();
-  h_ntrk_pt3->Write();
-  h_ntrk_pt10->Write();
+//  h_ntrk_pt2->Write();
+//  h_ntrk_pt3->Write();
+//  h_ntrk_pt10->Write();
+    
+   // TMVA!!!!
+    t_fake->Write();
+    t_real->Write();
+    
+    
+  
     
 
   // close output root ntuple file
@@ -940,12 +1088,12 @@ void makeResidualIntervalPlot( TString type, TString dir, TString variable, TH1F
   h_90->SetMarkerStyle(26);
   h_99->SetMarkerStyle(24);
 
-  h_68->Draw("P");
-  h_68->Write();
-  h_90->Draw("P same");
-  h_90->Write();
-  h_99->Draw("P same");
-  h_99->Write();
+//  h_68->Draw("P");
+//  h_68->Write();
+//  h_90->Draw("P same");
+//  h_90->Write();
+//  h_99->Draw("P same");
+//  h_99->Write();
 
   TLegend* l = new TLegend(0.65,0.65,0.85,0.85);
   l->SetFillStyle(0);
