@@ -337,6 +337,7 @@ void L1TrackNtupleMaker::beginJob()
     m_trk_z0    = new std::vector<float>;
     m_trk_d0    = new std::vector<float>;
     m_trk_chi2  = new std::vector<float>;
+    m_trk_bend_chi2  = new std::vector<float>; //new input
     m_trk_nstub = new std::vector<int>;
     m_trk_seed    = new std::vector<int>;
     m_trk_genuine       = new std::vector<int>;
@@ -434,6 +435,7 @@ void L1TrackNtupleMaker::beginJob()
         eventTree->Branch("trk_d0",    &m_trk_d0);
         eventTree->Branch("trk_z0",    &m_trk_z0);
         eventTree->Branch("trk_chi2",  &m_trk_chi2);
+        eventTree->Branch("trk_bend_chi2",  &m_trk_bend_chi2);
         eventTree->Branch("trk_nstub", &m_trk_nstub);
         if (SaveTracklet) eventTree->Branch("trk_seed",    &m_trk_seed);
         eventTree->Branch("trk_genuine",      &m_trk_genuine);
@@ -561,6 +563,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         m_trk_d0->clear();
         m_trk_z0->clear();
         m_trk_chi2->clear();
+        m_trk_bend_chi2->clear();
         m_trk_nstub->clear();
         m_trk_seed->clear();
         m_trk_genuine->clear();
@@ -894,7 +897,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             int tmp_trk_seed = 0;
             if (SaveTracklet) tmp_trk_seed = (int) iterL1Track->getWedge();
             
-            /*
+            
              int tmp_trk_nPSstub = 0;
              if (SaveTracklet) {
              for (int is=0; is<tmp_trk_nstub; is++) {
@@ -906,11 +909,11 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
              if (isPS) tmp_trk_nPSstub++;
              }
              }
-             */
+            
             
             // ----------------------------------------------------------------------------------------------
             // loop over stubs on tracks
-            /*
+            
              float tmp_trk_bend_chi2 = 0;
              if (SaveStubs) {
              // loop over stubs
@@ -956,7 +959,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
              
              }//end loop over stubs
              }
-             */
+            
             // ----------------------------------------------------------------------------------------------
             
             
@@ -984,6 +987,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             if (L1Tk_nPar==5) m_trk_d0->push_back(tmp_trk_d0);
             else m_trk_d0->push_back(999.);
             m_trk_chi2 ->push_back(tmp_trk_chi2);
+            m_trk_bend_chi2 ->push_back(tmp_trk_bend_chi2);
             m_trk_nstub->push_back(tmp_trk_nstub);
             if (SaveTracklet) m_trk_seed->push_back(tmp_trk_seed);
             m_trk_genuine->push_back(tmp_trk_genuine);
