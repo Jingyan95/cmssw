@@ -158,6 +158,7 @@ private:
     std::vector<float>* m_trk_d0;   // (filled if L1Tk_nPar==5, else 999)
     std::vector<float>* m_trk_z0;
     std::vector<float>* m_trk_chi2;
+    std::vector<float>* m_trk_bend_chi2;//new input
     std::vector<int>*   m_trk_nstub;
     std::vector<int>*   m_trk_seed;
     std::vector<int>*   m_trk_genuine;
