@@ -124,6 +124,7 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   vector<float>* trk_eta;
   vector<float>* trk_phi;
   vector<float>* trk_chi2;
+  vector<float>* trk_bend_chi2;//new input
   vector<int>*   trk_nstub;
   //vector<int>*   trk_seed;
   vector<int>*   trk_fake;
@@ -154,6 +155,7 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   TBranch* b_trk_eta; 
   TBranch* b_trk_phi; 
   TBranch* b_trk_chi2;
+  TBranch* b_trk_bend_chi2;
   TBranch* b_trk_chi2_fake;
   TBranch* b_trk_nstub; 
   //TBranch* b_trk_seed; 
@@ -184,7 +186,8 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   trk_pt = 0; 
   trk_eta = 0; 
   trk_phi = 0; 
-  trk_chi2 = 0; 
+  trk_chi2 = 0;
+  trk_bend_chi2 = 0;
   trk_nstub = 0; 
   //trk_seed = 0; 
   trk_fake = 0; 
@@ -216,6 +219,7 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   tree->SetBranchAddress("trk_eta",  &trk_eta,  &b_trk_eta);
   tree->SetBranchAddress("trk_phi",  &trk_phi,  &b_trk_phi);
   tree->SetBranchAddress("trk_chi2", &trk_chi2, &b_trk_chi2);
+  tree->SetBranchAddress("trk_bend_chi2", &trk_bend_chi2, &b_trk_bend_chi2);
   tree->SetBranchAddress("trk_nstub",   &trk_nstub,   &b_trk_nstub);
   //tree->SetBranchAddress("trk_seed",    &trk_seed,    &b_trk_seed);
   tree->SetBranchAddress("trk_fake",    &trk_fake,    &b_trk_fake);
@@ -229,11 +233,13 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   float pt_fake;
   float eta_fake;
   float chi2_fake;
+  float bend_chi2_fake;
   int   nstub_fake;
 
   float pt_real;
   float eta_real;
   float chi2_real;
+  float bend_chi2_real;
   int   nstub_real;
 
   // Tree branch
@@ -242,11 +248,13 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   t_fake->Branch("eta", &eta_fake, "Pseudorapidity/F");
   t_fake->Branch("nstub", &nstub_fake, "Number of Stubs/I");
   t_fake->Branch("chi2", &chi2_fake, "Chi squared/F");
+  t_fake->Branch("bend_chi2", &bend_chi2_fake, "bend Chi squared/F");
     
   t_real->Branch("pt", &pt_real, "Transverse Momentum/F");
   t_real->Branch("eta", &eta_real, "Pseudorapidity/F");
   t_real->Branch("nstub", &nstub_real, "Number of Stubs/I");
   t_real->Branch("chi2", &chi2_real, "Chi squared/F");
+  t_real->Branch("bend_chi2", &bend_chi2_real, "bend Chi squared/F");
   
 
   // ----------------------------------------------------------------------------------------------------------------
@@ -269,9 +277,11 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   // efficiencies
 
   TH1F* h_tp_pt    = new TH1F("tp_pt",   ";Tracking particle p_{T} [GeV]; Tracking particles / 1.0 GeV", 100,  0,   100.0);
+  TH1F* h_tp_pt_    = new TH1F("tp_pt",   ";Tracking particle p_{T} [GeV]; Tracking particles / 1.0 GeV", 100,  0,   100.0);
   TH1F* h_tp_pt_L  = new TH1F("tp_pt_L", ";Tracking particle p_{T} [GeV]; Tracking particles / 0.1 GeV",  80,  0,     8.0);
   TH1F* h_tp_pt_H  = new TH1F("tp_pt_H", ";Tracking particle p_{T} [GeV]; Tracking particles / 1.0 GeV",  92,  8.0, 100.0);
   TH1F* h_tp_eta   = new TH1F("tp_eta",  ";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
+  TH1F* h_tp_eta_  = new TH1F("tp_eta",  ";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
   TH1F* h_tp_eta_L = new TH1F("tp_eta_L",";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
   TH1F* h_tp_eta_H = new TH1F("tp_eta_H",";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
 
@@ -281,10 +291,20 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   TH1F* h_match_tp_eta   = new TH1F("match_tp_eta",  ";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
   TH1F* h_match_tp_eta_L = new TH1F("match_tp_eta_L",";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
   TH1F* h_match_tp_eta_H = new TH1F("match_tp_eta_H",";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
+    
+  TH1F* h_match_tp_pt_1    = new TH1F("match_tp_pt",   ";Tracking particle p_{T} [GeV]; Tracking particles / 1.0 GeV", 100,  0,   100.0);
+  TH1F* h_match_tp_pt_2    = new TH1F("match_tp_pt",   ";Tracking particle p_{T} [GeV]; Tracking particles / 1.0 GeV", 100,  0,   100.0);
+  TH1F* h_match_tp_pt_3    = new TH1F("match_tp_pt",   ";Tracking particle p_{T} [GeV]; Tracking particles / 1.0 GeV", 100,  0,   100.0);
+    
+  TH1F* h_match_tp_eta_1  = new TH1F("match_tp_eta",  ";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
+  TH1F* h_match_tp_eta_2  = new TH1F("match_tp_eta",  ";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
+  TH1F* h_match_tp_eta_3  = new TH1F("match_tp_eta",  ";Tracking particle #eta; Tracking particles / 0.1",             50, -2.5,   2.5);
 
+    
 
   // ----------------------------------------------------------------------------------------------------------------
   // resolution vs eta histograms
+
 
   const int nETARANGE = 24;
   TString etarange[nETARANGE] = {"0.1","0.2","0.3","0.4","0.5","0.6","0.7","0.8","0.9","1.0",
@@ -339,6 +359,7 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   TH1F* h_trk_eta_pri    = new TH1F("trk_eta_pri",   ";Primary interaction #eta; ",50,-2.5,2.5);
   TH1F* h_trk_eta_sec    = new TH1F("trk_eta_sec",            ";Pileup #eta; ",   50,-2.5,2.5);
   TH1F* h_trk_chi2       = new TH1F("trk_chi2",            ";All tracks #chi^{2}; ",   50,0,150);
+  TH1F* h_trk_bend_chi2  = new TH1F("trk_bend_chi2",            ";All tracks #bend_chi^{2}; ",   50,0,150);
   TH1F* h_matchtrk_chi2  = new TH1F("matchtrk_chi2",            ";Matched tracks #chi^{2}; ",   50,0,150);
   TH1F* h_trk_nstub      = new TH1F("trk_nstub",            ";number of stubs (all tracks); ",   50,0,10);
   TH1F* h_tp_nstub       = new TH1F("tp_nstub",            ";number of stubs (tracking particles); ",   50,0,15);
@@ -396,6 +417,7 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
 	ntrkevt_pt2++;
 	h_trk_all_vspt->Fill(trk_pt->at(it));
     h_trk_chi2->Fill(trk_chi2->at(it));
+    h_trk_bend_chi2->Fill(trk_bend_chi2->at(it));
     h_trk_nstub->Fill(trk_nstub->at(it));
 	if (trk_genuine->at(it) == 1) {
 	  h_trk_genuine_vspt->Fill(trk_pt->at(it));
@@ -416,12 +438,14 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
           
           if (trk_fake->at(it)==0) {eta_fake=(trk_eta->at(it));
               chi2_fake=trk_chi2->at(it);
+              bend_chi2_fake=trk_bend_chi2->at(it);
               nstub_fake=trk_nstub->at(it);
               pt_fake=trk_pt->at(it);
               t_fake->Fill();
           }
           if (trk_fake->at(it)>0) {eta_real=(trk_eta->at(it));
               chi2_real=trk_chi2->at(it);
+              bend_chi2_real=trk_bend_chi2->at(it);
               nstub_real=trk_nstub->at(it);
               pt_real=trk_pt->at(it);
               t_real->Fill();
@@ -435,6 +459,27 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
           if (trk_fake->at(it)==0) h_trk_eta_L_fake->Fill(trk_eta->at(it));
           else if (trk_fake->at(it)==1) h_trk_eta_L_pri->Fill(trk_eta->at(it));
           else h_trk_eta_L_sec->Fill(trk_eta->at(it));}
+          
+          if (trk_fake->at(it)>0) {
+              h_tp_pt_->Fill(trk_pt->at(it));
+              h_tp_eta_->Fill(trk_eta->at(it));
+              if (trk_bend_chi2->at(it)<20){
+                  h_match_tp_pt_1->Fill(trk_pt->at(it));
+                  h_match_tp_eta_1->Fill(trk_eta->at(it));
+              }
+          }
+          if (trk_fake->at(it)>0) {
+              if (trk_bend_chi2->at(it)<40){
+                  h_match_tp_pt_2->Fill(trk_pt->at(it));
+                  h_match_tp_eta_2->Fill(trk_eta->at(it));
+              }
+          }
+          if (trk_fake->at(it)>0) {
+              if (trk_bend_chi2->at(it)<60){
+                  h_match_tp_pt_3->Fill(trk_pt->at(it));
+                  h_match_tp_eta_3->Fill(trk_eta->at(it));
+              }
+          }
       
       }
       if (trk_pt->at(it) > 3.0) {
@@ -657,26 +702,49 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
 
   // rebin pt/phi plots
   h_tp_pt->Rebin(4);
+  h_tp_pt_->Rebin(4);
   h_match_tp_pt->Rebin(4);
   h_tp_pt_L->Rebin(2);
   h_match_tp_pt_L->Rebin(2);
   h_tp_pt_H->Rebin(2);
-  h_match_tp_pt_H->Rebin(2);
+  h_match_tp_pt_1->Rebin(4);
+  h_match_tp_pt_2->Rebin(4);
+  h_match_tp_pt_3->Rebin(4);
+  h_match_tp_eta_1->Rebin(2);
+  h_match_tp_eta_2->Rebin(2);
+  h_match_tp_eta_3->Rebin(2);
 
   h_tp_eta->Rebin(2);
+  h_tp_eta_->Rebin(2);
   h_match_tp_eta->Rebin(2);
   h_tp_eta_L->Rebin(2);
   h_match_tp_eta_L->Rebin(2);
   h_tp_eta_H->Rebin(2);
   h_match_tp_eta_H->Rebin(2);
 
-  // calculate the effeciency
+   //calculate the effeciency
   h_match_tp_pt->Sumw2();
+  h_match_tp_pt_1->Sumw2();
+  h_match_tp_pt_2->Sumw2();
+  h_match_tp_pt_3->Sumw2();
   h_tp_pt->Sumw2();
+  h_tp_pt_->Sumw2();
   TH1F* h_eff_pt = (TH1F*) h_match_tp_pt->Clone();
+  TH1F* h_eff_pt_1 = (TH1F*) h_match_tp_pt_1->Clone();
+  TH1F* h_eff_pt_2 = (TH1F*) h_match_tp_pt_2->Clone();
+  TH1F* h_eff_pt_3 = (TH1F*) h_match_tp_pt_3->Clone();
   h_eff_pt->SetName("eff_pt");
+  h_eff_pt_1->SetName("eff_pt_1");
+  h_eff_pt_1->SetName("eff_pt_2");
+  h_eff_pt_1->SetName("eff_pt_3");
   h_eff_pt->GetYaxis()->SetTitle("Efficiency");
+  h_eff_pt_1->GetYaxis()->SetTitle("Efficiency");
+  h_eff_pt_2->GetYaxis()->SetTitle("Efficiency");
+  h_eff_pt_3->GetYaxis()->SetTitle("Efficiency");
   h_eff_pt->Divide(h_match_tp_pt, h_tp_pt, 1.0, 1.0, "B");
+  h_eff_pt_1->Divide(h_match_tp_pt_1, h_tp_pt_, 1.0, 1.0, "B");
+  h_eff_pt_2->Divide(h_match_tp_pt_2, h_tp_pt_, 1.0, 1.0, "B");
+  h_eff_pt_3->Divide(h_match_tp_pt_3, h_tp_pt_, 1.0, 1.0, "B");
 
   h_match_tp_pt_L->Sumw2();
   h_tp_pt_L->Sumw2();
@@ -693,11 +761,27 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   h_eff_pt_H->Divide(h_match_tp_pt_H, h_tp_pt_H, 1.0, 1.0, "B");
 
   h_match_tp_eta->Sumw2();
+  h_match_tp_eta_1->Sumw2();
+  h_match_tp_eta_2->Sumw2();
+  h_match_tp_eta_3->Sumw2();
   h_tp_eta->Sumw2();
+  h_tp_eta_->Sumw2();
   TH1F* h_eff_eta = (TH1F*) h_match_tp_eta->Clone();
+  TH1F* h_eff_eta_1 = (TH1F*) h_match_tp_eta_1->Clone();
+  TH1F* h_eff_eta_2 = (TH1F*) h_match_tp_eta_2->Clone();
+  TH1F* h_eff_eta_3 = (TH1F*) h_match_tp_eta_3->Clone();
   h_eff_eta->SetName("eff_eta");
+  h_eff_eta_1->SetName("eff_eta_1");
+  h_eff_eta_1->SetName("eff_eta_2");
+  h_eff_eta_1->SetName("eff_eta_3");
   h_eff_eta->GetYaxis()->SetTitle("Efficiency");
+  h_eff_eta_1->GetYaxis()->SetTitle("Efficiency");
+  h_eff_eta_2->GetYaxis()->SetTitle("Efficiency");
+  h_eff_eta_3->GetYaxis()->SetTitle("Efficiency");
   h_eff_eta->Divide(h_match_tp_eta, h_tp_eta, 1.0, 1.0, "B");
+  h_eff_eta_1->Divide(h_match_tp_eta_1, h_tp_eta_, 1.0, 1.0, "B");
+  h_eff_eta_2->Divide(h_match_tp_eta_2, h_tp_eta_, 1.0, 1.0, "B");
+  h_eff_eta_3->Divide(h_match_tp_eta_3, h_tp_eta_, 1.0, 1.0, "B");
   
   h_match_tp_eta_L->Sumw2();
   h_tp_eta_L->Sumw2();
@@ -714,11 +798,17 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
   h_eff_eta_H->Divide(h_match_tp_eta_H, h_tp_eta_H, 1.0, 1.0, "B");
 
 
-  // set the axis range
+  //set the axis range
   h_eff_pt  ->SetAxisRange(0,1.1,"Y");
+  h_eff_pt_1  ->SetAxisRange(0,1.1,"Y");
+  h_eff_pt_2  ->SetAxisRange(0,1.1,"Y");
+  h_eff_pt_3  ->SetAxisRange(0,1.1,"Y");
   h_eff_pt_L->SetAxisRange(0,1.1,"Y");
   h_eff_pt_H->SetAxisRange(0,1.1,"Y");
   h_eff_eta ->SetAxisRange(0,1.1,"Y");
+  h_eff_eta_1 ->SetAxisRange(0,1.1,"Y");
+  h_eff_eta_2 ->SetAxisRange(0,1.1,"Y");
+  h_eff_eta_3 ->SetAxisRange(0,1.1,"Y");
   h_eff_eta_L ->SetAxisRange(0,1.1,"Y");
   h_eff_eta_H ->SetAxisRange(0,1.1,"Y");
 
@@ -878,6 +968,42 @@ void L1TrackNtuplePlot_mini(TString type, int TP_select_pdgid=0, int TP_select_e
 //  TCanvas *c2 = new TCanvas("c2","nstub",900,700);
 //  TCanvas *c3 = new TCanvas("c3","#eta_H",900,700);
 //  TCanvas *c4 = new TCanvas("c4","#eta_L",900,700);
+    
+  h_eff_pt_1->Draw();
+  h_eff_pt_1->Write();
+  sprintf(ctxt,"bendchi2 < 20");
+  mySmallText(0.45,0.5,1,ctxt);
+  c.SaveAs(DIR+type+"_eff_pt_1.png");
+
+  h_eff_pt_2->Draw();
+  h_eff_pt_2->Write();
+  sprintf(ctxt,"bendchi2 < 40");
+  mySmallText(0.45,0.5,1,ctxt);
+  c.SaveAs(DIR+type+"_eff_pt_2.png");
+
+  h_eff_pt_3->Draw();
+  h_eff_pt_3->Write();
+  sprintf(ctxt,"bendchi2 < 60");
+  mySmallText(0.45,0.5,1,ctxt);
+  c.SaveAs(DIR+type+"_eff_pt_3.png");
+
+  h_eff_eta_1->Draw();
+  h_eff_eta_1->Write();
+  sprintf(ctxt,"bendchi2 < 20");
+  mySmallText(0.45,0.5,1,ctxt);
+  c.SaveAs(DIR+type+"_eff_eta_1.png");
+
+  h_eff_eta_2->Draw();
+  h_eff_eta_2->Write();
+  sprintf(ctxt,"bendchi2 < 40");
+  mySmallText(0.45,0.5,1,ctxt);
+  c.SaveAs(DIR+type+"_eff_eta_2.png");
+
+  h_eff_eta_3->Draw();
+  h_eff_eta_3->Write();
+  sprintf(ctxt,"bendchi2 < 60");
+  mySmallText(0.45,0.5,1,ctxt);
+  c.SaveAs(DIR+type+"_eff_eta_3.png");
 
 
   gPad->SetGridx(0);

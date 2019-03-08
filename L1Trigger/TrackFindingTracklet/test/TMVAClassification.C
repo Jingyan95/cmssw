@@ -4,7 +4,7 @@ void TMVAClassification( TString myMethodList = "" )
    TMVA::Tools::Instance();
 
    // This loads the input file for machine learning
-   TFile * input = TFile::Open("output_TTbar_PU200_WithTruncation_12dec2018.root", "read");
+   TFile * input = TFile::Open("output_1000events03_10.root", "read");
    
    // Register the training and test trees
    // signal     -> electron
@@ -13,7 +13,7 @@ void TMVAClassification( TString myMethodList = "" )
    TTree *signal     = (TTree*)input->Get("t_real");
 
    // Create a output file where TMVA results will be stored 
-   TString outputFileName = "tmva_output1.root";
+   TString outputFileName = "1000events.root";
    TFile* output = TFile::Open( outputFileName, "recreate" );
 
    // Create the factory object where methods for machine learning are contained
@@ -22,13 +22,14 @@ void TMVAClassification( TString myMethodList = "" )
 					       "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
 
    // Create the dataloader where train/test objects is handled
-   TMVA::DataLoader *dataloader=new TMVA::DataLoader("MLP");
+   TMVA::DataLoader *dataloader=new TMVA::DataLoader("1000events");
 
    // Add varaible for machine learning in Float ('F') type
    dataloader->AddVariable( "pt := pt", 'F' );
    dataloader->AddVariable( "eta := eta", 'F' );
    dataloader->AddVariable( "nstub := nstub", 'I' );
    dataloader->AddVariable( "chi2 := chi2", 'F' );
+   dataloader->AddVariable( "bend_chi2 := bend_chi2", 'F' );
 
    // Set event weights: Just make it 1 
    Float_t signalWeight     = 1.0;
@@ -48,13 +49,13 @@ void TMVAClassification( TString myMethodList = "" )
 //   factory->BookMethod( dataloader, TMVA::Types::kMLP, "MLP12", "H:!V:NeuronType=tanh:VarTransform=N:NCycles=600:HiddenLayers=N+7:TestRate=5:!UseRegulator" );
 ////   factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT5",
 ////            "!H:!V:NTrees=5:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
-////   factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT850",
-////                        "!H:!V:NTrees=850:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
+   factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT850",
+                        "!H:!V:NTrees=850:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
 //   factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDT2500",
 //                        "!H:!V:NTrees=2500:MinNodeSize=2.5%:MaxDepth=3:BoostType=AdaBoost:AdaBoostBeta=0.5:UseBaggedBoost:BaggedSampleFraction=0.5:SeparationType=GiniIndex:nCuts=20" );
-    factory->BookMethod( dataloader, TMVA::Types::kSVM, "SVM0.01", "Gamma=0.01:C=1:Tol=0.01:MaxIter=1000" );
-    factory->BookMethod( dataloader, TMVA::Types::kSVM, "SVM0.03", "Gamma=0.03:C=1:Tol=0.01:MaxIter=1000" );//the best
-   factory->BookMethod( dataloader, TMVA::Types::kSVM, "SVM1", "Gamma=1:C=1:Tol=0.01:MaxIter=1000" );
+//    factory->BookMethod( dataloader, TMVA::Types::kSVM, "SVM0.01", "Gamma=0.01:C=1:Tol=0.01:MaxIter=1000" );
+//    factory->BookMethod( dataloader, TMVA::Types::kSVM, "SVM0.03", "Gamma=0.03:C=1:Tol=0.01:MaxIter=1000" );//the best
+//   factory->BookMethod( dataloader, TMVA::Types::kSVM, "SVM1", "Gamma=1:C=1:Tol=0.01:MaxIter=1000" );
 ////    // deep network
 ////   factory->BookMethod(dataloader, TMVA::Types::kDNN, "DNN1", "Layout=TANH|3,LINEAR");
 ////   factory->BookMethod(dataloader, TMVA::Types::kDNN, "DNN1", "Layout=TANH|10,LINEAR");
