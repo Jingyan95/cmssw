@@ -986,7 +986,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             if (L1Tk_nPar==5) m_trk_d0->push_back(tmp_trk_d0);
             else m_trk_d0->push_back(999.);
             m_trk_chi2 ->push_back(tmp_trk_chi2);
-            //tmp_trk_bend_chi2=tmp_trk_bend_chi2/tmp_trk_nstub;
+            tmp_trk_bend_chi2=tmp_trk_bend_chi2;
             m_trk_bend_chi2 ->push_back(tmp_trk_bend_chi2);
             m_trk_nstub->push_back(tmp_trk_nstub);
             if (SaveTracklet) m_trk_seed->push_back(tmp_trk_seed);
