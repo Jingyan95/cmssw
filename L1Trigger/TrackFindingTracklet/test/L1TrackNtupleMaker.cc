@@ -440,7 +440,7 @@ void L1TrackNtupleMaker::beginJob()
         eventTree->Branch("trk_d0",    &m_trk_d0);
         eventTree->Branch("trk_z0",    &m_trk_z0);
         eventTree->Branch("trk_chi2",  &m_trk_chi2);
-        eventTree->Branch("trk_chi2dof",  &m_trk_chi2dof);
+        //eventTree->Branch("trk_chi2dof",  &m_trk_chi2dof);
         eventTree->Branch("trk_bend_chi2",  &m_trk_bend_chi2);
         eventTree->Branch("matchtrk_bend_chi2",  &m_matchtrk_bend_chi2);
         eventTree->Branch("trk_nstub", &m_trk_nstub);
@@ -1475,7 +1475,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         m_matchtrk_z0 ->push_back(tmp_matchtrk_z0);
         m_matchtrk_d0 ->push_back(tmp_matchtrk_d0);
         m_matchtrk_chi2 ->push_back(tmp_matchtrk_chi2);
-        m_trk_chi2dof ->push_back(tmp_trk_chi2dof);
+        //m_trk_chi2dof ->push_back(tmp_trk_chi2dof);
         m_matchtrk_bend_chi2 ->push_back(tmp_matchtrk_bend_chi2);
         m_matchtrk_nstub->push_back(tmp_matchtrk_nstub);
         if (SaveTracklet) m_matchtrk_seed->push_back(tmp_matchtrk_seed);
