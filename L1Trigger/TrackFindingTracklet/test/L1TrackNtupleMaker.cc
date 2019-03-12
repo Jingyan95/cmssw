@@ -923,7 +923,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             // ----------------------------------------------------------------------------------------------
             // loop over stubs on tracks
             
-             float tmp_trk_bend_chi2 = iterL1Track->getStubPtConsistency(L1Tk_nPar);
+             float tmp_trk_bend_chi2 = iterL1Track->getConsistency(L1Tk_nPar);
 //             if (SaveStubs) {
 //             // loop over stubs
 //             for (int is=0; is<tmp_trk_nstub; is++) {
