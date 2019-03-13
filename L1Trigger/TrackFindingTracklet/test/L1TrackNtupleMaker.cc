@@ -915,55 +915,76 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             
             // ----------------------------------------------------------------------------------------------
             // loop over stubs on tracks
-            /*
-             float tmp_trk_bend_chi2 = 0;
-             if (SaveStubs) {
-             // loop over stubs
-             for (int is=0; is<tmp_trk_nstub; is++) {
-             
-             //detID of stub
-             DetId detIdStub = theTrackerGeom->idToDet( (stubRefs.at(is)->getClusterRef(0))->getDetId() )->geographicalId();
-             MeasurementPoint coords = stubRefs.at(is)->getClusterRef(0)->findAverageLocalCoordinatesCentered();
-             const GeomDet* theGeomDet = theTrackerGeom->idToDet(detIdStub);
-             Global3DPoint posStub = theGeomDet->surface().toGlobal( theGeomDet->topology().localPosition(coords) );
-             
-             double x=posStub.x();
-             double y=posStub.y();
-             double z=posStub.z();
-             
-             int isBarrel=-1;
-             int layer=-999999;
-             if ( detIdStub.subdetId()==StripSubdetector::TOB ) {
-             isBarrel=1;
-             layer  = static_cast<int>(tTopo->layer(detIdStub));
-             if (DebugMode) cout << "   stub in layer " << layer << " at position x y z = " << x << " " << y << " " << z << endl;
-             }
-             else if ( detIdStub.subdetId()==StripSubdetector::TID ) {
-             isBarrel=0;
-             layer  = static_cast<int>(tTopo->layer(detIdStub));
-             if (DebugMode) cout << "   stub in disk " << layer << " at position x y z = " << x << " " << y << " " << z << endl;
-             }
-             DetId stackDetid = tTopo->stack(detIdStub);
-             bool isPS = (theTrackerGeom->getDetectorType(stackDetid)==TrackerGeometry::ModuleType::Ph2PSP);
-             float pitch = 0.089;
-             float sigma_bend = 0.45;
-             
-             if (isPS) pitch = 0.099;
-             double tmp_stub_r = posStub.perp();
-             float signedPt = 0.3*3.811202/100.0/(iterL1Track->getRInv());
-             float trackBend = -(1.8*0.57*tmp_stub_r/100)/(pitch*signedPt);
-             
-             float stubBend = stubRefs.at(is)->getTriggerBend();
-             if ( !isBarrel && z<0 ) stubBend=-stubBend;
-             float tmp_bend_diff = stubBend - trackBend;
-             float bend_chi2 = (tmp_bend_diff)*(tmp_bend_diff)/(sigma_bend*sigma_bend);
-             tmp_trk_bend_chi2 += bend_chi2;
-             
-             }//end loop over stubs
-             }
-             */
+            float tmp_trk_bend_chi2=0;
+            float speedOfLightConverted = CLHEP::c_light/1.0E5;
+            edm::ESHandle< MagneticField > magneticFieldHandle;
+            iSetup.get< IdealMagneticFieldRecord >().get(magneticFieldHandle);
+            const MagneticField* theMagneticField = magneticFieldHandle.product();
+            double mMagneticFieldStrength = theMagneticField->inTesla(GlobalPoint(0,0,0)).z();
+            if (SaveStubs) {
+                // loop over stubs
+                for (int is=0; is<tmp_trk_nstub; is++) {
+                    
+                    //detID of stub
+                    DetId detIdStub = theTrackerGeom->idToDet( (stubRefs.at(is)->getClusterRef(0))->getDetId() )->geographicalId();
+                    MeasurementPoint coords = stubRefs.at(is)->getClusterRef(0)->findAverageLocalCoordinatesCentered();
+                    const GeomDet* theGeomDet = theTrackerGeom->idToDet(detIdStub);
+                    Global3DPoint posStub = theGeomDet->surface().toGlobal( theGeomDet->topology().localPosition(coords) );
+                    
+                    double x=posStub.x();
+                    double y=posStub.y();
+                    double z=posStub.z();
+                    double tmp_stub_r = posStub.perp();//
+                    
+                    int isBarrel=-1;
+                    int layer=-999999;
+                    if ( detIdStub.subdetId()==StripSubdetector::TOB ) {
+                        isBarrel=1;
+                        layer  = static_cast<int>(tTopo->layer(detIdStub));
+                        if (DebugMode) cout << "   stub in layer " << layer << " at position x y z = " << x << " " << y << " " << z << endl;
+                    }
+                    else if ( detIdStub.subdetId()==StripSubdetector::TID ) {
+                        isBarrel=0;
+                        layer  = static_cast<int>(tTopo->layer(detIdStub));
+                        if (DebugMode) cout << "   stub in disk " << layer << " at position x y z = " << x << " " << y << " " << z << endl;
+                    }
+                    const GeomDetUnit* det0 = theTrackerGeom->idToDetUnit( detIdStub );
+                    const GeomDetUnit* det1 = theTrackerGeom->idToDetUnit( tTopo->partnerDetId( detIdStub ) );
+                    const PixelGeomDetUnit* unit = reinterpret_cast<const PixelGeomDetUnit*>( det0 );
+                    const PixelTopology& topo = unit->specificTopology();
+                    
+                    
+                    float stripPitch = topo.pitch().first;
+                    
+                    float modMinR = std::min(det0->position().perp(),det1->position().perp());
+                    float modMaxR = std::max(det0->position().perp(),det1->position().perp());
+                    float modMinZ = std::min(det0->position().z(),det1->position().z());
+                    float modMaxZ = std::max(det0->position().z(),det1->position().z());
+                    float sensorSpacing = sqrt((modMaxR-modMinR)*(modMaxR-modMinR) + (modMaxZ-modMinZ)*(modMaxZ-modMinZ));
+                    
+                    bool tiltedBarrel = (isBarrel && tTopo->tobSide(detIdStub)!=3);//
+                    float gradient = 0.886454;//
+                    float intercept = 0.504148;//
+                    float correction;
+                    if (tiltedBarrel) correction = gradient*fabs(z)/tmp_stub_r + intercept;
+                    else if (isBarrel) correction = 1;
+                    else correction = fabs(z)/tmp_stub_r;
+                    
+                    float sigma_bend = 0.483;//
+                    
+                    //if (isPS) pitch = 0.099;
+                    float signedPt = speedOfLightConverted*mMagneticFieldStrength/(iterL1Track->getRInv());//
+                    float trackBend = -(sensorSpacing*tmp_stub_r*mMagneticFieldStrength*(speedOfLightConverted/2))/(stripPitch*signedPt*correction);//
+                    
+                    float stubBend = stubRefs.at(is)->getTriggerBend();//
+                    if ( !isBarrel && z<0 ) stubBend=-stubBend;//
+                    float tmp_bend_diff = stubBend - trackBend;//
+                    float bend_chi2 = (tmp_bend_diff)*(tmp_bend_diff)/(sigma_bend*sigma_bend);//
+                    tmp_trk_bend_chi2 += bend_chi2;
+                    
+                }//end loop over stubs
+            }
             // ----------------------------------------------------------------------------------------------
-            float tmp_trk_bend_chi2 = iterL1Track->getStubPtConsistency(L1Tk_nPar);
             
             int tmp_trk_genuine = 0;
             int tmp_trk_loose = 0;
