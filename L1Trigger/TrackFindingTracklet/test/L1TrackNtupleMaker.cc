@@ -1096,7 +1096,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         }//end track loop
         
     }//end if SaveAllTracks
-    std::TTTrack< Ref_Phase2TrackerDigi_ > iterL1Track1;
+    TTTrack< Ref_Phase2TrackerDigi_ > iterL1Track1;
     edm::ESHandle< MagneticField > magneticFieldHandle;
     iSetup.get< IdealMagneticFieldRecord >().get(magneticFieldHandle);
     const MagneticField* theMagneticField = magneticFieldHandle.product();
