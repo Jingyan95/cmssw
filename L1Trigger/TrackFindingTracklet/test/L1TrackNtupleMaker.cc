@@ -980,7 +980,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
                     if ( !isBarrel && z<0 ) stubBend=-stubBend;//
                     float tmp_bend_diff = stubBend - trackBend;//
                     float bend_chi2 = (tmp_bend_diff)*(tmp_bend_diff)/(sigma_bend*sigma_bend);//
-                    tmp_trk_bend_chi2 += bend_chi2;
+                    tmp_trk_bend_chi2 += bend_chi2/tmp_trk_nstub;
                     
                 }//end loop over stubs
             }
