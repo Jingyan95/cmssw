@@ -1371,6 +1371,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         float tmp_matchtrk_z0   = -999;
         float tmp_matchtrk_d0   = -999;
         float tmp_matchtrk_chi2 = -999;
+        float tmp_matchtrk_bend_chi2 = -999;
         int tmp_matchtrk_nstub  = -999;
         int tmp_matchtrk_seed   = -999;
         
@@ -1407,7 +1408,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             
             
            
-             float tmp_matchtrk_bend_chi2 = 0;
+             tmp_matchtrk_bend_chi2 = 0;
              float speedOfLightConverted = CLHEP::c_light/1.0E5;
              edm::ESHandle< MagneticField > magneticFieldHandle;
              iSetup.get< IdealMagneticFieldRecord >().get(magneticFieldHandle);
