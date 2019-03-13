@@ -910,17 +910,17 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             if (SaveTracklet) tmp_trk_seed = (int) iterL1Track->getWedge();
             
             
-             int tmp_trk_nPSstub = 0;
-             if (SaveTracklet) {
-             for (int is=0; is<tmp_trk_nstub; is++) {
-             
-             DetId detIdStub = theTrackerGeom->idToDet( (stubRefs.at(is)->getClusterRef(0))->getDetId() )->geographicalId();
-             DetId stackDetid = tTopo->stack(detIdStub);
-             
-             bool isPS = (theTrackerGeom->getDetectorType(stackDetid)==TrackerGeometry::ModuleType::Ph2PSP);
-             if (isPS) tmp_trk_nPSstub++;
-             }
-             }
+//             int tmp_trk_nPSstub = 0;
+//             if (SaveTracklet) {
+//             for (int is=0; is<tmp_trk_nstub; is++) {
+//
+//             DetId detIdStub = theTrackerGeom->idToDet( (stubRefs.at(is)->getClusterRef(0))->getDetId() )->geographicalId();
+//             DetId stackDetid = tTopo->stack(detIdStub);
+//
+//             bool isPS = (theTrackerGeom->getDetectorType(stackDetid)==TrackerGeometry::ModuleType::Ph2PSP);
+//             if (isPS) tmp_trk_nPSstub++;
+//             }
+//             }
             
             // ----------------------------------------------------------------------------------------------
             // loop over stubs on tracks
@@ -1004,10 +1004,10 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
              ----------------------------------------------------------------------------------------------
             
             
-            int tmp_trk_genuine = 0;
-            int tmp_trk_loose = 0;
-            int tmp_trk_unknown = 0;
-            int tmp_trk_combinatoric = 0;
+            std::int tmp_trk_genuine = 0;
+            std::int tmp_trk_loose = 0;
+            std::int tmp_trk_unknown = 0;
+            std::int tmp_trk_combinatoric = 0;
             if (MCTruthTTTrackHandle->isLooselyGenuine(l1track_ptr)) tmp_trk_loose = 1;
             if (MCTruthTTTrackHandle->isGenuine(l1track_ptr)) tmp_trk_genuine = 1;
             if (MCTruthTTTrackHandle->isUnknown(l1track_ptr)) tmp_trk_unknown = 1;
