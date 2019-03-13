@@ -924,14 +924,14 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             // ----------------------------------------------------------------------------------------------
             // loop over stubs on tracks
             
-             edm::ESHandle< MagneticField > magneticFieldHandle;
-             iSetup.get< IdealMagneticFieldRecord >().get(magneticFieldHandle);
-             const MagneticField* theMagneticField = magneticFieldHandle.product();
-             double mMagneticFieldStrength = theMagneticField->inTesla(GlobalPoint(0,0,0)).z();
+             //edm::ESHandle< MagneticField > magneticFieldHandle;
+             //iSetup.get< IdealMagneticFieldRecord >().get(magneticFieldHandle);
+             //const MagneticField* theMagneticField = magneticFieldHandle.product();
+             //double mMagneticFieldStrength = theMagneticField->inTesla(GlobalPoint(0,0,0)).z();
 
             
              //float tmp_trk_bend_chi2 = iterL1Track->getStubPtConsistency(L1Tk_nPar);
-             float tmp_trk_bend_chi2 = StubPtConsistency::getConsistency(iterL1Track, theTrackerGeom, tTopo, L1Tk_nPar, mMagneticFieldStrength);
+             //float tmp_trk_bend_chi2 = StubPtConsistency::getConsistency(iterL1Track, theTrackerGeom, tTopo, L1Tk_nPar, mMagneticFieldStrength);
 //             if (SaveStubs) {
 //             // loop over stubs
 //             for (int is=0; is<tmp_trk_nstub; is++) {
@@ -1003,7 +1003,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             if (L1Tk_nPar==5) m_trk_d0->push_back(tmp_trk_d0);
             else m_trk_d0->push_back(999.);
             m_trk_chi2 ->push_back(tmp_trk_chi2);
-            m_trk_bend_chi2 ->push_back(tmp_trk_bend_chi2);
+            //m_trk_bend_chi2 ->push_back(tmp_trk_bend_chi2);
             m_trk_nstub->push_back(tmp_trk_nstub);
             if (SaveTracklet) m_trk_seed->push_back(tmp_trk_seed);
             m_trk_genuine->push_back(tmp_trk_genuine);
@@ -1096,6 +1096,14 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         }//end track loop
         
     }//end if SaveAllTracks
+    std::TTTrack< Ref_Phase2TrackerDigi_ > iterL1Track1;
+    edm::ESHandle< MagneticField > magneticFieldHandle;
+    iSetup.get< IdealMagneticFieldRecord >().get(magneticFieldHandle);
+    const MagneticField* theMagneticField = magneticFieldHandle.product();
+    double mMagneticFieldStrength = theMagneticField->inTesla(GlobalPoint(0,0,0)).z();
+    for ( iterL1Track1 = TTTrackHandle->begin(); iterL1Track1 != TTTrackHandle->end(); iterL1Track1++ ) {
+        float tmp_trk_bend_chi2 = StubPtConsistency::getConsistency(iterL1Track1, theTrackerGeom, tTopo, L1Tk_nPar, mMagneticFieldStrength);
+        }
     
     
     
