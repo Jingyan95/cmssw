@@ -883,7 +883,6 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         
         int this_l1track = 0;
         std::vector< TTTrack< Ref_Phase2TrackerDigi_ > >::const_iterator iterL1Track;
-        StubPtConsistency::vector< TTTrack< Ref_Phase2TrackerDigi_ > >::const_iterator iterL1Track1;//new input
         for ( iterL1Track = TTTrackHandle->begin(); iterL1Track != TTTrackHandle->end(); iterL1Track++ ) {
             
             edm::Ptr< TTTrack< Ref_Phase2TrackerDigi_ > > l1track_ptr(TTTrackHandle, this_l1track);
@@ -925,7 +924,12 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             // ----------------------------------------------------------------------------------------------
             // loop over stubs on tracks
             
+             const MagneticField* theMagneticField = magneticFieldHandle.product();
+             double mMagneticFieldStrength = theMagneticField->inTesla(GlobalPoint(0,0,0)).z();
+
+            
              float tmp_trk_bend_chi2 = iterL1Track->getStubPtConsistency(L1Tk_nPar);
+             float tmp_trk_bend_chi2 = StubPtConsistency::getConsistency(iterL1Track, theTrackerGeom, tTopo, L1Tk_nPar, mMagneticFieldStrength);
 //             if (SaveStubs) {
 //             // loop over stubs
 //             for (int is=0; is<tmp_trk_nstub; is++) {
