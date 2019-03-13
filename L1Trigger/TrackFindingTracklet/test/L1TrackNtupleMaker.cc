@@ -924,11 +924,13 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             // ----------------------------------------------------------------------------------------------
             // loop over stubs on tracks
             
+             edm::ESHandle< MagneticField > magneticFieldHandle;
+             iSetup.get< IdealMagneticFieldRecord >().get(magneticFieldHandle);
              const MagneticField* theMagneticField = magneticFieldHandle.product();
              double mMagneticFieldStrength = theMagneticField->inTesla(GlobalPoint(0,0,0)).z();
 
             
-             float tmp_trk_bend_chi2 = iterL1Track->getStubPtConsistency(L1Tk_nPar);
+             //float tmp_trk_bend_chi2 = iterL1Track->getStubPtConsistency(L1Tk_nPar);
              float tmp_trk_bend_chi2 = StubPtConsistency::getConsistency(iterL1Track, theTrackerGeom, tTopo, L1Tk_nPar, mMagneticFieldStrength);
 //             if (SaveStubs) {
 //             // loop over stubs
