@@ -1407,7 +1407,12 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             
             
            
-             tmp_matchtrk_bend_chi2 = 0;
+             float tmp_matchtrk_bend_chi2 = 0;
+             float speedOfLightConverted = CLHEP::c_light/1.0E5;
+             edm::ESHandle< MagneticField > magneticFieldHandle;
+             iSetup.get< IdealMagneticFieldRecord >().get(magneticFieldHandle);
+             const MagneticField* theMagneticField = magneticFieldHandle.product();
+             double mMagneticFieldStrength = theMagneticField->inTesla(GlobalPoint(0,0,0)).z();
              std::vector< edm::Ref< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > >, TTStub< Ref_Phase2TrackerDigi_ > > > stubRefs = matchedTracks.at(i_track)->getStubRefs();
              int tmp_nstub = stubRefs.size();
             for (int is=0; is<tmp_nstub; is++) {
@@ -1460,7 +1465,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
                 float sigma_bend = 0.483;//
                 
                 //if (isPS) pitch = 0.099;
-                float signedPt = speedOfLightConverted*mMagneticFieldStrength/(iterL1Track->getRInv());//
+                float signedPt = speedOfLightConverted*mMagneticFieldStrength/(matchedTracks.at(i_track)->getRInv());//
                 float trackBend = -(sensorSpacing*tmp_stub_r*mMagneticFieldStrength*(speedOfLightConverted/2))/(stripPitch*signedPt*correction);//
                 
                 float stubBend = stubRefs.at(is)->getTriggerBend();//
