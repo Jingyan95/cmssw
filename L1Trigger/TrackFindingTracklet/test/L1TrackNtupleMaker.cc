@@ -78,6 +78,7 @@
 // NAMESPACES
 using namespace std;
 using namespace edm;
+using namespace StubPtConsistency;
 
 
 //////////////////////////////
@@ -882,6 +883,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         
         int this_l1track = 0;
         std::vector< TTTrack< Ref_Phase2TrackerDigi_ > >::const_iterator iterL1Track;
+        StubPtConsistency::vector< TTTrack< Ref_Phase2TrackerDigi_ > >::const_iterator iterL1Track1;//new input
         for ( iterL1Track = TTTrackHandle->begin(); iterL1Track != TTTrackHandle->end(); iterL1Track++ ) {
             
             edm::Ptr< TTTrack< Ref_Phase2TrackerDigi_ > > l1track_ptr(TTTrackHandle, this_l1track);
