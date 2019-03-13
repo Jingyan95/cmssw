@@ -160,6 +160,7 @@ private:
     std::vector<float>* m_trk_z0;
     std::vector<float>* m_trk_chi2;
     std::vector<float>* m_trk_bend_chi2;//new input
+    std::vector<float>* m_matchtrk_bend_chi2;//new input
     std::vector<int>*   m_trk_nstub;
     std::vector<int>*   m_trk_seed;
     std::vector<int>*   m_trk_genuine;
@@ -340,6 +341,7 @@ void L1TrackNtupleMaker::beginJob()
     m_trk_d0    = new std::vector<float>;
     m_trk_chi2  = new std::vector<float>;
     m_trk_bend_chi2  = new std::vector<float>; //new input
+    m_matchtrk_bend_chi2  = new std::vector<float>; //new input
     m_trk_nstub = new std::vector<int>;
     m_trk_seed    = new std::vector<int>;
     m_trk_genuine       = new std::vector<int>;
@@ -438,6 +440,7 @@ void L1TrackNtupleMaker::beginJob()
         eventTree->Branch("trk_z0",    &m_trk_z0);
         eventTree->Branch("trk_chi2",  &m_trk_chi2);
         eventTree->Branch("trk_bend_chi2",  &m_trk_bend_chi2);
+        eventTree->Branch("matchtrk_bend_chi2",  &m_matchtrk_bend_chi2);
         eventTree->Branch("trk_nstub", &m_trk_nstub);
         if (SaveTracklet) eventTree->Branch("trk_seed",    &m_trk_seed);
         eventTree->Branch("trk_genuine",      &m_trk_genuine);
@@ -566,6 +569,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         m_trk_z0->clear();
         m_trk_chi2->clear();
         m_trk_bend_chi2->clear();
+        m_matchtrk_bend_chi2->clear();
         m_trk_nstub->clear();
         m_trk_seed->clear();
         m_trk_genuine->clear();
@@ -1402,54 +1406,72 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             
             
             
-            // ------------------------------------------------------------------------------------------
-            /*
+           
              tmp_matchtrk_bend_chi2 = 0;
              std::vector< edm::Ref< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > >, TTStub< Ref_Phase2TrackerDigi_ > > > stubRefs = matchedTracks.at(i_track)->getStubRefs();
              int tmp_nstub = stubRefs.size();
-             for (int is=0; is<tmp_nstub; is++) {
+            for (int is=0; is<tmp_nstub; is++) {
+                
+                //detID of stub
+                DetId detIdStub = theTrackerGeom->idToDet( (stubRefs.at(is)->getClusterRef(0))->getDetId() )->geographicalId();
+                MeasurementPoint coords = stubRefs.at(is)->getClusterRef(0)->findAverageLocalCoordinatesCentered();
+                const GeomDet* theGeomDet = theTrackerGeom->idToDet(detIdStub);
+                Global3DPoint posStub = theGeomDet->surface().toGlobal( theGeomDet->topology().localPosition(coords) );
+                
+                double x=posStub.x();
+                double y=posStub.y();
+                double z=posStub.z();
+                double tmp_stub_r = posStub.perp();//
+                
+                int isBarrel=-1;
+                int layer=-999999;
+                if ( detIdStub.subdetId()==StripSubdetector::TOB ) {
+                    isBarrel=1;
+                    layer  = static_cast<int>(tTopo->layer(detIdStub));
+                    if (DebugMode) cout << "   stub in layer " << layer << " at position x y z = " << x << " " << y << " " << z << endl;
+                }
+                else if ( detIdStub.subdetId()==StripSubdetector::TID ) {
+                    isBarrel=0;
+                    layer  = static_cast<int>(tTopo->layer(detIdStub));
+                    if (DebugMode) cout << "   stub in disk " << layer << " at position x y z = " << x << " " << y << " " << z << endl;
+                }
+                const GeomDetUnit* det0 = theTrackerGeom->idToDetUnit( detIdStub );
+                const GeomDetUnit* det1 = theTrackerGeom->idToDetUnit( tTopo->partnerDetId( detIdStub ) );
+                const PixelGeomDetUnit* unit = reinterpret_cast<const PixelGeomDetUnit*>( det0 );
+                const PixelTopology& topo = unit->specificTopology();
+                
+                
+                float stripPitch = topo.pitch().first;
+                
+                float modMinR = std::min(det0->position().perp(),det1->position().perp());
+                float modMaxR = std::max(det0->position().perp(),det1->position().perp());
+                float modMinZ = std::min(det0->position().z(),det1->position().z());
+                float modMaxZ = std::max(det0->position().z(),det1->position().z());
+                float sensorSpacing = sqrt((modMaxR-modMinR)*(modMaxR-modMinR) + (modMaxZ-modMinZ)*(modMaxZ-modMinZ));
+                
+                bool tiltedBarrel = (isBarrel && tTopo->tobSide(detIdStub)!=3);//
+                float gradient = 0.886454;//
+                float intercept = 0.504148;//
+                float correction;
+                if (tiltedBarrel) correction = gradient*fabs(z)/tmp_stub_r + intercept;
+                else if (isBarrel) correction = 1;
+                else correction = fabs(z)/tmp_stub_r;
+                
+                float sigma_bend = 0.483;//
+                
+                //if (isPS) pitch = 0.099;
+                float signedPt = speedOfLightConverted*mMagneticFieldStrength/(iterL1Track->getRInv());//
+                float trackBend = -(sensorSpacing*tmp_stub_r*mMagneticFieldStrength*(speedOfLightConverted/2))/(stripPitch*signedPt*correction);//
+                
+                float stubBend = stubRefs.at(is)->getTriggerBend();//
+                if ( !isBarrel && z<0 ) stubBend=-stubBend;//
+                float tmp_bend_diff = stubBend - trackBend;//
+                float bend_chi2 = (tmp_bend_diff)*(tmp_bend_diff)/(sigma_bend*sigma_bend);//
+                tmp_matchtrk_bend_chi2 += bend_chi2/tmp_nstub;//
+                
+            }//end loop over stubs
              
-             DetId detIdStub = theTrackerGeom->idToDet( (stubRefs.at(is)->getClusterRef(0))->getDetId() )->geographicalId();
-             
-             MeasurementPoint coords = stubRefs.at(is)->getClusterRef(0)->findAverageLocalCoordinatesCentered();
-             const GeomDet* theGeomDet = theTrackerGeom->idToDet(detIdStub);
-             Global3DPoint posStub = theGeomDet->surface().toGlobal( theGeomDet->topology().localPosition(coords) );
-             
-             double x=posStub.x();
-             double y=posStub.y();
-             double z=posStub.z();
-             
-             int isBarrel = 0;
-             int layer=-999999;
-             if ( detIdStub.subdetId()==StripSubdetector::TOB ) {
-             isBarrel = 1;
-             layer  = static_cast<int>(tTopo->layer(detIdStub));
-             }
-             else if ( detIdStub.subdetId()==StripSubdetector::TID ) {
-             isBarrel = 0;
-             layer  = static_cast<int>(tTopo->layer(detIdStub));
-             }
-             DetId stackDetid = tTopo->stack(detIdStub);
-             bool isPS = (theTrackerGeom->getDetectorType(stackDetid)==TrackerGeometry::ModuleType::Ph2PSP);
-             
-             float pitch = 0.089;
-             float sigma_bend = 0.45;
-             if (isPS) pitch = 0.099;
-             double tmp_stub_r = posStub.perp();
-             float signedPt = 0.3*3.811202/100.0/(matchedTracks.at(i_track)->getRInv());
-             float trackBend = -(1.8*0.57*tmp_stub_r/100)/(pitch*signedPt);
-             
-             float stubBend = stubRefs.at(is)->getTriggerBend();
-             if ( !isBarrel && z>0 ) stubBend=-stubBend;
-             float tmp_bend_diff = stubBend - trackBend;
-             float bend_chi2 = (tmp_bend_diff)*(tmp_bend_diff)/(sigma_bend*sigma_bend);
-             tmp_matchtrk_bend_chi2 += bend_chi2;
-             }
-             */
-            // ------------------------------------------------------------------------------------------
-            
-            
-        }
+            }
         
         if (nLooseMatch > 0) {
             tmp_loosematchtrk_pt   = matchedTracks.at(i_loosetrack)->getMomentum(L1Tk_nPar).perp();
@@ -1490,6 +1512,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         m_matchtrk_z0 ->push_back(tmp_matchtrk_z0);
         m_matchtrk_d0 ->push_back(tmp_matchtrk_d0);
         m_matchtrk_chi2 ->push_back(tmp_matchtrk_chi2);
+        m_matchtrk_bend_chi2 ->push_back(tmp_matchtrk_bend_chi2);
         m_matchtrk_nstub->push_back(tmp_matchtrk_nstub);
         if (SaveTracklet) m_matchtrk_seed->push_back(tmp_matchtrk_seed);
         
