@@ -1004,22 +1004,22 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
              ----------------------------------------------------------------------------------------------
             
             
-            //int tmp_trk_genuine = 0;
-            //int tmp_trk_loose = 0;
-            //int tmp_trk_unknown = 0;
-            //int tmp_trk_combinatoric = 0;
-            //if (MCTruthTTTrackHandle->isLooselyGenuine(l1track_ptr)) tmp_trk_loose = 1;
-            //if (MCTruthTTTrackHandle->isGenuine(l1track_ptr)) tmp_trk_genuine = 1;
-            //if (MCTruthTTTrackHandle->isUnknown(l1track_ptr)) tmp_trk_unknown = 1;
-            //if (MCTruthTTTrackHandle->isCombinatoric(l1track_ptr)) tmp_trk_combinatoric = 1;
+            int tmp_trk_genuine = 0;
+            int tmp_trk_loose = 0;
+            int tmp_trk_unknown = 0;
+            int tmp_trk_combinatoric = 0;
+            if (MCTruthTTTrackHandle->isLooselyGenuine(l1track_ptr)) tmp_trk_loose = 1;
+            if (MCTruthTTTrackHandle->isGenuine(l1track_ptr)) tmp_trk_genuine = 1;
+            if (MCTruthTTTrackHandle->isUnknown(l1track_ptr)) tmp_trk_unknown = 1;
+            if (MCTruthTTTrackHandle->isCombinatoric(l1track_ptr)) tmp_trk_combinatoric = 1;
             
-//            if (DebugMode) {
-//                cout << "L1 track, pt: " << tmp_trk_pt << " eta: " << tmp_trk_eta << " phi: " << tmp_trk_phi
-//                << " z0: " << tmp_trk_z0 << " chi2: " << tmp_trk_chi2 << " nstub: " << tmp_trk_nstub;
-//                //if (tmp_trk_genuine) cout << " (is genuine)" << endl;
-//                if (tmp_trk_unknown) cout << " (is unknown)" << endl;
-//                if (tmp_trk_combinatoric) cout << " (is combinatoric)" << endl;
-//            }
+            if (DebugMode) {
+                cout << "L1 track, pt: " << tmp_trk_pt << " eta: " << tmp_trk_eta << " phi: " << tmp_trk_phi
+                << " z0: " << tmp_trk_z0 << " chi2: " << tmp_trk_chi2 << " nstub: " << tmp_trk_nstub;
+                //if (tmp_trk_genuine) cout << " (is genuine)" << endl;
+                if (tmp_trk_unknown) cout << " (is unknown)" << endl;
+                if (tmp_trk_combinatoric) cout << " (is combinatoric)" << endl;
+            }
             
             m_trk_pt ->push_back(tmp_trk_pt);
             m_trk_eta->push_back(tmp_trk_eta);
@@ -1031,10 +1031,10 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
             m_trk_bend_chi2 ->push_back(tmp_trk_bend_chi2);
             m_trk_nstub->push_back(tmp_trk_nstub);
             if (SaveTracklet) m_trk_seed->push_back(tmp_trk_seed);
-            //m_trk_genuine->push_back(tmp_trk_genuine);
-//            m_trk_loose->push_back(tmp_trk_loose);
-//            m_trk_unknown->push_back(tmp_trk_unknown);
-//            m_trk_combinatoric->push_back(tmp_trk_combinatoric);
+            m_trk_genuine->push_back(tmp_trk_genuine);
+            m_trk_loose->push_back(tmp_trk_loose);
+            m_trk_unknown->push_back(tmp_trk_unknown);
+            m_trk_combinatoric->push_back(tmp_trk_combinatoric);
             
             
             // ----------------------------------------------------------------------------------------------
