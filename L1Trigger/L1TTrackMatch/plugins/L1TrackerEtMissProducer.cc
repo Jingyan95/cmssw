@@ -18,7 +18,7 @@
 #include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticle.h"
 #include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticleFwd.h"
 #include "DataFormats/L1TVertex/interface/Vertex.h"
-
+#include "DataFormats/L1TrackTrigger/interface/L1TkPrimaryVertex.h" //new 
 // detector geometry
 #include "MagneticField/Engine/interface/MagneticField.h"
 #include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
@@ -53,7 +53,8 @@ private:
   float maxPt;	    // in GeV
   int HighPtTracks; // saturate or truncate
 
-  const edm::EDGetTokenT< VertexCollection > pvToken;
+ // const edm::EDGetTokenT< VertexCollection > pvToken;
+  const edm::EDGetTokenT< L1TkPrimaryVertexCollection > pvToken;
   const edm::EDGetTokenT<std::vector<TTTrack< Ref_Phase2TrackerDigi_ > > > trackToken;
 };
 
@@ -61,7 +62,7 @@ private:
 //constructor//
 ///////////////
 L1TrackerEtMissProducer::L1TrackerEtMissProducer(const edm::ParameterSet& iConfig) :
-pvToken(consumes<VertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
+pvToken(consumes<L1TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
 trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag")))
 {
   maxZ0 = (float)iConfig.getParameter<double>("maxZ0");
@@ -96,22 +97,27 @@ void L1TrackerEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup&
 
   std::unique_ptr<L1TkEtMissParticleCollection> METCollection(new L1TkEtMissParticleCollection);
 
-  edm::Handle<VertexCollection> L1VertexHandle;
+  edm::Handle<L1TkPrimaryVertexCollection> L1VertexHandle;
   iEvent.getByToken(pvToken,L1VertexHandle);
 
   edm::Handle<L1TTTrackCollectionType> L1TTTrackHandle;
   iEvent.getByToken(trackToken, L1TTTrackHandle);
   L1TTTrackCollectionType::const_iterator trackIter;
 
+  if( !L1TTTrackHandle.isValid() ) {
+    LogError("L1TrackerEtMissProducer")<< "\nWarning: L1TTTrackCollection not found in the event. Exit"<< std::endl;
+    return;
+  }
+
   if( !L1VertexHandle.isValid() ) {
     LogError("L1TrackerEtMissProducer")<< "\nWarning: VertexCollection not found in the event. Exit"<< std::endl;
     return;
   }
 
-  if( !L1TTTrackHandle.isValid() ) {
-    LogError("L1TrackerEtMissProducer")<< "\nWarning: L1TTTrackCollection not found in the event. Exit"<< std::endl;
-    return;
-  }
+ // if( !L1TTTrackHandle.isValid() ) {
+   // LogError("L1TrackerEtMissProducer")<< "\nWarning: L1TTTrackCollection not found in the event. Exit"<< std::endl;
+   // return;
+ // }
 
 
   float sumPx = 0;
@@ -121,7 +127,8 @@ void L1TrackerEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup&
   double sumPy_PU = 0;
   double etTot_PU = 0;
 
-  float zVTX = L1VertexHandle->begin()->z0();
+ // float zVTX = L1VertexHandle->begin()->z0();
+  float zVTX = L1VertexHandle->begin()->getZvertex();
 
   for (trackIter = L1TTTrackHandle->begin(); trackIter != L1TTTrackHandle->end(); ++trackIter) {
     float pt = trackIter->getMomentum().perp();

@@ -312,16 +312,15 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
   }
 
   // adding capability of booking histograms internal to tracklet steps
-  if (bookHistos) {
-    histimp=new FPGAHistImp;
-    histimp->init();
-    histimp->bookLayerResidual();
-    histimp->bookDiskResidual();
-    histimp->bookTrackletParams();
-    histimp->bookSeedEff();
+  histimp=new FPGAHistImp;
+  histimp->init();
+  histimp->bookLayerResidual();
+  histimp->bookDiskResidual();
+  histimp->bookTrackletParams();
+  histimp->bookSeedEff();
 
   FPGAGlobal::histograms()=histimp;
-  }
+
 
   sectors=new FPGASector*[NSector];
 
@@ -420,9 +419,7 @@ L1FPGATrackProducer::~L1FPGATrackProducer()
     asciiEventOut_.close();
   }
 
-  if (bookHistos) {
-    histimp->close();
-  }
+  histimp->close();
 
 }
 

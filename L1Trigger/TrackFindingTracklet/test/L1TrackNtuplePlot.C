@@ -42,7 +42,7 @@ void makeResidualIntervalPlot( TString type, TString dir, TString variable, TH1F
 
 void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0, int TP_select_pdgid=0, int TP_select_eventid=0, 
 		       bool useTightCuts=false, bool useDeadRegion=false, 
-		       float TP_minPt=2.0, float TP_maxPt=100.0, float TP_maxEta=2.4) {
+		       float TP_minPt=2.0, float TP_maxPt=100.0, float TP_maxEta=2.4, float TP_maxD0=1.0) {
 
   // type:              this is the input file you want to process (minus ".root" extension)
   // TP_select_pdgid:   if non-zero, only select TPs with a given PDG ID
@@ -826,7 +826,7 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
       }
 
       // kinematic cuts
-      if (tp_dxy->at(it) > 1) continue;
+      if (fabs(tp_dxy->at(it)) > TP_maxD0) continue;
       if (tp_pt->at(it) < 0.2) continue;
       if (tp_pt->at(it) > TP_maxPt) continue;
       if (fabs(tp_eta->at(it)) > TP_maxEta) continue;
@@ -2222,8 +2222,8 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   // ----------------------------------------------------------------------------------------------------------------
 
   // rebin pt/phi plots
-  h_tp_pt->Rebin(4);
-  h_match_tp_pt->Rebin(4);
+  h_tp_pt->Rebin(2);
+  h_match_tp_pt->Rebin(2);
   h_tp_phi->Rebin(2);
   h_match_tp_phi->Rebin(2);
 
@@ -2374,10 +2374,6 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   h_eff_d0  ->SetAxisRange(0,1.1,"Y");
   h_eff_absd0  ->SetAxisRange(0,1.1,"Y");
 
-  if (type.Contains("Electron") || type.Contains("Pion") || type.Contains("Muon")) {
-    h_eff_pt->SetAxisRange(0,49,"X");
-    h_eff_pt_H->SetAxisRange(8,49,"X");
-  }
 
   gPad->SetGridx();
   gPad->SetGridy();
@@ -3073,7 +3069,12 @@ double getIntervalContainingFractionOfEntries( TH1* absResidualHistogram, double
   // Calculate quantile for given interval
   double interval[1];
   double quantile[1] = { quantileToCalculate };
-  absResidualHistogram->GetQuantiles( 1, interval, quantile);
+  if (totalIntegral > 0.) {
+    absResidualHistogram->GetQuantiles( 1, interval, quantile);
+  } else {
+    cout<<"WARNING: histo "<<absResidualHistogram->GetName()<<" empty, so can't calc quantiles."<<endl;
+    interval[0] = 0.;
+  }
 
   return interval[0];
 }

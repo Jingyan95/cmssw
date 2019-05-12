@@ -925,22 +925,12 @@ public:
 	validprojdisk[i]=true;
 	iphiderdisk[i] = ITC->der_phiD_final.get_ival();
 	irderdisk[i]   = ITC->der_rD_final.get_ival();
-      
-	if (iphiprojdisk[i]<0) {
-	  iphiprojdisk[i]=0;
-	  validprojdisk[i]=false;
-	}
-	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)) {
-	  iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-	  validprojdisk[i]=false;
-	}
-      
 	//"protection" from the original
-	if (iphiprojdisk[i]<0) {
+	if (iphiprojdisk[i]<=0) {
 	  iphiprojdisk[i]=0;
 	  validprojdisk[i]=false;
 	}
-	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)) {
+	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
 	  iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
 	  validprojdisk[i]=false;
 	}
@@ -1339,11 +1329,18 @@ public:
       iphiderdisk[i] = ITC->der_phiD_final.get_ival();
       irderdisk[i]   = ITC->der_rD_final.get_ival();
       
-      //"protection" from the original
-      if (iphiprojdisk[i]<0) iphiprojdisk[i]=0;
-      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)) iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-      
       validprojdisk[i]=true;
+
+      //"protection" from the original
+      if (iphiprojdisk[i]<=0) {
+        iphiprojdisk[i]=0;
+        validprojdisk[i]=false;
+      }
+      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
+        iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
+        validprojdisk[i]=false;
+      }
+      
       if(irprojdisk[i]<=0 || irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ){
 	validprojdisk[i]=false;
 	irprojdisk[i] = 0;
@@ -1681,7 +1678,7 @@ public:
       if (izproj[i]>=(1<<(nbitszprojL123-1))) validproj[i]=false;
 
       //this is left from the original....
-      if (iphiproj[i]>=(1<<nbitsphistubL456)) {
+      if (iphiproj[i]>=(1<<nbitsphistubL456)-1) {
 	iphiproj[i]=(1<<nbitsphistubL456)-2; //-2 not to hit atExtreme
 	validproj[i] = false;
       }
@@ -1714,11 +1711,18 @@ public:
       iphiderdisk[i] = ITC->der_phiD_final.get_ival();
       irderdisk[i]   = ITC->der_rD_final.get_ival();
 
-      //"protection" from the original
-      if (iphiprojdisk[i]<0) iphiprojdisk[i]=0;
-      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)) iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-      
       validprojdisk[i]=true;
+
+      //"protection" from the original
+      if (iphiprojdisk[i]<=0) {
+        iphiprojdisk[i]=0;
+        validprojdisk[i]=false;
+      }
+      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
+        iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
+        validprojdisk[i]=false;
+      }
+
       if(irprojdisk[i]<=0 || irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ){
 	validprojdisk[i]=false;
 	irprojdisk[i] = 0;

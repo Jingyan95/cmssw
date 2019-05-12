@@ -172,7 +172,7 @@ L1TkFastVertexProducer::L1TkFastVertexProducer(const edm::ParameterSet& iConfig)
 
 
 
-  produces<L1TkPrimaryVertexCollection>();
+  produces<L1TkPrimaryVertexCollection>("l1vertextdr");
 
 }
 
@@ -451,7 +451,7 @@ L1TkFastVertexProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     result -> push_back( vtx5 );
   */
   
-  iEvent.put( std::move(result) );
+  iEvent.put(std::move(result), "l1vertextdr" );
 }
 
 

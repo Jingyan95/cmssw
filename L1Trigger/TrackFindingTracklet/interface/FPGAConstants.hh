@@ -5,21 +5,19 @@
 //#define USEROOT
 
 //Uncomment to run the hybrid algorithm
-//#ifdef CMSSW_GIT_HASH
-//#define USEHYBRID
-//#endif
+#ifdef CMSSW_GIT_HASH
+#define USEHYBRID
+#endif
 
 //Uncomment to run the HLS version of the KF if using the Hybrid (instead of the C++ KF).
 //(Please also follow the instructions in L1Trigger/TrackFindingTMTT/README_HLS.txt).
 //#define USE_HLS
 
-static unsigned int nHelixPar = 4; // 4 or 5 param helix fit.
-
-static bool doKF=false; //true => use KF (assumes USEHYBRID is defined)
+static bool doKF=true; //true => use KF (assumes USEHYBRID is defined)
 static bool printDebugKF=false; // if true print lots of debugging statements related to the KF fit
-static bool bookHistos=false;
 
-static bool hourglassExtended=false; // This is turn on Displaced Tracking. Also change the file in Tracklet_cfi from hourglass to hourglassExtended ****************
+static unsigned int nHelixPar = 4; // 4 or 5 param helix fit.
+static bool hourglassExtended=false; // This is turn on Displaced Tracking. Also edit L1TrackNtupleMaker_cfg.py, searching for and uncommenting "Extended" on several lines. ****************
 
 //Gemetry extensions
 static std::string geomext=hourglassExtended?"hourglassExtended":"hourglass";  
@@ -455,14 +453,15 @@ static int chisqzfactbits=14;
 //Duplicate Removal
 static int minIndStubs=3; // Not for merge removal
 
+//static std::string RemovalType=""; // Run without duplicate removal
 #ifdef USEHYBRID
-static std::string RemovalType="ichi"; //"merge";
+static std::string RemovalType="ichi"; // "merge" option loses 2% efficiency;
 #else
 static std::string RemovalType="ichi";
 #endif
 
 //"ichi" (pairwise, keep track with best ichisq), "nstub" (pairwise, keep track with more stubs), "grid" (TMTT-like removal), "" (no removal)
-static bool fakefit_5par=false; //if true, this would use KF 5-parameter fit for displaced tracking, false means use tracklet parameters instead (i.e. no fit)
+static bool fakefit=false; //if true, this would use KF 5-parameter fit for displaced tracking, false means use tracklet parameters instead (i.e. no fit)
 
 #endif
 

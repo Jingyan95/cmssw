@@ -7,7 +7,8 @@ L1TkPrimaryVertex = cms.EDProducer('L1TkFastVertexProducer',
 #
      HepMCInputTag = cms.InputTag("generator"),
      GenParticleInputTag = cms.InputTag("genParticles",""),
-     L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+    # L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),
+     L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),
      ZMAX = cms.double ( 25. ) ,        # in cm
      CHI2MAX = cms.double( 100. ),
      PTMINTRA = cms.double( 2.),        # PTMIN of L1Tracks, in GeV

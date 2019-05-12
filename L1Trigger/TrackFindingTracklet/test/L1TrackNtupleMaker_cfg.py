@@ -44,7 +44,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 # input and output
 ############################################################
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(5))
 
 if GEOMETRY == "D17":
     Source_Files = cms.untracked.vstring(
@@ -102,6 +102,11 @@ process.load("L1Trigger.TrackFindingTracklet.L1TrackletEmulationTracks_cff")
 process.TTTracksEmulation = cms.Path(process.L1TrackletEmulationTracks)
 process.TTTracksEmulationWithTruth = cms.Path(process.L1TrackletEmulationTracksWithAssociators)
 
+process.load("L1Trigger.L1TTrackMatch.L1TkPrimaryVertexProducer_cfi")
+process.pL1TkPrimaryVertex = cms.Path( process.L1TkPrimaryVertex )
+
+process.load("L1Trigger.L1TTrackMatch.L1TrackerEtMissProducer_cfi")
+process.pL1TkEtMiss = cms.Path( process.L1TrackerEtMiss )
 
 ############################################################
 # Define the track ntuple process, MyProcess is the (unsigned) PDGID corresponding to the process which is run
@@ -114,7 +119,7 @@ process.TTTracksEmulationWithTruth = cms.Path(process.L1TrackletEmulationTracksW
 ############################################################
 
 process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
-                                       MyProcess = cms.int32(1),
+                                       MyProcess = cms.int32(11),
                                        DebugMode = cms.bool(False),      # printout lots of debug statements
                                        SaveAllTracks = cms.bool(True),   # save *all* L1 tracks, not just truth matched to primary particle
                                        SaveStubs = cms.bool(False),      # save some info for *all* stubs
@@ -127,7 +132,8 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        TP_maxZ0 = cms.double(30.0),      # only save TPs with |z0| < X cm
                                        #L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),                 ## TTTrack input
                                        L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),         ## TTTrack input
-                                       MCTruthTrackInputTag = cms.InputTag("TTTrackAssociatorFromPixelDigis", "Level1TTTracks"),  ## MCTruth input 
+                                       MCTruthTrackInputTag = cms.InputTag("TTTrackAssociatorFromPixelDigis", "Level1TTTracks"),  ## TrkMET input
+                                       L1TrkMETInputTag = cms.InputTag("L1TrackerEtMiss", "trkMET"),  
                                        # other input collections
                                        L1StubInputTag = cms.InputTag("TTStubsFromPhase2TrackerDigis","StubAccepted"),
                                        MCTruthClusterInputTag = cms.InputTag("TTClusterAssociatorFromPixelDigis", "ClusterAccepted"),
@@ -140,6 +146,17 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        )
 process.ana = cms.Path(process.L1TrackNtuple)
 
+# output module
+#process.out = cms.OutputModule( "PoolOutputModule",
+#                                fileName = cms.untracked.string("Tracklets.root"),
+#                                fastCloning = cms.untracked.bool( False ),
+#                                outputCommands = cms.untracked.vstring('drop *',
+#                                                                       'keep *_TTTrack*_Level1TTTracks_*', 
+#                                       'keep *_L1TrackerEtMiss*_*_*'
+#)
+#)
+#process.FEVToutput_step = cms.EndPath(process.out)
+
 # use this if you want to re-run the stub making
 #process.schedule = cms.Schedule(process.TTClusterStub,process.TTClusterStubTruth,process.TTTracksEmulationWithTruth,process.ana)
 
@@ -148,5 +165,5 @@ process.ana = cms.Path(process.L1TrackNtuple)
 
 # use this to only run tracking + track associator
 #process.schedule = cms.Schedule(process.TTTracksWithTruth,process.ana)            # floating-point simulation
-process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth,process.ana)    # emulation
+process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth, process.pL1TkPrimaryVertex, process.pL1TkEtMiss, process.ana) # emulation
 

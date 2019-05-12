@@ -1,6 +1,7 @@
 <environment>
   <library   file="*.cc" name="TrackFindingTrackletTests">
     <flags   EDM_PLUGIN="1"/>
+    <flags   SKIP_FILES="fpga.cc"/>
     <use   name="FWCore/Framework"/>
     <use   name="FWCore/PluginManager"/>
     <use   name="FWCore/ParameterSet"/>
