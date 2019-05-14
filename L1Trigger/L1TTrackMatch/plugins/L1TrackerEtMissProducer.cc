@@ -42,16 +42,16 @@ private:
   virtual void endJob() ;
 
   // ----------member data ---------------------------
-  float maxZ0;	    // in cm
-  float DeltaZ;	    // in cm
-  float maxEta;
-  float chi2dofMax;
-  float bendchi2Max;
-  float minPt;	    // in GeV
-  int nStubsmin;
-  int nStubsPSmin;  // minimum number of stubs in PS modules
-  float maxPt;	    // in GeV
-  int HighPtTracks; // saturate or truncate
+  float L1Tk_maxZ0;	    // in cm
+  float L1Tk_maxDeltaZ;	    // in cm
+  float L1Tk_maxEta;
+  float L1Tk_maxChi2dof;
+  float L1Tk_maxBendchi2;
+  float L1Tk_minPt;	    // in GeV
+  int L1Tk_minNStubs;
+  int L1Tk_minNStubsPS;  // minimum number of stubs in PS modules
+  float L1Tk_maxPt;	    // in GeV
+  int L1Tk_HighPtTracks; // saturate or truncate
 
  // const edm::EDGetTokenT< VertexCollection > pvToken;
   const edm::EDGetTokenT< L1TkPrimaryVertexCollection > pvToken;
@@ -65,16 +65,16 @@ L1TrackerEtMissProducer::L1TrackerEtMissProducer(const edm::ParameterSet& iConfi
 pvToken(consumes<L1TkPrimaryVertexCollection>(iConfig.getParameter<edm::InputTag>("L1VertexInputTag"))),
 trackToken(consumes< std::vector<TTTrack< Ref_Phase2TrackerDigi_> > > (iConfig.getParameter<edm::InputTag>("L1TrackInputTag")))
 {
-  maxZ0 = (float)iConfig.getParameter<double>("maxZ0");
-  DeltaZ = (float)iConfig.getParameter<double>("DeltaZ");
-  chi2dofMax = (float)iConfig.getParameter<double>("chi2dofMax");
-  bendchi2Max = (float)iConfig.getParameter<double>("bendchi2Max");
-  minPt = (float)iConfig.getParameter<double>("minPt");
-  nStubsmin = iConfig.getParameter<int>("nStubsmin");
-  nStubsPSmin = iConfig.getParameter<int>("nStubsPSmin");
-  maxPt = (float)iConfig.getParameter<double>("maxPt");
-  maxEta = (float)iConfig.getParameter<double>("maxEta");
-  HighPtTracks = iConfig.getParameter<int>("HighPtTracks");
+  L1Tk_maxZ0 = (float)iConfig.getParameter<double>("L1Tk_maxZ0");
+  L1Tk_maxDeltaZ = (float)iConfig.getParameter<double>("L1Tk_maxDeltaZ");
+  L1Tk_maxChi2dof = (float)iConfig.getParameter<double>("L1Tk_maxChi2dof");
+  L1Tk_maxBendchi2 = (float)iConfig.getParameter<double>("L1Tk_maxBendchi2");
+  L1Tk_minPt = (float)iConfig.getParameter<double>("L1Tk_minPt");
+  L1Tk_minNStubs = iConfig.getParameter<int>("L1Tk_minNStubs");
+  L1Tk_minNStubsPS = iConfig.getParameter<int>("L1Tk_minNStubsPS");
+  L1Tk_maxPt = (float)iConfig.getParameter<double>("L1Tk_maxPt");
+  L1Tk_maxEta = (float)iConfig.getParameter<double>("L1Tk_maxEta");
+  L1Tk_HighPtTracks = iConfig.getParameter<int>("L1Tk_HighPtTracks");
 
   produces<L1TkEtMissParticleCollection>("trkMET");
 }
@@ -142,15 +142,15 @@ void L1TrackerEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup&
     float bendchi2 = trackIter->getStubPtConsistency();
     float z0  = trackIter->getPOCA().z();
 
-    if (pt < minPt) continue;
-    if (fabs(z0) > maxZ0) continue;
-    if (fabs(eta) > maxEta) continue;
-    if (chi2dof > chi2dofMax) continue;
-    if (bendchi2 > bendchi2Max) continue;
+    if (pt < L1Tk_minPt) continue;
+    if (fabs(z0) > L1Tk_maxZ0) continue;
+    if (fabs(eta) > L1Tk_maxEta) continue;
+    if (chi2dof > L1Tk_maxChi2dof) continue;
+    if (bendchi2 > L1Tk_maxBendchi2) continue;
 
-    if ( maxPt > 0 && pt > maxPt)  {
-      if (HighPtTracks == 0)  continue;	// ignore these very high PT tracks: truncate
-      if (HighPtTracks == 1)  pt = maxPt; // saturate
+    if ( L1Tk_maxPt > 0 && pt > L1Tk_maxPt)  {
+      if (L1Tk_HighPtTracks == 0)  continue;	// ignore these very high PT tracks: truncate
+      if (L1Tk_HighPtTracks == 1)  pt = L1Tk_maxPt; // saturate
     }
 
     int nPS = 0.;     // number of stubs in PS modules
@@ -162,18 +162,18 @@ void L1TrackerEtMissProducer::produce(edm::Event& iEvent, const edm::EventSetup&
       }
     }
 
-    if (nstubs < nStubsmin) continue;
-    if (nPS < nStubsPSmin) continue;
+    if (nstubs < L1Tk_minNStubs) continue;
+    if (nPS < L1Tk_minNStubsPS) continue;
 
     // construct deltaZ cut to be based on track eta
-    if      ( fabs(eta)>=0   &&  fabs(eta)<0.7)  DeltaZ = 0.4;
-    else if ( fabs(eta)>=0.7 &&  fabs(eta)<1.0)  DeltaZ = 0.6;
-    else if ( fabs(eta)>=1.0 &&  fabs(eta)<1.2)  DeltaZ = 0.76;
-    else if ( fabs(eta)>=1.2 &&  fabs(eta)<1.6)  DeltaZ = 1.0;
-    else if ( fabs(eta)>=1.6 &&  fabs(eta)<2.0)  DeltaZ = 1.7;
-    else if ( fabs(eta)>=2.0 &&  fabs(eta)<=2.4) DeltaZ = 2.2;
+    if      ( fabs(eta)>=0   &&  fabs(eta)<0.7)  L1Tk_maxDeltaZ = 0.4;
+    else if ( fabs(eta)>=0.7 &&  fabs(eta)<1.0)  L1Tk_maxDeltaZ = 0.6;
+    else if ( fabs(eta)>=1.0 &&  fabs(eta)<1.2)  L1Tk_maxDeltaZ = 0.76;
+    else if ( fabs(eta)>=1.2 &&  fabs(eta)<1.6)  L1Tk_maxDeltaZ = 1.0;
+    else if ( fabs(eta)>=1.6 &&  fabs(eta)<2.0)  L1Tk_maxDeltaZ = 1.7;
+    else if ( fabs(eta)>=2.0 &&  fabs(eta)<=2.4) L1Tk_maxDeltaZ = 2.2;
 
-    if ( fabs(z0 - zVTX) <= DeltaZ) {
+    if ( fabs(z0 - zVTX) <= L1Tk_maxDeltaZ) {
       sumPx += pt*cos(phi);
       sumPy += pt*sin(phi);
       etTot += pt ;
@@ -208,3 +208,4 @@ void L1TrackerEtMissProducer::endJob() {
 }
 
 DEFINE_FWK_MODULE(L1TrackerEtMissProducer);
+
