@@ -40,6 +40,7 @@
 
 #include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticle.h"//MET
 #include "DataFormats/L1TrackTrigger/interface/L1TkEtMissParticleFwd.h"
+#include "DataFormats/L1TrackTrigger/interface/L1TkPrimaryVertex.h" //VTX
 
 ////////////////////////////
 // DETECTOR GEOMETRY HEADERS
@@ -80,7 +81,6 @@
 // NAMESPACES
 using namespace std;
 using namespace edm;
-
 //////////////////////////////
 //                          //
 //     CLASS DEFINITION     //
@@ -134,6 +134,7 @@ private:
   edm::InputTag TrackingParticleInputTag;
   edm::InputTag TrackingVertexInputTag;
   edm::InputTag GenJetInputTag;
+  edm::InputTag L1VertexInputTag;  
 
   edm::EDGetTokenT< edmNew::DetSetVector< TTCluster< Ref_Phase2TrackerDigi_ > > > ttClusterToken_;
   edm::EDGetTokenT< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > > > ttStubToken_;
@@ -143,6 +144,7 @@ private:
   edm::EDGetTokenT< std::vector< TTTrack< Ref_Phase2TrackerDigi_ > > > ttTrackToken_;
   edm::EDGetTokenT< std::vector< l1t::L1TkEtMissParticle > > ttMETToken_;
   edm::EDGetTokenT< TTTrackAssociationMap< Ref_Phase2TrackerDigi_ > > ttTrackMCTruthToken_;
+  edm::EDGetTokenT< std::vector< l1t::L1TkPrimaryVertex> > pvToken;
 
   edm::EDGetTokenT< std::vector< TrackingParticle > > TrackingParticleToken_;
   edm::EDGetTokenT< std::vector< TrackingVertex > > TrackingVertexToken_;
@@ -162,6 +164,7 @@ private:
   std::vector<float>* m_trk_phi;
   std::vector<float>* m_trk_d0;   // (filled if L1Tk_nPar==5, else 999)
   std::vector<float>* m_trk_z0;
+  std::vector<float>* m_trk_DeltaZ;
   std::vector<float>* m_trk_chi2;
   std::vector<float>* m_trk_bendchi2;
   std::vector<int>*   m_trk_nstub;
@@ -290,6 +293,7 @@ L1TrackNtupleMaker::L1TrackNtupleMaker(edm::ParameterSet const& iConfig) :
   TP_maxEta        = iConfig.getParameter< double >("TP_maxEta");
   TP_maxZ0         = iConfig.getParameter< double >("TP_maxZ0");
   L1TrackInputTag      = iConfig.getParameter<edm::InputTag>("L1TrackInputTag");
+  L1VertexInputTag     = iConfig.getParameter<edm::InputTag>("L1VertexInputTag");
   MCTruthTrackInputTag = iConfig.getParameter<edm::InputTag>("MCTruthTrackInputTag");
   L1TrkMETInputTag     = iConfig.getParameter<edm::InputTag>("L1TrkMETInputTag");
   L1Tk_minNStub        = iConfig.getParameter< int >("L1Tk_minNStub");
@@ -309,6 +313,7 @@ L1TrackNtupleMaker::L1TrackNtupleMaker(edm::ParameterSet const& iConfig) :
   ttStubToken_           = consumes< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > > >(L1StubInputTag);
   ttClusterMCTruthToken_ = consumes< TTClusterAssociationMap< Ref_Phase2TrackerDigi_ > >(MCTruthClusterInputTag);
   ttStubMCTruthToken_    = consumes< TTStubAssociationMap< Ref_Phase2TrackerDigi_ > >(MCTruthStubInputTag);
+  pvToken                = consumes< std::vector< l1t::L1TkPrimaryVertex> >(L1VertexInputTag);
 
   TrackingParticleToken_ = consumes< std::vector< TrackingParticle > >(TrackingParticleInputTag);
   TrackingVertexToken_   = consumes< std::vector< TrackingVertex > >(TrackingVertexInputTag);
@@ -351,6 +356,7 @@ void L1TrackNtupleMaker::beginJob()
   m_trk_MET   = new std::vector<float>;
   m_trk_phi   = new std::vector<float>;
   m_trk_z0    = new std::vector<float>;
+  m_trk_DeltaZ    = new std::vector<float>;
   m_trk_d0    = new std::vector<float>;
   m_trk_chi2  = new std::vector<float>;
   m_trk_bendchi2  = new std::vector<float>;
@@ -458,6 +464,7 @@ void L1TrackNtupleMaker::beginJob()
     eventTree->Branch("trk_phi",   &m_trk_phi);
     eventTree->Branch("trk_d0",    &m_trk_d0);
     eventTree->Branch("trk_z0",    &m_trk_z0);
+    eventTree->Branch("trk_DeltaZ",    &m_trk_DeltaZ);
     eventTree->Branch("trk_chi2",  &m_trk_chi2);
     eventTree->Branch("trk_bendchi2",  &m_trk_bendchi2);
     eventTree->Branch("trk_nstub", &m_trk_nstub);
@@ -594,6 +601,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
     m_trk_phi->clear();
     m_trk_d0->clear();
     m_trk_z0->clear();
+    m_trk_DeltaZ->clear();
     m_trk_chi2->clear();
     m_trk_bendchi2->clear();
     m_trk_nstub->clear();
@@ -694,7 +702,6 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
   m_jet_loosematchtrk_sumpt->clear();
 
 
-
   // -----------------------------------------------------------------------------------------------
   // retrieve various containers
   // -----------------------------------------------------------------------------------------------
@@ -710,6 +717,10 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
   // L1 MET
   edm::Handle< std::vector< l1t::L1TkEtMissParticle > > TTMETHandle;
   iEvent.getByToken(ttMETToken_, TTMETHandle);
+
+  // L1 Vtx
+  edm::Handle< std::vector< l1t::L1TkPrimaryVertex> > L1VertexHandle;
+  iEvent.getByToken(pvToken,L1VertexHandle);
 
   // MC truth association maps
   edm::Handle< TTClusterAssociationMap< Ref_Phase2TrackerDigi_ > > MCTruthTTClusterHandle;
@@ -743,6 +754,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
   // getting trkMET
      float tmp_trk_MET = TTMETHandle->begin()->etMiss();
      m_trk_MET->push_back(tmp_trk_MET);
+     float zVTX = L1VertexHandle->begin()->getZvertex();
 
   // ----------------------------------------------------------------------------------------------
   // loop over L1 stubs
@@ -926,6 +938,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
       float tmp_trk_eta  = iterL1Track->getMomentum(L1Tk_nPar).eta();
       float tmp_trk_phi  = iterL1Track->getMomentum(L1Tk_nPar).phi();
       float tmp_trk_z0   = iterL1Track->getPOCA(L1Tk_nPar).z(); //cm
+      float tmp_trk_DeltaZ = fabs(tmp_trk_z0-zVTX);
 
       float tmp_trk_d0 = -999;
       if (L1Tk_nPar == 5) {
@@ -1040,6 +1053,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
       m_trk_eta->push_back(tmp_trk_eta);
       m_trk_phi->push_back(tmp_trk_phi);
       m_trk_z0 ->push_back(tmp_trk_z0);
+      m_trk_DeltaZ ->push_back(tmp_trk_DeltaZ);
       if (L1Tk_nPar==5) m_trk_d0->push_back(tmp_trk_d0);
       else m_trk_d0->push_back(999.);
       m_trk_chi2 ->push_back(tmp_trk_chi2);

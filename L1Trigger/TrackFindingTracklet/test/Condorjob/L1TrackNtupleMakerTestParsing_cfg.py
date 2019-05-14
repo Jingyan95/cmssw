@@ -123,7 +123,7 @@ process.pL1TkEtMiss = cms.Path( process.L1TrackerEtMiss )
 ############################################################
 
 process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
-                                       MyProcess = cms.int32(11),
+                                       MyProcess = cms.int32(1),
                                        DebugMode = cms.bool(False),      # printout lots of debug statements
                                        SaveAllTracks = cms.bool(True),   # save *all* L1 tracks, not just truth matched to primary particle
                                        SaveStubs = cms.bool(False),      # save some info for *all* stubs
@@ -137,7 +137,8 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        #L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),                 ## TTTrack input
                                        L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),         ## TTTrack input
                                        MCTruthTrackInputTag = cms.InputTag("TTTrackAssociatorFromPixelDigis", "Level1TTTracks"),  ## TrkMET input
-                                       L1TrkMETInputTag = cms.InputTag("L1TrackerEtMiss", "trkMET"),  
+                                       L1TrkMETInputTag = cms.InputTag("L1TrackerEtMiss", "trkMET"),
+                                       L1VertexInputTag = cms.InputTag("L1TkPrimaryVertex", "l1vertextdr"),  
                                        # other input collections
                                        L1StubInputTag = cms.InputTag("TTStubsFromPhase2TrackerDigis","StubAccepted"),
                                        MCTruthClusterInputTag = cms.InputTag("TTClusterAssociatorFromPixelDigis", "ClusterAccepted"),
