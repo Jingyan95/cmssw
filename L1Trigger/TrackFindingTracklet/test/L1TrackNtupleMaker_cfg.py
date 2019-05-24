@@ -44,7 +44,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 # input and output
 ############################################################
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(5))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
 
 if GEOMETRY == "D17":
     Source_Files = cms.untracked.vstring(
@@ -52,7 +52,7 @@ if GEOMETRY == "D17":
     )
 elif GEOMETRY == "D21": # Tilted barrel T6 tracker
     Source_Files = cms.untracked.vstring(
-        "/store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/FFF48AB4-E5E6-3842-8A5B-20E2B7E497BC.root"
+        "/store/relval/CMSSW_10_4_0_pre2/RelValNuGun/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/6F3A5B45-7A43-BD41-B1B4-D7C1C186B7DD.root"
     )
 elif GEOMETRY == "TkOnly":
     Source_Files = cms.untracked.vstring(
@@ -128,12 +128,13 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        TP_minNStub = cms.int32(4),       # require TP to have >= X number of stubs associated with it
                                        TP_minNStubLayer = cms.int32(4),  # require TP to have stubs in >= X layers/disks
                                        TP_minPt = cms.double(2.0),       # only save TPs with pt > X GeV
-                                       TP_maxEta = cms.double(2.5),      # only save TPs with |eta| < X
+                                       TP_maxEta = cms.double(2.4),      # only save TPs with |eta| < X
                                        TP_maxZ0 = cms.double(30.0),      # only save TPs with |z0| < X cm
                                        #L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),                 ## TTTrack input
                                        L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),         ## TTTrack input
                                        MCTruthTrackInputTag = cms.InputTag("TTTrackAssociatorFromPixelDigis", "Level1TTTracks"),  ## TrkMET input
-                                       L1TrkMETInputTag = cms.InputTag("L1TrackerEtMiss", "trkMET"), 
+                                       L1TrkMETInputTag = cms.InputTag("L1TrackerEtMiss", "trkMET"),
+                                       L1TrueMETInputTag = cms.InputTag("L1TrackerEtMiss", "trueMET"),
                                        L1VertexInputTag = cms.InputTag("L1TkPrimaryVertex", "l1vertextdr"), 
                                        # other input collections
                                        L1StubInputTag = cms.InputTag("TTStubsFromPhase2TrackerDigis","StubAccepted"),

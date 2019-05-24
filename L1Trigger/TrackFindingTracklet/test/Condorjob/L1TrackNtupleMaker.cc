@@ -128,6 +128,7 @@ private:
   edm::InputTag L1TrackInputTag;        // L1 track collection
   edm::InputTag MCTruthTrackInputTag;   // MC truth collection
   edm::InputTag L1TrkMETInputTag;
+  edm::InputTag L1TrueMETInputTag;
   edm::InputTag MCTruthClusterInputTag;
   edm::InputTag L1StubInputTag;
   edm::InputTag MCTruthStubInputTag;
@@ -143,6 +144,7 @@ private:
 
   edm::EDGetTokenT< std::vector< TTTrack< Ref_Phase2TrackerDigi_ > > > ttTrackToken_;
   edm::EDGetTokenT< std::vector< l1t::L1TkEtMissParticle > > ttMETToken_;
+  edm::EDGetTokenT< std::vector< l1t::L1TkEtMissParticle > > ttrueMETToken_;
   edm::EDGetTokenT< TTTrackAssociationMap< Ref_Phase2TrackerDigi_ > > ttTrackMCTruthToken_;
   edm::EDGetTokenT< std::vector< l1t::L1TkPrimaryVertex> > pvToken;
 
@@ -194,6 +196,8 @@ private:
   std::vector<float>* m_tp_dxy;
   std::vector<float>* m_tp_d0;
   std::vector<float>* m_tp_z0;
+  std::vector<float>* m_tp_DeltaZ;
+  std::vector<float>* m_tp_vz;
   std::vector<float>* m_tp_d0_prod;
   std::vector<float>* m_tp_z0_prod;
   std::vector<int>*   m_tp_pdgid;
@@ -296,6 +300,7 @@ L1TrackNtupleMaker::L1TrackNtupleMaker(edm::ParameterSet const& iConfig) :
   L1VertexInputTag     = iConfig.getParameter<edm::InputTag>("L1VertexInputTag");
   MCTruthTrackInputTag = iConfig.getParameter<edm::InputTag>("MCTruthTrackInputTag");
   L1TrkMETInputTag     = iConfig.getParameter<edm::InputTag>("L1TrkMETInputTag");
+  L1TrueMETInputTag     = iConfig.getParameter<edm::InputTag>("L1TrueMETInputTag");
   L1Tk_minNStub        = iConfig.getParameter< int >("L1Tk_minNStub");
 
   TrackingInJets = iConfig.getParameter< bool >("TrackingInJets");
@@ -310,6 +315,7 @@ L1TrackNtupleMaker::L1TrackNtupleMaker(edm::ParameterSet const& iConfig) :
   ttTrackToken_          = consumes< std::vector< TTTrack< Ref_Phase2TrackerDigi_ > > >(L1TrackInputTag);
   ttTrackMCTruthToken_   = consumes< TTTrackAssociationMap< Ref_Phase2TrackerDigi_ > >(MCTruthTrackInputTag);
   ttMETToken_            = consumes< std::vector< l1t::L1TkEtMissParticle > >(L1TrkMETInputTag);
+  ttrueMETToken_         = consumes< std::vector< l1t::L1TkEtMissParticle > >(L1TrueMETInputTag);
   ttStubToken_           = consumes< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > > >(L1StubInputTag);
   ttClusterMCTruthToken_ = consumes< TTClusterAssociationMap< Ref_Phase2TrackerDigi_ > >(MCTruthClusterInputTag);
   ttStubMCTruthToken_    = consumes< TTStubAssociationMap< Ref_Phase2TrackerDigi_ > >(MCTruthStubInputTag);
@@ -386,6 +392,8 @@ void L1TrackNtupleMaker::beginJob()
   m_tp_dxy     = new std::vector<float>;
   m_tp_d0      = new std::vector<float>;
   m_tp_z0      = new std::vector<float>;
+  m_tp_DeltaZ      = new std::vector<float>;
+  m_tp_vz      = new std::vector<float>;
   m_tp_d0_prod = new std::vector<float>;
   m_tp_z0_prod = new std::vector<float>;
   m_tp_pdgid   = new std::vector<int>;
@@ -496,6 +504,8 @@ void L1TrackNtupleMaker::beginJob()
   eventTree->Branch("tp_dxy",    &m_tp_dxy);
   eventTree->Branch("tp_d0",     &m_tp_d0);
   eventTree->Branch("tp_z0",     &m_tp_z0);
+  eventTree->Branch("tp_DeltaZ",     &m_tp_DeltaZ);
+  eventTree->Branch("tp_vz",     &m_tp_vz);
   eventTree->Branch("tp_d0_prod",     &m_tp_d0_prod);
   eventTree->Branch("tp_z0_prod",     &m_tp_z0_prod);
   eventTree->Branch("tp_pdgid",       &m_tp_pdgid);
@@ -631,6 +641,8 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
   m_tp_dxy->clear();
   m_tp_d0->clear();
   m_tp_z0->clear();
+  m_tp_DeltaZ->clear();
+  m_tp_vz->clear();
   m_tp_d0_prod->clear();
   m_tp_z0_prod->clear();
   m_tp_pdgid->clear();
@@ -702,7 +714,6 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
   m_jet_loosematchtrk_sumpt->clear();
 
 
-
   // -----------------------------------------------------------------------------------------------
   // retrieve various containers
   // -----------------------------------------------------------------------------------------------
@@ -718,6 +729,10 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
   // L1 MET
   edm::Handle< std::vector< l1t::L1TkEtMissParticle > > TTMETHandle;
   iEvent.getByToken(ttMETToken_, TTMETHandle);
+    
+  // L1 trueMET
+  edm::Handle< std::vector< l1t::L1TkEtMissParticle > > TTrueMETHandle;
+  iEvent.getByToken(ttrueMETToken_, TTrueMETHandle);
 
   // L1 Vtx
   edm::Handle< std::vector< l1t::L1TkPrimaryVertex> > L1VertexHandle;
@@ -755,6 +770,8 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
   // getting trkMET
      float tmp_trk_MET = TTMETHandle->begin()->etMiss();
      m_trk_MET->push_back(tmp_trk_MET);
+     float tmp_tp_MET = TTrueMETHandle->begin()->etMiss();
+     m_tp_MET->push_back(tmp_tp_MET);
      float zVTX = L1VertexHandle->begin()->getZvertex();
 
   // ----------------------------------------------------------------------------------------------
@@ -1164,9 +1181,6 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
 
   int this_tp = 0;
   
-  float sumPx = 0;
-  float sumPy = 0;
-
   std::vector< TrackingParticle >::const_iterator iterTP;
   for (iterTP = TrackingParticleHandle->begin(); iterTP != TrackingParticleHandle->end(); ++iterTP) {
 
@@ -1221,6 +1235,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
     if (delphi<-pi) delphi+=2.0*pi;
     if (delphi>pi) delphi-=2.0*pi;
     float tmp_tp_z0 = tmp_tp_vz+tmp_tp_t*delphi/(2.0*K);
+    float tmp_tp_DeltaZ = fabs(tmp_tp_z0-zVTX);
     // ----------------------------------------------------------------------------------------------
 
     if (fabs(tmp_tp_z0) > TP_maxZ0) continue;
@@ -1302,13 +1317,6 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
 	continue;
       }
     }
-
-    if (MyProcess==11){
-    if (dxy > 1.0||tmp_tp_charge==0) continue;
-}
-
-    sumPx += tmp_tp_pt*cos(tmp_tp_phi);
-    sumPy += tmp_tp_pt*sin(tmp_tp_phi);
 
     // ----------------------------------------------------------------------------------------------
     // look for L1 tracks matched to the tracking particle
@@ -1550,6 +1558,8 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
     m_tp_phi->push_back(tmp_tp_phi);
     m_tp_dxy->push_back(tmp_tp_dxy);
     m_tp_z0->push_back(tmp_tp_z0);
+    m_tp_DeltaZ->push_back(tmp_tp_DeltaZ);
+    m_tp_vz->push_back(tmp_tp_vz);
     m_tp_d0->push_back(tmp_tp_d0);
     m_tp_z0_prod->push_back(tmp_tp_z0_prod);
     m_tp_d0_prod->push_back(tmp_tp_d0_prod);
@@ -1653,9 +1663,6 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
     }//end TrackingInJets
 
   } //end loop tracking particles
-
-  float tmp_tp_MET = sqrt( sumPx*sumPx + sumPy*sumPy );
-  m_tp_MET->push_back(tmp_tp_MET);  
 
   if (TrackingInJets) {
     for (int ij=0; ij<(int)v_jets.size(); ij++) {

@@ -138,6 +138,7 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),         ## TTTrack input
                                        MCTruthTrackInputTag = cms.InputTag("TTTrackAssociatorFromPixelDigis", "Level1TTTracks"),  ## TrkMET input
                                        L1TrkMETInputTag = cms.InputTag("L1TrackerEtMiss", "trkMET"),
+                                       L1TrueMETInputTag = cms.InputTag("L1TrackerEtMiss", "trueMET"),
                                        L1VertexInputTag = cms.InputTag("L1TkPrimaryVertex", "l1vertextdr"),  
                                        # other input collections
                                        L1StubInputTag = cms.InputTag("TTStubsFromPhase2TrackerDigis","StubAccepted"),

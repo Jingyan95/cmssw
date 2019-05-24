@@ -13,7 +13,7 @@ sub1 = open(submitName,'w')
 sub1.write(submit+'\n')
 sub1.close()
 nfile = 10
-filename = 'PU200.txt'
+filename = 'TTbar_PU200.txt'
 with open(filename,'r') as f:
     counter1 = 1
     while True:
