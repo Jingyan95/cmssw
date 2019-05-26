@@ -17,7 +17,7 @@ static bool doKF=true; //true => use KF (assumes USEHYBRID is defined)
 static bool printDebugKF=false; // if true print lots of debugging statements related to the KF fit
 
 static unsigned int nHelixPar = 4; // 4 or 5 param helix fit.
-static bool hourglassExtended=false; // This is turn on Displaced Tracking. Also edit L1TrackNtupleMaker_cfg.py, searching for and uncommenting "Extended" on several lines. ****************
+static bool hourglassExtended=true; // This is turn on Displaced Tracking. Also edit L1TrackNtupleMaker_cfg.py, searching for and uncommenting "Extended" on several lines. ****************
 
 //Gemetry extensions
 static std::string geomext=hourglassExtended?"hourglassExtended":"hourglass";  

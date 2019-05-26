@@ -5,9 +5,14 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.Utilities.FileUtils as FileUtils
 import os
+import FWCore.ParameterSet.VarParsing as VarParsing
 process = cms.Process("L1TrackNtuple")
 
 GEOMETRY = "D21"
+
+options = VarParsing.VarParsing ('analysis')
+# get and parse the command line arguments
+options.parseArguments()
 
  
 ############################################################
@@ -48,15 +53,15 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 # input and output
 ############################################################
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
 
 # Get list of MC datasets from repo, or specify yourself.
 
 if GEOMETRY == "D17": # Tilted barrel T5 tracker
-    inputMC = FileUtils.loadListFromFile('../../TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/PU200.txt')
+    inputMC = FileUtils.loadListFromFile('../../../TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/PU200.txt')
 
 elif GEOMETRY == "D21": # Tilted barrel T6 tracker
-    inputMC = FileUtils.loadListFromFile('../../TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt')
+    inputMC = FileUtils.loadListFromFile('../../../TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt')
     # inputMC = FileUtils.loadListFromFile('../../TrackFindingTMTT/test/MCsamples/1040/RelVal/SingleMuPt2to100/PU0.txt')
     # inputMC = FileUtils.loadListFromFile('../../TrackFindingTMTT/test/MCsamples/1040/RelVal/DisplacedSingleMuPt2to100/PU0.txt')
 
@@ -65,7 +70,7 @@ elif GEOMETRY == "TkOnly":
     # inputMC = ['/store/relval/CMSSW_9_3_7/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200-v1/10000/5A8CFF7F-1E2D-E811-A7B0-0242AC130002.root']
 
 process.source = cms.Source("PoolSource", 
-                            fileNames = cms.untracked.vstring(*inputMC),
+                            fileNames = cms.untracked.vstring(options.inputFiles),
                             inputCommands = cms.untracked.vstring(
                               'keep *_*_*_*',
                               'drop l1tEMTFHit2016*_*_*_*',
@@ -73,7 +78,7 @@ process.source = cms.Source("PoolSource",
                               )
                             )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string('TTbar_PU200_hybrid.root'), closeFileFast = cms.untracked.bool(True))
+process.TFileService = cms.Service("TFileService", fileName = cms.string(options.outputFile), closeFileFast = cms.untracked.bool(True))
 
 
 
