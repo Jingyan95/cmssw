@@ -313,6 +313,7 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
 
   // adding capability of booking histograms internal to tracklet steps
   histimp=new FPGAHistImp;
+  TH1::AddDirectory(kTRUE); 
   histimp->init();
   histimp->bookLayerResidual();
   histimp->bookDiskResidual();

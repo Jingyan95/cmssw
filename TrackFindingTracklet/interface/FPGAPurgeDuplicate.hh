@@ -144,8 +144,10 @@ public:
             seedRank.push_back(7);
           } else if (curSeed == 21) {
             seedRank.push_back(8);
+          } else if (hourglassExtended) {
+            seedRank.push_back(9);
           } else {
-            cout << "Error: Seed " << curSeed << " not found in list." << endl;
+            cout << "Error: Seed " << curSeed << " not found in list, and hourglassExtended not set." << endl;
             assert(0);
           }
 
