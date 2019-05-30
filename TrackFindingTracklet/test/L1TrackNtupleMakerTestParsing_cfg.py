@@ -58,10 +58,10 @@ process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEv
 # Get list of MC datasets from repo, or specify yourself.
 
 if GEOMETRY == "D17": # Tilted barrel T5 tracker
-    inputMC = FileUtils.loadListFromFile('../../../TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/PU200.txt')
+    inputMC = FileUtils.loadListFromFile('../../TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/PU200.txt')
 
 elif GEOMETRY == "D21": # Tilted barrel T6 tracker
-    inputMC = FileUtils.loadListFromFile('../../../TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt')
+    inputMC = FileUtils.loadListFromFile('../../TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt')
     # inputMC = FileUtils.loadListFromFile('../../TrackFindingTMTT/test/MCsamples/1040/RelVal/SingleMuPt2to100/PU0.txt')
     # inputMC = FileUtils.loadListFromFile('../../TrackFindingTMTT/test/MCsamples/1040/RelVal/DisplacedSingleMuPt2to100/PU0.txt')
 
@@ -114,16 +114,16 @@ from L1Trigger.TrackFindingTracklet.Tracklet_cfi import *
 
 
 ### emulation instead 
-process.load("L1Trigger.TrackFindingTracklet.L1TrackletEmulationTracks_cff")
-process.TTTracksEmulation = cms.Path(process.L1TrackletEmulationTracks)
-process.TTTracksEmulationWithTruth = cms.Path(process.L1TrackletEmulationTracksWithAssociators)
+#process.load("L1Trigger.TrackFindingTracklet.L1TrackletEmulationTracks_cff")
+#process.TTTracksEmulation = cms.Path(process.L1TrackletEmulationTracks)
+#process.TTTracksEmulationWithTruth = cms.Path(process.L1TrackletEmulationTracksWithAssociators)
 #TTTracksFromTrackletEmulation.asciiFileName = cms.untracked.string("evlist.txt")
 #TTTracksFromTrackletEmulation.failscenario = cms.untracked.int32(0)
 
 ### Extended (displaced) emulation
-#process.load("L1Trigger.TrackFindingTracklet.L1ExtendedTrackletEmulationTracks_cff")
-#process.TTTracksExtendedEmulation = cms.Path(process.L1ExtendedTrackletEmulationTracks)
-#process.TTTracksExtendedEmulationWithTruth = cms.Path(process.L1ExtendedTrackletEmulationTracksWithAssociators)
+process.load("L1Trigger.TrackFindingTracklet.L1ExtendedTrackletEmulationTracks_cff")
+process.TTTracksExtendedEmulation = cms.Path(process.L1ExtendedTrackletEmulationTracks)
+process.TTTracksExtendedEmulationWithTruth = cms.Path(process.L1ExtendedTrackletEmulationTracksWithAssociators)
 
 
 ############################################################
@@ -149,8 +149,8 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        TP_maxEta = cms.double(2.5),      # only save TPs with |eta| < X
                                        TP_maxZ0 = cms.double(30.0),      # only save TPs with |z0| < X cm
                                        #L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),                 ## TTTrack input
-                                       L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),         ## TTTrack input
-                                       #L1TrackInputTag = cms.InputTag("TTTracksFromExtendedTrackletEmulation", "Level1TTTracks"), ## TTTrack input (displaced)
+                                       #L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),         ## TTTrack input
+                                       L1TrackInputTag = cms.InputTag("TTTracksFromExtendedTrackletEmulation", "Level1TTTracks"), ## TTTrack input (displaced)
                                        MCTruthTrackInputTag = cms.InputTag("TTTrackAssociatorFromPixelDigis", "Level1TTTracks"),  ## MCTruth input 
                                        # other input collections
                                        L1StubInputTag = cms.InputTag("TTStubsFromPhase2TrackerDigis","StubAccepted"),
@@ -171,8 +171,8 @@ process.ana = cms.Path(process.L1TrackNtuple)
 # process.schedule = cms.Schedule(process.TTClusterStubTruth,process.TTTracksEmulationWithTruth,process.ana)
 
 # use this to only run tracking + track associator
-process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth,process.ana)
+#process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth,process.ana)
 
 # use this to only run extended tracking + track associator
-#process.schedule = cms.Schedule(process.TTTracksExtendedEmulationWithTruth,process.ana)
+process.schedule = cms.Schedule(process.TTTracksExtendedEmulationWithTruth,process.ana)
 

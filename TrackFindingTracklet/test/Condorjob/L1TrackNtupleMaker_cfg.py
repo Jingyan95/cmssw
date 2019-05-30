@@ -5,14 +5,9 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.Utilities.FileUtils as FileUtils
 import os
-import FWCore.ParameterSet.VarParsing as VarParsing
 process = cms.Process("L1TrackNtuple")
 
 GEOMETRY = "D21"
-
-options = VarParsing.VarParsing ('analysis')
-# get and parse the command line arguments
-options.parseArguments()
 
  
 ############################################################
@@ -53,7 +48,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 # input and output
 ############################################################
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
 
 # Get list of MC datasets from repo, or specify yourself.
 
@@ -70,7 +65,7 @@ elif GEOMETRY == "TkOnly":
     # inputMC = ['/store/relval/CMSSW_9_3_7/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_93X_upgrade2023_realistic_v5_2023D17PU200-v1/10000/5A8CFF7F-1E2D-E811-A7B0-0242AC130002.root']
 
 process.source = cms.Source("PoolSource", 
-                            fileNames = cms.untracked.vstring(options.inputFiles),
+                            fileNames = cms.untracked.vstring(*inputMC),
                             inputCommands = cms.untracked.vstring(
                               'keep *_*_*_*',
                               'drop l1tEMTFHit2016*_*_*_*',
@@ -78,7 +73,7 @@ process.source = cms.Source("PoolSource",
                               )
                             )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string(options.outputFile), closeFileFast = cms.untracked.bool(True))
+process.TFileService = cms.Service("TFileService", fileName = cms.string('TTbar_PU200_hybrid.root'), closeFileFast = cms.untracked.bool(True))
 
 
 
@@ -114,16 +109,16 @@ from L1Trigger.TrackFindingTracklet.Tracklet_cfi import *
 
 
 ### emulation instead 
-process.load("L1Trigger.TrackFindingTracklet.L1TrackletEmulationTracks_cff")
-process.TTTracksEmulation = cms.Path(process.L1TrackletEmulationTracks)
-process.TTTracksEmulationWithTruth = cms.Path(process.L1TrackletEmulationTracksWithAssociators)
+#process.load("L1Trigger.TrackFindingTracklet.L1TrackletEmulationTracks_cff")
+#process.TTTracksEmulation = cms.Path(process.L1TrackletEmulationTracks)
+#process.TTTracksEmulationWithTruth = cms.Path(process.L1TrackletEmulationTracksWithAssociators)
 #TTTracksFromTrackletEmulation.asciiFileName = cms.untracked.string("evlist.txt")
 #TTTracksFromTrackletEmulation.failscenario = cms.untracked.int32(0)
 
 ### Extended (displaced) emulation
-#process.load("L1Trigger.TrackFindingTracklet.L1ExtendedTrackletEmulationTracks_cff")
-#process.TTTracksExtendedEmulation = cms.Path(process.L1ExtendedTrackletEmulationTracks)
-#process.TTTracksExtendedEmulationWithTruth = cms.Path(process.L1ExtendedTrackletEmulationTracksWithAssociators)
+process.load("L1Trigger.TrackFindingTracklet.L1ExtendedTrackletEmulationTracks_cff")
+process.TTTracksExtendedEmulation = cms.Path(process.L1ExtendedTrackletEmulationTracks)
+process.TTTracksExtendedEmulationWithTruth = cms.Path(process.L1ExtendedTrackletEmulationTracksWithAssociators)
 
 
 ############################################################
@@ -149,8 +144,8 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        TP_maxEta = cms.double(2.5),      # only save TPs with |eta| < X
                                        TP_maxZ0 = cms.double(30.0),      # only save TPs with |z0| < X cm
                                        #L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),                 ## TTTrack input
-                                       L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),         ## TTTrack input
-                                       #L1TrackInputTag = cms.InputTag("TTTracksFromExtendedTrackletEmulation", "Level1TTTracks"), ## TTTrack input (displaced)
+                                       #L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),         ## TTTrack input
+                                       L1TrackInputTag = cms.InputTag("TTTracksFromExtendedTrackletEmulation", "Level1TTTracks"), ## TTTrack input (displaced)
                                        MCTruthTrackInputTag = cms.InputTag("TTTrackAssociatorFromPixelDigis", "Level1TTTracks"),  ## MCTruth input 
                                        # other input collections
                                        L1StubInputTag = cms.InputTag("TTStubsFromPhase2TrackerDigis","StubAccepted"),
@@ -171,8 +166,8 @@ process.ana = cms.Path(process.L1TrackNtuple)
 # process.schedule = cms.Schedule(process.TTClusterStubTruth,process.TTTracksEmulationWithTruth,process.ana)
 
 # use this to only run tracking + track associator
-process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth,process.ana)
+#process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth,process.ana)
 
 # use this to only run extended tracking + track associator
-#process.schedule = cms.Schedule(process.TTTracksExtendedEmulationWithTruth,process.ana)
+process.schedule = cms.Schedule(process.TTTracksExtendedEmulationWithTruth,process.ana)
 

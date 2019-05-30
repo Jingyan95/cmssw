@@ -1,0 +1,1160 @@
+28-May-2019 19:22:14 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/EE163EAC-1441-ED42-91ED-98105E9CD167.root
+[2019-05-28 19:22:18.157225 +0200][Warning][XRootDTransport   ] [131.225.205.80:29334 #0.0] Logged in, accepting empty login response.
+%MSG-w XrdAdaptor:  file_open 28-May-2019 19:22:18 CEST pre-events
+Data is served from fnal.gov instead of original site T2_CH_CERN
+%MSG
+28-May-2019 19:22:24 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/EE163EAC-1441-ED42-91ED-98105E9CD167.root
+L1TrackNtupleMaker::beginJob
+Begin processing the 1st record. Run 1, Event 1001, LumiSection 11 on stream 0 at 28-May-2019 19:23:35.914 CEST
+Begin processing the 2nd record. Run 1, Event 1002, LumiSection 11 on stream 0 at 28-May-2019 19:23:54.873 CEST
+Begin processing the 3rd record. Run 1, Event 1004, LumiSection 11 on stream 0 at 28-May-2019 19:24:06.244 CEST
+Begin processing the 4th record. Run 1, Event 1003, LumiSection 11 on stream 0 at 28-May-2019 19:24:18.449 CEST
+Begin processing the 5th record. Run 1, Event 1006, LumiSection 11 on stream 0 at 28-May-2019 19:24:30.321 CEST
+Begin processing the 6th record. Run 1, Event 1005, LumiSection 11 on stream 0 at 28-May-2019 19:24:42.881 CEST
+Begin processing the 7th record. Run 1, Event 1008, LumiSection 11 on stream 0 at 28-May-2019 19:24:56.152 CEST
+Begin processing the 8th record. Run 1, Event 1010, LumiSection 11 on stream 0 at 28-May-2019 19:25:08.990 CEST
+Begin processing the 9th record. Run 1, Event 1009, LumiSection 11 on stream 0 at 28-May-2019 19:25:21.560 CEST
+Begin processing the 10th record. Run 1, Event 1014, LumiSection 11 on stream 0 at 28-May-2019 19:25:35.106 CEST
+Begin processing the 11th record. Run 1, Event 1016, LumiSection 11 on stream 0 at 28-May-2019 19:25:49.062 CEST
+%MSG-w XrdAdaptor:  (NoModuleName) 28-May-2019 19:25:54 CEST pre-events
+Data is now served from fnal.gov, T2_UK_SGrid_RALPP instead of previous fnal.gov
+%MSG
+Begin processing the 12th record. Run 1, Event 1007, LumiSection 11 on stream 0 at 28-May-2019 19:26:01.681 CEST
+%MSG-w XrdAdaptor:  source 28-May-2019 19:26:07 CEST PostProcessEvent
+Data is now served from T2_UK_SGrid_RALPP instead of previous fnal.gov, T2_UK_SGrid_RALPP
+%MSG
+Begin processing the 13th record. Run 1, Event 1011, LumiSection 11 on stream 0 at 28-May-2019 19:26:08.263 CEST
+Begin processing the 14th record. Run 1, Event 1013, LumiSection 11 on stream 0 at 28-May-2019 19:26:16.485 CEST
+Begin processing the 15th record. Run 1, Event 1012, LumiSection 11 on stream 0 at 28-May-2019 19:26:25.767 CEST
+Begin processing the 16th record. Run 1, Event 1020, LumiSection 11 on stream 0 at 28-May-2019 19:26:43.498 CEST
+Begin processing the 17th record. Run 1, Event 1018, LumiSection 11 on stream 0 at 28-May-2019 19:27:00.794 CEST
+Begin processing the 18th record. Run 1, Event 1017, LumiSection 11 on stream 0 at 28-May-2019 19:27:16.166 CEST
+Begin processing the 19th record. Run 1, Event 1024, LumiSection 11 on stream 0 at 28-May-2019 19:27:37.362 CEST
+Begin processing the 20th record. Run 1, Event 1015, LumiSection 11 on stream 0 at 28-May-2019 19:27:54.573 CEST
+Begin processing the 21st record. Run 1, Event 1022, LumiSection 11 on stream 0 at 28-May-2019 19:28:12.520 CEST
+Begin processing the 22nd record. Run 1, Event 1021, LumiSection 11 on stream 0 at 28-May-2019 19:28:28.824 CEST
+Begin processing the 23rd record. Run 1, Event 1023, LumiSection 11 on stream 0 at 28-May-2019 19:28:44.216 CEST
+Begin processing the 24th record. Run 1, Event 1019, LumiSection 11 on stream 0 at 28-May-2019 19:29:02.454 CEST
+Begin processing the 25th record. Run 1, Event 1025, LumiSection 11 on stream 0 at 28-May-2019 19:29:22.382 CEST
+Begin processing the 26th record. Run 1, Event 1029, LumiSection 11 on stream 0 at 28-May-2019 19:29:42.840 CEST
+Begin processing the 27th record. Run 1, Event 1026, LumiSection 11 on stream 0 at 28-May-2019 19:30:02.837 CEST
+Begin processing the 28th record. Run 1, Event 1027, LumiSection 11 on stream 0 at 28-May-2019 19:30:18.763 CEST
+Begin processing the 29th record. Run 1, Event 1028, LumiSection 11 on stream 0 at 28-May-2019 19:30:37.293 CEST
+Begin processing the 30th record. Run 1, Event 1032, LumiSection 11 on stream 0 at 28-May-2019 19:31:04.044 CEST
+Begin processing the 31st record. Run 1, Event 1037, LumiSection 11 on stream 0 at 28-May-2019 19:31:26.707 CEST
+Begin processing the 32nd record. Run 1, Event 1035, LumiSection 11 on stream 0 at 28-May-2019 19:31:45.214 CEST
+Begin processing the 33rd record. Run 1, Event 1030, LumiSection 11 on stream 0 at 28-May-2019 19:32:02.343 CEST
+Begin processing the 34th record. Run 1, Event 1034, LumiSection 11 on stream 0 at 28-May-2019 19:32:25.055 CEST
+Begin processing the 35th record. Run 1, Event 1038, LumiSection 11 on stream 0 at 28-May-2019 19:32:46.024 CEST
+Begin processing the 36th record. Run 1, Event 1036, LumiSection 11 on stream 0 at 28-May-2019 19:33:04.153 CEST
+Begin processing the 37th record. Run 1, Event 1033, LumiSection 11 on stream 0 at 28-May-2019 19:33:26.807 CEST
+Begin processing the 38th record. Run 1, Event 1040, LumiSection 11 on stream 0 at 28-May-2019 19:33:40.995 CEST
+Begin processing the 39th record. Run 1, Event 1041, LumiSection 11 on stream 0 at 28-May-2019 19:33:56.217 CEST
+Begin processing the 40th record. Run 1, Event 1039, LumiSection 11 on stream 0 at 28-May-2019 19:34:14.585 CEST
+Begin processing the 41st record. Run 1, Event 1044, LumiSection 11 on stream 0 at 28-May-2019 19:34:28.696 CEST
+Begin processing the 42nd record. Run 1, Event 1045, LumiSection 11 on stream 0 at 28-May-2019 19:34:46.213 CEST
+Begin processing the 43rd record. Run 1, Event 1043, LumiSection 11 on stream 0 at 28-May-2019 19:35:05.159 CEST
+Begin processing the 44th record. Run 1, Event 1051, LumiSection 11 on stream 0 at 28-May-2019 19:35:27.216 CEST
+Begin processing the 45th record. Run 1, Event 1046, LumiSection 11 on stream 0 at 28-May-2019 19:35:46.300 CEST
+Begin processing the 46th record. Run 1, Event 1042, LumiSection 11 on stream 0 at 28-May-2019 19:36:08.271 CEST
+Begin processing the 47th record. Run 1, Event 1047, LumiSection 11 on stream 0 at 28-May-2019 19:36:27.750 CEST
+Begin processing the 48th record. Run 1, Event 1031, LumiSection 11 on stream 0 at 28-May-2019 19:36:44.311 CEST
+Begin processing the 49th record. Run 1, Event 1050, LumiSection 11 on stream 0 at 28-May-2019 19:36:59.517 CEST
+Begin processing the 50th record. Run 1, Event 1049, LumiSection 11 on stream 0 at 28-May-2019 19:37:16.666 CEST
+Begin processing the 51st record. Run 1, Event 1052, LumiSection 11 on stream 0 at 28-May-2019 19:37:39.978 CEST
+Begin processing the 52nd record. Run 1, Event 1053, LumiSection 11 on stream 0 at 28-May-2019 19:37:58.810 CEST
+Begin processing the 53rd record. Run 1, Event 1056, LumiSection 11 on stream 0 at 28-May-2019 19:38:18.629 CEST
+Begin processing the 54th record. Run 1, Event 1055, LumiSection 11 on stream 0 at 28-May-2019 19:38:39.375 CEST
+Begin processing the 55th record. Run 1, Event 1058, LumiSection 11 on stream 0 at 28-May-2019 19:38:58.669 CEST
+Begin processing the 56th record. Run 1, Event 1061, LumiSection 11 on stream 0 at 28-May-2019 19:39:18.683 CEST
+Begin processing the 57th record. Run 1, Event 1048, LumiSection 11 on stream 0 at 28-May-2019 19:39:38.690 CEST
+Begin processing the 58th record. Run 1, Event 1059, LumiSection 11 on stream 0 at 28-May-2019 19:40:01.182 CEST
+Begin processing the 59th record. Run 1, Event 1060, LumiSection 11 on stream 0 at 28-May-2019 19:40:22.804 CEST
+Begin processing the 60th record. Run 1, Event 1062, LumiSection 11 on stream 0 at 28-May-2019 19:40:41.782 CEST
+Begin processing the 61st record. Run 1, Event 1063, LumiSection 11 on stream 0 at 28-May-2019 19:41:00.087 CEST
+Begin processing the 62nd record. Run 1, Event 1057, LumiSection 11 on stream 0 at 28-May-2019 19:41:19.582 CEST
+Begin processing the 63rd record. Run 1, Event 1067, LumiSection 11 on stream 0 at 28-May-2019 19:41:37.524 CEST
+Begin processing the 64th record. Run 1, Event 1068, LumiSection 11 on stream 0 at 28-May-2019 19:41:57.637 CEST
+Begin processing the 65th record. Run 1, Event 1064, LumiSection 11 on stream 0 at 28-May-2019 19:42:20.735 CEST
+Begin processing the 66th record. Run 1, Event 1054, LumiSection 11 on stream 0 at 28-May-2019 19:42:39.865 CEST
+Begin processing the 67th record. Run 1, Event 1066, LumiSection 11 on stream 0 at 28-May-2019 19:42:59.789 CEST
+Begin processing the 68th record. Run 1, Event 1069, LumiSection 11 on stream 0 at 28-May-2019 19:43:22.028 CEST
+Begin processing the 69th record. Run 1, Event 1070, LumiSection 11 on stream 0 at 28-May-2019 19:43:38.854 CEST
+Begin processing the 70th record. Run 1, Event 1065, LumiSection 11 on stream 0 at 28-May-2019 19:44:00.772 CEST
+Begin processing the 71st record. Run 1, Event 1075, LumiSection 11 on stream 0 at 28-May-2019 19:44:23.175 CEST
+Begin processing the 72nd record. Run 1, Event 1072, LumiSection 11 on stream 0 at 28-May-2019 19:44:44.304 CEST
+Begin processing the 73rd record. Run 1, Event 1073, LumiSection 11 on stream 0 at 28-May-2019 19:45:03.658 CEST
+Begin processing the 74th record. Run 1, Event 1071, LumiSection 11 on stream 0 at 28-May-2019 19:45:23.903 CEST
+Begin processing the 75th record. Run 1, Event 1076, LumiSection 11 on stream 0 at 28-May-2019 19:45:46.094 CEST
+Begin processing the 76th record. Run 1, Event 1078, LumiSection 11 on stream 0 at 28-May-2019 19:46:07.098 CEST
+Begin processing the 77th record. Run 1, Event 1077, LumiSection 11 on stream 0 at 28-May-2019 19:46:25.516 CEST
+Begin processing the 78th record. Run 1, Event 1084, LumiSection 11 on stream 0 at 28-May-2019 19:46:46.141 CEST
+Begin processing the 79th record. Run 1, Event 1080, LumiSection 11 on stream 0 at 28-May-2019 19:47:06.449 CEST
+Begin processing the 80th record. Run 1, Event 1079, LumiSection 11 on stream 0 at 28-May-2019 19:47:24.588 CEST
+Begin processing the 81st record. Run 1, Event 1074, LumiSection 11 on stream 0 at 28-May-2019 19:47:46.560 CEST
+Begin processing the 82nd record. Run 1, Event 1083, LumiSection 11 on stream 0 at 28-May-2019 19:48:06.818 CEST
+Begin processing the 83rd record. Run 1, Event 1086, LumiSection 11 on stream 0 at 28-May-2019 19:48:22.661 CEST
+Begin processing the 84th record. Run 1, Event 1081, LumiSection 11 on stream 0 at 28-May-2019 19:48:41.120 CEST
+Begin processing the 85th record. Run 1, Event 1085, LumiSection 11 on stream 0 at 28-May-2019 19:48:59.977 CEST
+Begin processing the 86th record. Run 1, Event 1089, LumiSection 11 on stream 0 at 28-May-2019 19:49:19.264 CEST
+Begin processing the 87th record. Run 1, Event 1088, LumiSection 11 on stream 0 at 28-May-2019 19:49:41.105 CEST
+Begin processing the 88th record. Run 1, Event 1082, LumiSection 11 on stream 0 at 28-May-2019 19:50:02.708 CEST
+Begin processing the 89th record. Run 1, Event 1091, LumiSection 11 on stream 0 at 28-May-2019 19:50:19.378 CEST
+Begin processing the 90th record. Run 1, Event 1087, LumiSection 11 on stream 0 at 28-May-2019 19:50:35.449 CEST
+Begin processing the 91st record. Run 1, Event 1092, LumiSection 11 on stream 0 at 28-May-2019 19:50:54.255 CEST
+Begin processing the 92nd record. Run 1, Event 1090, LumiSection 11 on stream 0 at 28-May-2019 19:51:10.239 CEST
+Begin processing the 93rd record. Run 1, Event 1093, LumiSection 11 on stream 0 at 28-May-2019 19:51:24.645 CEST
+Begin processing the 94th record. Run 1, Event 1097, LumiSection 11 on stream 0 at 28-May-2019 19:51:37.613 CEST
+Begin processing the 95th record. Run 1, Event 1094, LumiSection 11 on stream 0 at 28-May-2019 19:51:51.690 CEST
+Begin processing the 96th record. Run 1, Event 1099, LumiSection 11 on stream 0 at 28-May-2019 19:52:05.490 CEST
+Begin processing the 97th record. Run 1, Event 1098, LumiSection 11 on stream 0 at 28-May-2019 19:52:22.208 CEST
+Begin processing the 98th record. Run 1, Event 1096, LumiSection 11 on stream 0 at 28-May-2019 19:52:39.705 CEST
+Begin processing the 99th record. Run 1, Event 1100, LumiSection 11 on stream 0 at 28-May-2019 19:52:56.010 CEST
+Begin processing the 100th record. Run 1, Event 1095, LumiSection 11 on stream 0 at 28-May-2019 19:53:12.502 CEST
+28-May-2019 19:53:17 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/EE163EAC-1441-ED42-91ED-98105E9CD167.root
+28-May-2019 19:53:17 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/E0BB0A7E-6C19-2141-8484-65EFA337DDBB.root
+%MSG-w XrdAdaptor:  file_open 28-May-2019 19:54:19 CEST PostProcessEvent
+Data is served from T2_UK_SGrid_RALPP instead of original site T2_CH_CERN
+%MSG
+28-May-2019 19:54:19 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/E0BB0A7E-6C19-2141-8484-65EFA337DDBB.root
+Begin processing the 101st record. Run 1, Event 1304, LumiSection 14 on stream 0 at 28-May-2019 19:54:48.135 CEST
+[2019-05-28 19:54:54.360823 +0200][Warning][XRootDTransport   ] [131.225.205.60:18264 #0.0] Logged in, accepting empty login response.
+%MSG-w XrdAdaptor:  (NoModuleName) 28-May-2019 19:54:54 CEST pre-events
+Data is now served from T2_UK_SGrid_RALPP, fnal.gov instead of previous T2_UK_SGrid_RALPP
+%MSG
+Begin processing the 102nd record. Run 1, Event 1302, LumiSection 14 on stream 0 at 28-May-2019 19:55:01.074 CEST
+%MSG-w XrdAdaptor:  PostModuleEvent 28-May-2019 19:55:06 CEST PostProcessEvent
+Data is now served from fnal.gov instead of previous T2_UK_SGrid_RALPP, fnal.gov
+%MSG
+Begin processing the 103rd record. Run 1, Event 1305, LumiSection 14 on stream 0 at 28-May-2019 19:55:16.446 CEST
+Begin processing the 104th record. Run 1, Event 1307, LumiSection 14 on stream 0 at 28-May-2019 19:55:29.240 CEST
+Begin processing the 105th record. Run 1, Event 1308, LumiSection 14 on stream 0 at 28-May-2019 19:55:40.312 CEST
+Begin processing the 106th record. Run 1, Event 1306, LumiSection 14 on stream 0 at 28-May-2019 19:55:52.104 CEST
+Begin processing the 107th record. Run 1, Event 1303, LumiSection 14 on stream 0 at 28-May-2019 19:56:09.026 CEST
+Begin processing the 108th record. Run 1, Event 1312, LumiSection 14 on stream 0 at 28-May-2019 19:56:22.937 CEST
+Begin processing the 109th record. Run 1, Event 1315, LumiSection 14 on stream 0 at 28-May-2019 19:56:35.646 CEST
+Begin processing the 110th record. Run 1, Event 1310, LumiSection 14 on stream 0 at 28-May-2019 19:56:50.147 CEST
+Begin processing the 111th record. Run 1, Event 1314, LumiSection 14 on stream 0 at 28-May-2019 19:57:02.018 CEST
+Begin processing the 112th record. Run 1, Event 1313, LumiSection 14 on stream 0 at 28-May-2019 19:57:16.764 CEST
+Begin processing the 113th record. Run 1, Event 1301, LumiSection 14 on stream 0 at 28-May-2019 19:57:31.158 CEST
+Begin processing the 114th record. Run 1, Event 1309, LumiSection 14 on stream 0 at 28-May-2019 19:57:44.765 CEST
+Begin processing the 115th record. Run 1, Event 1311, LumiSection 14 on stream 0 at 28-May-2019 19:57:57.934 CEST
+Begin processing the 116th record. Run 1, Event 1317, LumiSection 14 on stream 0 at 28-May-2019 19:58:12.299 CEST
+Begin processing the 117th record. Run 1, Event 1316, LumiSection 14 on stream 0 at 28-May-2019 19:58:26.399 CEST
+Begin processing the 118th record. Run 1, Event 1318, LumiSection 14 on stream 0 at 28-May-2019 19:58:39.613 CEST
+Begin processing the 119th record. Run 1, Event 1320, LumiSection 14 on stream 0 at 28-May-2019 19:58:54.837 CEST
+Begin processing the 120th record. Run 1, Event 1323, LumiSection 14 on stream 0 at 28-May-2019 19:59:10.095 CEST
+Begin processing the 121st record. Run 1, Event 1322, LumiSection 14 on stream 0 at 28-May-2019 19:59:25.518 CEST
+Begin processing the 122nd record. Run 1, Event 1321, LumiSection 14 on stream 0 at 28-May-2019 19:59:38.663 CEST
+%MSG-w XrdAdaptor:  (NoModuleName) 28-May-2019 19:59:46 CEST pre-events
+Data is now served from fnal.gov, T2_UK_SGrid_RALPP instead of previous fnal.gov
+%MSG
+Begin processing the 123rd record. Run 1, Event 1319, LumiSection 14 on stream 0 at 28-May-2019 19:59:53.688 CEST
+%MSG-w XrdAdaptor:  source 28-May-2019 19:59:59 CEST PostProcessEvent
+Data is now served from T2_UK_SGrid_RALPP instead of previous fnal.gov, T2_UK_SGrid_RALPP
+%MSG
+Begin processing the 124th record. Run 1, Event 1324, LumiSection 14 on stream 0 at 28-May-2019 20:00:02.366 CEST
+Begin processing the 125th record. Run 1, Event 1328, LumiSection 14 on stream 0 at 28-May-2019 20:00:22.675 CEST
+Begin processing the 126th record. Run 1, Event 1329, LumiSection 14 on stream 0 at 28-May-2019 20:00:43.318 CEST
+Begin processing the 127th record. Run 1, Event 1330, LumiSection 14 on stream 0 at 28-May-2019 20:01:02.835 CEST
+Begin processing the 128th record. Run 1, Event 1332, LumiSection 14 on stream 0 at 28-May-2019 20:01:27.514 CEST
+Begin processing the 129th record. Run 1, Event 1333, LumiSection 14 on stream 0 at 28-May-2019 20:01:46.120 CEST
+Begin processing the 130th record. Run 1, Event 1326, LumiSection 14 on stream 0 at 28-May-2019 20:02:10.269 CEST
+Begin processing the 131st record. Run 1, Event 1325, LumiSection 14 on stream 0 at 28-May-2019 20:02:36.155 CEST
+Begin processing the 132nd record. Run 1, Event 1327, LumiSection 14 on stream 0 at 28-May-2019 20:03:00.051 CEST
+Begin processing the 133rd record. Run 1, Event 1335, LumiSection 14 on stream 0 at 28-May-2019 20:03:25.903 CEST
+Begin processing the 134th record. Run 1, Event 1334, LumiSection 14 on stream 0 at 28-May-2019 20:03:50.946 CEST
+Begin processing the 135th record. Run 1, Event 1331, LumiSection 14 on stream 0 at 28-May-2019 20:04:11.365 CEST
+Begin processing the 136th record. Run 1, Event 1336, LumiSection 14 on stream 0 at 28-May-2019 20:04:32.202 CEST
+Begin processing the 137th record. Run 1, Event 1340, LumiSection 14 on stream 0 at 28-May-2019 20:04:54.389 CEST
+Begin processing the 138th record. Run 1, Event 1342, LumiSection 14 on stream 0 at 28-May-2019 20:05:16.456 CEST
+Begin processing the 139th record. Run 1, Event 1341, LumiSection 14 on stream 0 at 28-May-2019 20:05:34.918 CEST
+Begin processing the 140th record. Run 1, Event 1337, LumiSection 14 on stream 0 at 28-May-2019 20:05:57.337 CEST
+Begin processing the 141st record. Run 1, Event 1343, LumiSection 14 on stream 0 at 28-May-2019 20:06:20.437 CEST
+Begin processing the 142nd record. Run 1, Event 1344, LumiSection 14 on stream 0 at 28-May-2019 20:06:41.465 CEST
+Begin processing the 143rd record. Run 1, Event 1338, LumiSection 14 on stream 0 at 28-May-2019 20:07:05.929 CEST
+Begin processing the 144th record. Run 1, Event 1347, LumiSection 14 on stream 0 at 28-May-2019 20:07:26.869 CEST
+Begin processing the 145th record. Run 1, Event 1339, LumiSection 14 on stream 0 at 28-May-2019 20:07:45.193 CEST
+Begin processing the 146th record. Run 1, Event 1345, LumiSection 14 on stream 0 at 28-May-2019 20:08:03.075 CEST
+Begin processing the 147th record. Run 1, Event 1348, LumiSection 14 on stream 0 at 28-May-2019 20:08:24.273 CEST
+Begin processing the 148th record. Run 1, Event 1350, LumiSection 14 on stream 0 at 28-May-2019 20:08:44.511 CEST
+Begin processing the 149th record. Run 1, Event 1346, LumiSection 14 on stream 0 at 28-May-2019 20:09:04.837 CEST
+Begin processing the 150th record. Run 1, Event 1352, LumiSection 14 on stream 0 at 28-May-2019 20:09:20.383 CEST
+Begin processing the 151st record. Run 1, Event 1353, LumiSection 14 on stream 0 at 28-May-2019 20:09:39.885 CEST
+Begin processing the 152nd record. Run 1, Event 1355, LumiSection 14 on stream 0 at 28-May-2019 20:09:54.873 CEST
+Begin processing the 153rd record. Run 1, Event 1349, LumiSection 14 on stream 0 at 28-May-2019 20:10:06.867 CEST
+Begin processing the 154th record. Run 1, Event 1351, LumiSection 14 on stream 0 at 28-May-2019 20:10:23.805 CEST
+Begin processing the 155th record. Run 1, Event 1354, LumiSection 14 on stream 0 at 28-May-2019 20:10:38.876 CEST
+Begin processing the 156th record. Run 1, Event 1359, LumiSection 14 on stream 0 at 28-May-2019 20:10:56.260 CEST
+Begin processing the 157th record. Run 1, Event 1360, LumiSection 14 on stream 0 at 28-May-2019 20:11:15.553 CEST
+Begin processing the 158th record. Run 1, Event 1362, LumiSection 14 on stream 0 at 28-May-2019 20:11:35.168 CEST
+Begin processing the 159th record. Run 1, Event 1356, LumiSection 14 on stream 0 at 28-May-2019 20:11:55.308 CEST
+Begin processing the 160th record. Run 1, Event 1361, LumiSection 14 on stream 0 at 28-May-2019 20:12:13.693 CEST
+Begin processing the 161st record. Run 1, Event 1357, LumiSection 14 on stream 0 at 28-May-2019 20:12:30.215 CEST
+Begin processing the 162nd record. Run 1, Event 1358, LumiSection 14 on stream 0 at 28-May-2019 20:12:44.273 CEST
+Begin processing the 163rd record. Run 1, Event 1365, LumiSection 14 on stream 0 at 28-May-2019 20:13:00.854 CEST
+Begin processing the 164th record. Run 1, Event 1363, LumiSection 14 on stream 0 at 28-May-2019 20:13:20.016 CEST
+Begin processing the 165th record. Run 1, Event 1364, LumiSection 14 on stream 0 at 28-May-2019 20:13:36.732 CEST
+Begin processing the 166th record. Run 1, Event 1370, LumiSection 14 on stream 0 at 28-May-2019 20:13:58.830 CEST
+Begin processing the 167th record. Run 1, Event 1371, LumiSection 14 on stream 0 at 28-May-2019 20:14:16.441 CEST
+Begin processing the 168th record. Run 1, Event 1369, LumiSection 14 on stream 0 at 28-May-2019 20:14:37.339 CEST
+Begin processing the 169th record. Run 1, Event 1373, LumiSection 14 on stream 0 at 28-May-2019 20:14:54.663 CEST
+Begin processing the 170th record. Run 1, Event 1367, LumiSection 14 on stream 0 at 28-May-2019 20:15:15.360 CEST
+Begin processing the 171st record. Run 1, Event 1375, LumiSection 14 on stream 0 at 28-May-2019 20:15:35.909 CEST
+Begin processing the 172nd record. Run 1, Event 1372, LumiSection 14 on stream 0 at 28-May-2019 20:15:57.408 CEST
+Begin processing the 173rd record. Run 1, Event 1368, LumiSection 14 on stream 0 at 28-May-2019 20:16:20.064 CEST
+Begin processing the 174th record. Run 1, Event 1374, LumiSection 14 on stream 0 at 28-May-2019 20:16:44.464 CEST
+Begin processing the 175th record. Run 1, Event 1379, LumiSection 14 on stream 0 at 28-May-2019 20:17:06.012 CEST
+Begin processing the 176th record. Run 1, Event 1377, LumiSection 14 on stream 0 at 28-May-2019 20:17:24.158 CEST
+Begin processing the 177th record. Run 1, Event 1366, LumiSection 14 on stream 0 at 28-May-2019 20:17:47.584 CEST
+Begin processing the 178th record. Run 1, Event 1381, LumiSection 14 on stream 0 at 28-May-2019 20:18:14.756 CEST
+Begin processing the 179th record. Run 1, Event 1378, LumiSection 14 on stream 0 at 28-May-2019 20:18:36.172 CEST
+Begin processing the 180th record. Run 1, Event 1384, LumiSection 14 on stream 0 at 28-May-2019 20:18:59.606 CEST
+Begin processing the 181st record. Run 1, Event 1376, LumiSection 14 on stream 0 at 28-May-2019 20:19:18.109 CEST
+Begin processing the 182nd record. Run 1, Event 1385, LumiSection 14 on stream 0 at 28-May-2019 20:19:41.128 CEST
+Begin processing the 183rd record. Run 1, Event 1382, LumiSection 14 on stream 0 at 28-May-2019 20:20:00.800 CEST
+Begin processing the 184th record. Run 1, Event 1387, LumiSection 14 on stream 0 at 28-May-2019 20:20:18.670 CEST
+Begin processing the 185th record. Run 1, Event 1383, LumiSection 14 on stream 0 at 28-May-2019 20:20:37.858 CEST
+Begin processing the 186th record. Run 1, Event 1386, LumiSection 14 on stream 0 at 28-May-2019 20:20:57.709 CEST
+Begin processing the 187th record. Run 1, Event 1389, LumiSection 14 on stream 0 at 28-May-2019 20:21:14.135 CEST
+Begin processing the 188th record. Run 1, Event 1390, LumiSection 14 on stream 0 at 28-May-2019 20:21:34.757 CEST
+Begin processing the 189th record. Run 1, Event 1391, LumiSection 14 on stream 0 at 28-May-2019 20:21:55.751 CEST
+Begin processing the 190th record. Run 1, Event 1388, LumiSection 14 on stream 0 at 28-May-2019 20:22:13.136 CEST
+Begin processing the 191st record. Run 1, Event 1380, LumiSection 14 on stream 0 at 28-May-2019 20:22:33.910 CEST
+Begin processing the 192nd record. Run 1, Event 1395, LumiSection 14 on stream 0 at 28-May-2019 20:22:51.796 CEST
+Begin processing the 193rd record. Run 1, Event 1397, LumiSection 14 on stream 0 at 28-May-2019 20:23:11.403 CEST
+Begin processing the 194th record. Run 1, Event 1394, LumiSection 14 on stream 0 at 28-May-2019 20:23:28.278 CEST
+Begin processing the 195th record. Run 1, Event 1396, LumiSection 14 on stream 0 at 28-May-2019 20:23:51.743 CEST
+Begin processing the 196th record. Run 1, Event 1392, LumiSection 14 on stream 0 at 28-May-2019 20:24:12.773 CEST
+Begin processing the 197th record. Run 1, Event 1393, LumiSection 14 on stream 0 at 28-May-2019 20:24:42.124 CEST
+Begin processing the 198th record. Run 1, Event 1398, LumiSection 14 on stream 0 at 28-May-2019 20:25:07.987 CEST
+Begin processing the 199th record. Run 1, Event 1399, LumiSection 14 on stream 0 at 28-May-2019 20:25:36.168 CEST
+Begin processing the 200th record. Run 1, Event 1400, LumiSection 14 on stream 0 at 28-May-2019 20:26:06.253 CEST
+28-May-2019 20:26:11 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/E0BB0A7E-6C19-2141-8484-65EFA337DDBB.root
+28-May-2019 20:26:11 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/E03B287C-6571-534A-9566-27FAB7402CEC.root
+%MSG-w XrdAdaptor:  file_open 28-May-2019 20:26:13 CEST PostProcessEvent
+Data is served from T2_UK_SGrid_RALPP instead of original site T2_CH_CERN
+%MSG
+28-May-2019 20:26:13 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/E03B287C-6571-534A-9566-27FAB7402CEC.root
+Begin processing the 201st record. Run 1, Event 4803, LumiSection 49 on stream 0 at 28-May-2019 20:26:58.207 CEST
+Begin processing the 202nd record. Run 1, Event 4801, LumiSection 49 on stream 0 at 28-May-2019 20:27:23.567 CEST
+Begin processing the 203rd record. Run 1, Event 4804, LumiSection 49 on stream 0 at 28-May-2019 20:27:46.374 CEST
+Begin processing the 204th record. Run 1, Event 4808, LumiSection 49 on stream 0 at 28-May-2019 20:28:07.733 CEST
+Begin processing the 205th record. Run 1, Event 4809, LumiSection 49 on stream 0 at 28-May-2019 20:28:32.176 CEST
+Begin processing the 206th record. Run 1, Event 4805, LumiSection 49 on stream 0 at 28-May-2019 20:28:55.489 CEST
+Begin processing the 207th record. Run 1, Event 4807, LumiSection 49 on stream 0 at 28-May-2019 20:29:22.379 CEST
+Begin processing the 208th record. Run 1, Event 4806, LumiSection 49 on stream 0 at 28-May-2019 20:29:42.463 CEST
+Begin processing the 209th record. Run 1, Event 4810, LumiSection 49 on stream 0 at 28-May-2019 20:30:05.019 CEST
+Begin processing the 210th record. Run 1, Event 4812, LumiSection 49 on stream 0 at 28-May-2019 20:30:26.076 CEST
+Begin processing the 211th record. Run 1, Event 4817, LumiSection 49 on stream 0 at 28-May-2019 20:30:46.660 CEST
+Begin processing the 212th record. Run 1, Event 4813, LumiSection 49 on stream 0 at 28-May-2019 20:31:03.882 CEST
+Begin processing the 213th record. Run 1, Event 4814, LumiSection 49 on stream 0 at 28-May-2019 20:31:21.274 CEST
+Begin processing the 214th record. Run 1, Event 4811, LumiSection 49 on stream 0 at 28-May-2019 20:31:39.367 CEST
+Begin processing the 215th record. Run 1, Event 4802, LumiSection 49 on stream 0 at 28-May-2019 20:31:55.162 CEST
+Begin processing the 216th record. Run 1, Event 4815, LumiSection 49 on stream 0 at 28-May-2019 20:32:11.871 CEST
+Begin processing the 217th record. Run 1, Event 4821, LumiSection 49 on stream 0 at 28-May-2019 20:32:30.627 CEST
+Begin processing the 218th record. Run 1, Event 4818, LumiSection 49 on stream 0 at 28-May-2019 20:32:43.390 CEST
+Begin processing the 219th record. Run 1, Event 4820, LumiSection 49 on stream 0 at 28-May-2019 20:33:00.168 CEST
+Begin processing the 220th record. Run 1, Event 4816, LumiSection 49 on stream 0 at 28-May-2019 20:33:16.418 CEST
+Begin processing the 221st record. Run 1, Event 4823, LumiSection 49 on stream 0 at 28-May-2019 20:33:31.625 CEST
+Begin processing the 222nd record. Run 1, Event 4819, LumiSection 49 on stream 0 at 28-May-2019 20:33:48.524 CEST
+Begin processing the 223rd record. Run 1, Event 4824, LumiSection 49 on stream 0 at 28-May-2019 20:34:04.297 CEST
+Begin processing the 224th record. Run 1, Event 4822, LumiSection 49 on stream 0 at 28-May-2019 20:34:19.056 CEST
+Begin processing the 225th record. Run 1, Event 4826, LumiSection 49 on stream 0 at 28-May-2019 20:34:34.437 CEST
+Begin processing the 226th record. Run 1, Event 4829, LumiSection 49 on stream 0 at 28-May-2019 20:34:51.883 CEST
+Begin processing the 227th record. Run 1, Event 4827, LumiSection 49 on stream 0 at 28-May-2019 20:35:09.795 CEST
+Begin processing the 228th record. Run 1, Event 4831, LumiSection 49 on stream 0 at 28-May-2019 20:35:27.449 CEST
+Begin processing the 229th record. Run 1, Event 4828, LumiSection 49 on stream 0 at 28-May-2019 20:35:44.655 CEST
+Begin processing the 230th record. Run 1, Event 4833, LumiSection 49 on stream 0 at 28-May-2019 20:36:00.514 CEST
+Begin processing the 231st record. Run 1, Event 4832, LumiSection 49 on stream 0 at 28-May-2019 20:36:16.434 CEST
+Begin processing the 232nd record. Run 1, Event 4836, LumiSection 49 on stream 0 at 28-May-2019 20:36:29.193 CEST
+Begin processing the 233rd record. Run 1, Event 4825, LumiSection 49 on stream 0 at 28-May-2019 20:36:41.494 CEST
+Begin processing the 234th record. Run 1, Event 4830, LumiSection 49 on stream 0 at 28-May-2019 20:36:55.954 CEST
+Begin processing the 235th record. Run 1, Event 4837, LumiSection 49 on stream 0 at 28-May-2019 20:37:07.761 CEST
+Begin processing the 236th record. Run 1, Event 4840, LumiSection 49 on stream 0 at 28-May-2019 20:37:22.129 CEST
+Begin processing the 237th record. Run 1, Event 4834, LumiSection 49 on stream 0 at 28-May-2019 20:37:34.631 CEST
+Begin processing the 238th record. Run 1, Event 4842, LumiSection 49 on stream 0 at 28-May-2019 20:37:47.491 CEST
+Begin processing the 239th record. Run 1, Event 4839, LumiSection 49 on stream 0 at 28-May-2019 20:38:04.451 CEST
+Begin processing the 240th record. Run 1, Event 4838, LumiSection 49 on stream 0 at 28-May-2019 20:38:16.317 CEST
+Begin processing the 241st record. Run 1, Event 4847, LumiSection 49 on stream 0 at 28-May-2019 20:38:30.608 CEST
+Begin processing the 242nd record. Run 1, Event 4845, LumiSection 49 on stream 0 at 28-May-2019 20:38:45.280 CEST
+Begin processing the 243rd record. Run 1, Event 4835, LumiSection 49 on stream 0 at 28-May-2019 20:39:00.921 CEST
+Begin processing the 244th record. Run 1, Event 4846, LumiSection 49 on stream 0 at 28-May-2019 20:39:14.398 CEST
+Begin processing the 245th record. Run 1, Event 4849, LumiSection 49 on stream 0 at 28-May-2019 20:39:27.323 CEST
+Begin processing the 246th record. Run 1, Event 4841, LumiSection 49 on stream 0 at 28-May-2019 20:39:41.770 CEST
+Begin processing the 247th record. Run 1, Event 4850, LumiSection 49 on stream 0 at 28-May-2019 20:39:55.033 CEST
+Begin processing the 248th record. Run 1, Event 4844, LumiSection 49 on stream 0 at 28-May-2019 20:40:06.555 CEST
+Begin processing the 249th record. Run 1, Event 4843, LumiSection 49 on stream 0 at 28-May-2019 20:40:20.854 CEST
+Begin processing the 250th record. Run 1, Event 4852, LumiSection 49 on stream 0 at 28-May-2019 20:40:33.458 CEST
+Begin processing the 251st record. Run 1, Event 4848, LumiSection 49 on stream 0 at 28-May-2019 20:40:50.192 CEST
+Begin processing the 252nd record. Run 1, Event 4858, LumiSection 49 on stream 0 at 28-May-2019 20:41:03.808 CEST
+Begin processing the 253rd record. Run 1, Event 4853, LumiSection 49 on stream 0 at 28-May-2019 20:41:18.564 CEST
+Begin processing the 254th record. Run 1, Event 4854, LumiSection 49 on stream 0 at 28-May-2019 20:41:33.627 CEST
+Begin processing the 255th record. Run 1, Event 4856, LumiSection 49 on stream 0 at 28-May-2019 20:41:46.500 CEST
+Begin processing the 256th record. Run 1, Event 4857, LumiSection 49 on stream 0 at 28-May-2019 20:42:03.104 CEST
+Begin processing the 257th record. Run 1, Event 4863, LumiSection 49 on stream 0 at 28-May-2019 20:42:17.573 CEST
+Begin processing the 258th record. Run 1, Event 4860, LumiSection 49 on stream 0 at 28-May-2019 20:42:31.141 CEST
+Begin processing the 259th record. Run 1, Event 4859, LumiSection 49 on stream 0 at 28-May-2019 20:42:44.808 CEST
+Begin processing the 260th record. Run 1, Event 4861, LumiSection 49 on stream 0 at 28-May-2019 20:42:58.887 CEST
+Begin processing the 261st record. Run 1, Event 4855, LumiSection 49 on stream 0 at 28-May-2019 20:43:12.087 CEST
+Begin processing the 262nd record. Run 1, Event 4865, LumiSection 49 on stream 0 at 28-May-2019 20:43:25.556 CEST
+Begin processing the 263rd record. Run 1, Event 4851, LumiSection 49 on stream 0 at 28-May-2019 20:43:39.004 CEST
+Begin processing the 264th record. Run 1, Event 4869, LumiSection 49 on stream 0 at 28-May-2019 20:43:56.128 CEST
+Begin processing the 265th record. Run 1, Event 4864, LumiSection 49 on stream 0 at 28-May-2019 20:44:11.526 CEST
+Begin processing the 266th record. Run 1, Event 4871, LumiSection 49 on stream 0 at 28-May-2019 20:44:23.282 CEST
+Begin processing the 267th record. Run 1, Event 4867, LumiSection 49 on stream 0 at 28-May-2019 20:44:37.564 CEST
+Begin processing the 268th record. Run 1, Event 4862, LumiSection 49 on stream 0 at 28-May-2019 20:44:52.477 CEST
+Begin processing the 269th record. Run 1, Event 4866, LumiSection 49 on stream 0 at 28-May-2019 20:45:06.094 CEST
+Begin processing the 270th record. Run 1, Event 4870, LumiSection 49 on stream 0 at 28-May-2019 20:45:23.097 CEST
+Begin processing the 271st record. Run 1, Event 4868, LumiSection 49 on stream 0 at 28-May-2019 20:45:36.522 CEST
+Begin processing the 272nd record. Run 1, Event 4875, LumiSection 49 on stream 0 at 28-May-2019 20:45:51.442 CEST
+Begin processing the 273rd record. Run 1, Event 4873, LumiSection 49 on stream 0 at 28-May-2019 20:46:02.983 CEST
+Begin processing the 274th record. Run 1, Event 4874, LumiSection 49 on stream 0 at 28-May-2019 20:46:17.796 CEST
+Begin processing the 275th record. Run 1, Event 4877, LumiSection 49 on stream 0 at 28-May-2019 20:46:27.798 CEST
+Begin processing the 276th record. Run 1, Event 4872, LumiSection 49 on stream 0 at 28-May-2019 20:46:42.250 CEST
+Begin processing the 277th record. Run 1, Event 4881, LumiSection 49 on stream 0 at 28-May-2019 20:46:52.446 CEST
+Begin processing the 278th record. Run 1, Event 4879, LumiSection 49 on stream 0 at 28-May-2019 20:47:02.552 CEST
+Begin processing the 279th record. Run 1, Event 4878, LumiSection 49 on stream 0 at 28-May-2019 20:47:18.917 CEST
+Begin processing the 280th record. Run 1, Event 4876, LumiSection 49 on stream 0 at 28-May-2019 20:47:31.980 CEST
+Begin processing the 281st record. Run 1, Event 4880, LumiSection 49 on stream 0 at 28-May-2019 20:47:49.636 CEST
+Begin processing the 282nd record. Run 1, Event 4882, LumiSection 49 on stream 0 at 28-May-2019 20:48:04.362 CEST
+Begin processing the 283rd record. Run 1, Event 4884, LumiSection 49 on stream 0 at 28-May-2019 20:48:23.665 CEST
+Begin processing the 284th record. Run 1, Event 4883, LumiSection 49 on stream 0 at 28-May-2019 20:48:41.196 CEST
+Begin processing the 285th record. Run 1, Event 4886, LumiSection 49 on stream 0 at 28-May-2019 20:48:58.491 CEST
+Begin processing the 286th record. Run 1, Event 4888, LumiSection 49 on stream 0 at 28-May-2019 20:49:13.250 CEST
+Begin processing the 287th record. Run 1, Event 4889, LumiSection 49 on stream 0 at 28-May-2019 20:49:29.971 CEST
+Begin processing the 288th record. Run 1, Event 4893, LumiSection 49 on stream 0 at 28-May-2019 20:49:49.141 CEST
+Begin processing the 289th record. Run 1, Event 4894, LumiSection 49 on stream 0 at 28-May-2019 20:50:03.609 CEST
+Begin processing the 290th record. Run 1, Event 4890, LumiSection 49 on stream 0 at 28-May-2019 20:50:25.775 CEST
+Begin processing the 291st record. Run 1, Event 4885, LumiSection 49 on stream 0 at 28-May-2019 20:50:43.255 CEST
+Begin processing the 292nd record. Run 1, Event 4887, LumiSection 49 on stream 0 at 28-May-2019 20:51:01.147 CEST
+Begin processing the 293rd record. Run 1, Event 4897, LumiSection 49 on stream 0 at 28-May-2019 20:51:20.463 CEST
+Begin processing the 294th record. Run 1, Event 4891, LumiSection 49 on stream 0 at 28-May-2019 20:51:40.169 CEST
+Begin processing the 295th record. Run 1, Event 4895, LumiSection 49 on stream 0 at 28-May-2019 20:52:00.411 CEST
+Begin processing the 296th record. Run 1, Event 4898, LumiSection 49 on stream 0 at 28-May-2019 20:52:16.079 CEST
+Begin processing the 297th record. Run 1, Event 4900, LumiSection 49 on stream 0 at 28-May-2019 20:52:33.762 CEST
+Begin processing the 298th record. Run 1, Event 4896, LumiSection 49 on stream 0 at 28-May-2019 20:52:52.288 CEST
+Begin processing the 299th record. Run 1, Event 4892, LumiSection 49 on stream 0 at 28-May-2019 20:53:09.258 CEST
+Begin processing the 300th record. Run 1, Event 4899, LumiSection 49 on stream 0 at 28-May-2019 20:53:30.610 CEST
+28-May-2019 20:53:34 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/E03B287C-6571-534A-9566-27FAB7402CEC.root
+28-May-2019 20:53:34 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/DAF5ACF1-BC4D-B640-8C1D-B21F4FBCDDB6.root
+%MSG-w XrdAdaptor:  file_open 28-May-2019 20:54:22 CEST PostProcessEvent
+Data is served from T2_UK_SGrid_RALPP instead of original site T2_CH_CERN
+%MSG
+28-May-2019 20:54:22 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/DAF5ACF1-BC4D-B640-8C1D-B21F4FBCDDB6.root
+Begin processing the 301st record. Run 1, Event 9701, LumiSection 98 on stream 0 at 28-May-2019 20:55:04.970 CEST
+[2019-05-28 20:55:11.524618 +0200][Warning][XRootDTransport   ] [131.225.207.241:33186 #0.0] Logged in, accepting empty login response.
+%MSG-w XrdAdaptor:  (NoModuleName) 28-May-2019 20:55:11 CEST pre-events
+Data is now served from T2_UK_SGrid_RALPP, fnal.gov instead of previous T2_UK_SGrid_RALPP
+%MSG
+Begin processing the 302nd record. Run 1, Event 9707, LumiSection 98 on stream 0 at 28-May-2019 20:55:25.830 CEST
+%MSG-w XrdAdaptor:  PostModuleEvent 28-May-2019 20:55:28 CEST PostProcessEvent
+Data is now served from fnal.gov instead of previous T2_UK_SGrid_RALPP, fnal.gov
+%MSG
+Begin processing the 303rd record. Run 1, Event 9705, LumiSection 98 on stream 0 at 28-May-2019 20:55:35.094 CEST
+Begin processing the 304th record. Run 1, Event 9702, LumiSection 98 on stream 0 at 28-May-2019 20:55:45.631 CEST
+Begin processing the 305th record. Run 1, Event 9706, LumiSection 98 on stream 0 at 28-May-2019 20:55:55.435 CEST
+Begin processing the 306th record. Run 1, Event 9709, LumiSection 98 on stream 0 at 28-May-2019 20:56:08.253 CEST
+Begin processing the 307th record. Run 1, Event 9704, LumiSection 98 on stream 0 at 28-May-2019 20:56:19.869 CEST
+Begin processing the 308th record. Run 1, Event 9703, LumiSection 98 on stream 0 at 28-May-2019 20:56:32.999 CEST
+Begin processing the 309th record. Run 1, Event 9712, LumiSection 98 on stream 0 at 28-May-2019 20:56:43.767 CEST
+Begin processing the 310th record. Run 1, Event 9713, LumiSection 98 on stream 0 at 28-May-2019 20:56:55.066 CEST
+Begin processing the 311th record. Run 1, Event 9715, LumiSection 98 on stream 0 at 28-May-2019 20:57:05.111 CEST
+Begin processing the 312th record. Run 1, Event 9710, LumiSection 98 on stream 0 at 28-May-2019 20:57:16.914 CEST
+Begin processing the 313th record. Run 1, Event 9714, LumiSection 98 on stream 0 at 28-May-2019 20:57:28.017 CEST
+Begin processing the 314th record. Run 1, Event 9718, LumiSection 98 on stream 0 at 28-May-2019 20:57:38.020 CEST
+Begin processing the 315th record. Run 1, Event 9711, LumiSection 98 on stream 0 at 28-May-2019 20:57:48.869 CEST
+Begin processing the 316th record. Run 1, Event 9720, LumiSection 98 on stream 0 at 28-May-2019 20:58:00.631 CEST
+Begin processing the 317th record. Run 1, Event 9716, LumiSection 98 on stream 0 at 28-May-2019 20:58:11.384 CEST
+Begin processing the 318th record. Run 1, Event 9708, LumiSection 98 on stream 0 at 28-May-2019 20:58:22.782 CEST
+Begin processing the 319th record. Run 1, Event 9719, LumiSection 98 on stream 0 at 28-May-2019 20:58:33.798 CEST
+Begin processing the 320th record. Run 1, Event 9722, LumiSection 98 on stream 0 at 28-May-2019 20:58:44.804 CEST
+Begin processing the 321st record. Run 1, Event 9723, LumiSection 98 on stream 0 at 28-May-2019 20:58:54.663 CEST
+Begin processing the 322nd record. Run 1, Event 9717, LumiSection 98 on stream 0 at 28-May-2019 20:59:05.254 CEST
+Begin processing the 323rd record. Run 1, Event 9725, LumiSection 98 on stream 0 at 28-May-2019 20:59:14.492 CEST
+Begin processing the 324th record. Run 1, Event 9721, LumiSection 98 on stream 0 at 28-May-2019 20:59:24.892 CEST
+Begin processing the 325th record. Run 1, Event 9728, LumiSection 98 on stream 0 at 28-May-2019 20:59:35.930 CEST
+Begin processing the 326th record. Run 1, Event 9726, LumiSection 98 on stream 0 at 28-May-2019 20:59:47.220 CEST
+Begin processing the 327th record. Run 1, Event 9729, LumiSection 98 on stream 0 at 28-May-2019 21:00:00.187 CEST
+Begin processing the 328th record. Run 1, Event 9727, LumiSection 98 on stream 0 at 28-May-2019 21:00:09.970 CEST
+%MSG-w XrdAdaptor:  (NoModuleName) 28-May-2019 21:00:16 CEST pre-events
+Data is now served from fnal.gov, T2_UK_SGrid_RALPP instead of previous fnal.gov
+%MSG
+Begin processing the 329th record. Run 1, Event 9733, LumiSection 98 on stream 0 at 28-May-2019 21:00:19.315 CEST
+%MSG-w XrdAdaptor:  source 28-May-2019 21:00:22 CEST PostProcessEvent
+Data is now served from T2_UK_SGrid_RALPP instead of previous fnal.gov, T2_UK_SGrid_RALPP
+%MSG
+Begin processing the 330th record. Run 1, Event 9730, LumiSection 98 on stream 0 at 28-May-2019 21:00:41.901 CEST
+Begin processing the 331st record. Run 1, Event 9731, LumiSection 98 on stream 0 at 28-May-2019 21:00:56.570 CEST
+Begin processing the 332nd record. Run 1, Event 9724, LumiSection 98 on stream 0 at 28-May-2019 21:01:14.904 CEST
+Begin processing the 333rd record. Run 1, Event 9732, LumiSection 98 on stream 0 at 28-May-2019 21:01:34.880 CEST
+Begin processing the 334th record. Run 1, Event 9738, LumiSection 98 on stream 0 at 28-May-2019 21:01:52.783 CEST
+Begin processing the 335th record. Run 1, Event 9735, LumiSection 98 on stream 0 at 28-May-2019 21:02:12.694 CEST
+Begin processing the 336th record. Run 1, Event 9734, LumiSection 98 on stream 0 at 28-May-2019 21:02:33.053 CEST
+Begin processing the 337th record. Run 1, Event 9741, LumiSection 98 on stream 0 at 28-May-2019 21:02:50.972 CEST
+Begin processing the 338th record. Run 1, Event 9737, LumiSection 98 on stream 0 at 28-May-2019 21:03:10.453 CEST
+Begin processing the 339th record. Run 1, Event 9743, LumiSection 98 on stream 0 at 28-May-2019 21:03:33.777 CEST
+Begin processing the 340th record. Run 1, Event 9736, LumiSection 98 on stream 0 at 28-May-2019 21:03:51.201 CEST
+Begin processing the 341st record. Run 1, Event 9742, LumiSection 98 on stream 0 at 28-May-2019 21:04:10.810 CEST
+Begin processing the 342nd record. Run 1, Event 9744, LumiSection 98 on stream 0 at 28-May-2019 21:04:30.394 CEST
+Begin processing the 343rd record. Run 1, Event 9740, LumiSection 98 on stream 0 at 28-May-2019 21:04:51.085 CEST
+Begin processing the 344th record. Run 1, Event 9739, LumiSection 98 on stream 0 at 28-May-2019 21:05:13.652 CEST
+Begin processing the 345th record. Run 1, Event 9745, LumiSection 98 on stream 0 at 28-May-2019 21:05:37.824 CEST
+Begin processing the 346th record. Run 1, Event 9747, LumiSection 98 on stream 0 at 28-May-2019 21:06:02.389 CEST
+Begin processing the 347th record. Run 1, Event 9746, LumiSection 98 on stream 0 at 28-May-2019 21:06:24.849 CEST
+Begin processing the 348th record. Run 1, Event 9753, LumiSection 98 on stream 0 at 28-May-2019 21:06:49.990 CEST
+Begin processing the 349th record. Run 1, Event 9751, LumiSection 98 on stream 0 at 28-May-2019 21:07:09.396 CEST
+Begin processing the 350th record. Run 1, Event 9752, LumiSection 98 on stream 0 at 28-May-2019 21:07:30.020 CEST
+Begin processing the 351st record. Run 1, Event 9754, LumiSection 98 on stream 0 at 28-May-2019 21:07:49.676 CEST
+Begin processing the 352nd record. Run 1, Event 9749, LumiSection 98 on stream 0 at 28-May-2019 21:08:05.744 CEST
+Begin processing the 353rd record. Run 1, Event 9755, LumiSection 98 on stream 0 at 28-May-2019 21:08:27.347 CEST
+Begin processing the 354th record. Run 1, Event 9750, LumiSection 98 on stream 0 at 28-May-2019 21:08:50.741 CEST
+Begin processing the 355th record. Run 1, Event 9748, LumiSection 98 on stream 0 at 28-May-2019 21:09:17.253 CEST
+Begin processing the 356th record. Run 1, Event 9761, LumiSection 98 on stream 0 at 28-May-2019 21:09:44.940 CEST
+Begin processing the 357th record. Run 1, Event 9759, LumiSection 98 on stream 0 at 28-May-2019 21:10:12.377 CEST
+Begin processing the 358th record. Run 1, Event 9758, LumiSection 98 on stream 0 at 28-May-2019 21:10:35.213 CEST
+Begin processing the 359th record. Run 1, Event 9762, LumiSection 98 on stream 0 at 28-May-2019 21:11:01.330 CEST
+Begin processing the 360th record. Run 1, Event 9756, LumiSection 98 on stream 0 at 28-May-2019 21:11:26.190 CEST
+Begin processing the 361st record. Run 1, Event 9763, LumiSection 98 on stream 0 at 28-May-2019 21:11:52.770 CEST
+Begin processing the 362nd record. Run 1, Event 9766, LumiSection 98 on stream 0 at 28-May-2019 21:12:16.905 CEST
+Begin processing the 363rd record. Run 1, Event 9757, LumiSection 98 on stream 0 at 28-May-2019 21:12:33.302 CEST
+Begin processing the 364th record. Run 1, Event 9769, LumiSection 98 on stream 0 at 28-May-2019 21:12:55.065 CEST
+Begin processing the 365th record. Run 1, Event 9765, LumiSection 98 on stream 0 at 28-May-2019 21:13:18.422 CEST
+Begin processing the 366th record. Run 1, Event 9760, LumiSection 98 on stream 0 at 28-May-2019 21:13:34.673 CEST
+Begin processing the 367th record. Run 1, Event 9771, LumiSection 98 on stream 0 at 28-May-2019 21:13:54.187 CEST
+Begin processing the 368th record. Run 1, Event 9768, LumiSection 98 on stream 0 at 28-May-2019 21:14:15.094 CEST
+Begin processing the 369th record. Run 1, Event 9767, LumiSection 98 on stream 0 at 28-May-2019 21:14:32.011 CEST
+Begin processing the 370th record. Run 1, Event 9764, LumiSection 98 on stream 0 at 28-May-2019 21:14:50.352 CEST
+Begin processing the 371st record. Run 1, Event 9770, LumiSection 98 on stream 0 at 28-May-2019 21:15:11.564 CEST
+Begin processing the 372nd record. Run 1, Event 9775, LumiSection 98 on stream 0 at 28-May-2019 21:15:30.849 CEST
+Begin processing the 373rd record. Run 1, Event 9774, LumiSection 98 on stream 0 at 28-May-2019 21:15:46.796 CEST
+Begin processing the 374th record. Run 1, Event 9777, LumiSection 98 on stream 0 at 28-May-2019 21:16:04.162 CEST
+Begin processing the 375th record. Run 1, Event 9776, LumiSection 98 on stream 0 at 28-May-2019 21:16:18.638 CEST
+Begin processing the 376th record. Run 1, Event 9772, LumiSection 98 on stream 0 at 28-May-2019 21:16:33.222 CEST
+Begin processing the 377th record. Run 1, Event 9778, LumiSection 98 on stream 0 at 28-May-2019 21:16:49.682 CEST
+Begin processing the 378th record. Run 1, Event 9773, LumiSection 98 on stream 0 at 28-May-2019 21:17:05.590 CEST
+Begin processing the 379th record. Run 1, Event 9779, LumiSection 98 on stream 0 at 28-May-2019 21:17:19.094 CEST
+Begin processing the 380th record. Run 1, Event 9785, LumiSection 98 on stream 0 at 28-May-2019 21:17:36.469 CEST
+Begin processing the 381st record. Run 1, Event 9786, LumiSection 98 on stream 0 at 28-May-2019 21:17:49.734 CEST
+Begin processing the 382nd record. Run 1, Event 9784, LumiSection 98 on stream 0 at 28-May-2019 21:18:05.631 CEST
+Begin processing the 383rd record. Run 1, Event 9780, LumiSection 98 on stream 0 at 28-May-2019 21:18:19.073 CEST
+Begin processing the 384th record. Run 1, Event 9781, LumiSection 98 on stream 0 at 28-May-2019 21:18:31.792 CEST
+Begin processing the 385th record. Run 1, Event 9783, LumiSection 98 on stream 0 at 28-May-2019 21:18:46.751 CEST
+Begin processing the 386th record. Run 1, Event 9787, LumiSection 98 on stream 0 at 28-May-2019 21:18:59.339 CEST
+Begin processing the 387th record. Run 1, Event 9788, LumiSection 98 on stream 0 at 28-May-2019 21:19:14.118 CEST
+Begin processing the 388th record. Run 1, Event 9782, LumiSection 98 on stream 0 at 28-May-2019 21:19:31.637 CEST
+Begin processing the 389th record. Run 1, Event 9789, LumiSection 98 on stream 0 at 28-May-2019 21:19:46.642 CEST
+Begin processing the 390th record. Run 1, Event 9792, LumiSection 98 on stream 0 at 28-May-2019 21:20:02.334 CEST
+Begin processing the 391st record. Run 1, Event 9791, LumiSection 98 on stream 0 at 28-May-2019 21:20:13.977 CEST
+Begin processing the 392nd record. Run 1, Event 9796, LumiSection 98 on stream 0 at 28-May-2019 21:20:26.928 CEST
+Begin processing the 393rd record. Run 1, Event 9793, LumiSection 98 on stream 0 at 28-May-2019 21:20:40.450 CEST
+Begin processing the 394th record. Run 1, Event 9790, LumiSection 98 on stream 0 at 28-May-2019 21:20:52.522 CEST
+Begin processing the 395th record. Run 1, Event 9795, LumiSection 98 on stream 0 at 28-May-2019 21:21:07.998 CEST
+Begin processing the 396th record. Run 1, Event 9797, LumiSection 98 on stream 0 at 28-May-2019 21:21:21.626 CEST
+Begin processing the 397th record. Run 1, Event 9800, LumiSection 98 on stream 0 at 28-May-2019 21:21:34.304 CEST
+Begin processing the 398th record. Run 1, Event 9798, LumiSection 98 on stream 0 at 28-May-2019 21:21:49.652 CEST
+Begin processing the 399th record. Run 1, Event 9794, LumiSection 98 on stream 0 at 28-May-2019 21:21:59.559 CEST
+Begin processing the 400th record. Run 1, Event 9799, LumiSection 98 on stream 0 at 28-May-2019 21:22:08.711 CEST
+28-May-2019 21:22:14 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/DAF5ACF1-BC4D-B640-8C1D-B21F4FBCDDB6.root
+28-May-2019 21:22:14 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/D53E3C85-F44C-894B-B57A-0D93309B4DD9.root
+%MSG-w XrdAdaptor:  file_open 28-May-2019 21:22:16 CEST PostProcessEvent
+Data is served from T2_UK_SGrid_RALPP instead of original site T2_CH_CERN
+%MSG
+28-May-2019 21:22:17 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/D53E3C85-F44C-894B-B57A-0D93309B4DD9.root
+Begin processing the 401st record. Run 1, Event 8801, LumiSection 89 on stream 0 at 28-May-2019 21:22:43.131 CEST
+[2019-05-28 21:22:48.441030 +0200][Warning][XRootDTransport   ] [131.225.188.89:33885 #0.0] Logged in, accepting empty login response.
+%MSG-w XrdAdaptor:  (NoModuleName) 28-May-2019 21:22:48 CEST pre-events
+Data is now served from T2_UK_SGrid_RALPP, fnal.gov instead of previous T2_UK_SGrid_RALPP
+%MSG
+Begin processing the 402nd record. Run 1, Event 8804, LumiSection 89 on stream 0 at 28-May-2019 21:22:57.003 CEST
+%MSG-w XrdAdaptor:  PostModuleEvent 28-May-2019 21:23:01 CEST PostProcessEvent
+Data is now served from fnal.gov instead of previous T2_UK_SGrid_RALPP, fnal.gov
+%MSG
+Begin processing the 403rd record. Run 1, Event 8806, LumiSection 89 on stream 0 at 28-May-2019 21:23:07.416 CEST
+Begin processing the 404th record. Run 1, Event 8808, LumiSection 89 on stream 0 at 28-May-2019 21:23:19.631 CEST
+Begin processing the 405th record. Run 1, Event 8807, LumiSection 89 on stream 0 at 28-May-2019 21:23:30.346 CEST
+Begin processing the 406th record. Run 1, Event 8803, LumiSection 89 on stream 0 at 28-May-2019 21:23:41.040 CEST
+Begin processing the 407th record. Run 1, Event 8805, LumiSection 89 on stream 0 at 28-May-2019 21:23:51.442 CEST
+Begin processing the 408th record. Run 1, Event 8809, LumiSection 89 on stream 0 at 28-May-2019 21:24:03.002 CEST
+Begin processing the 409th record. Run 1, Event 8811, LumiSection 89 on stream 0 at 28-May-2019 21:24:13.584 CEST
+Begin processing the 410th record. Run 1, Event 8813, LumiSection 89 on stream 0 at 28-May-2019 21:24:25.546 CEST
+Begin processing the 411th record. Run 1, Event 8810, LumiSection 89 on stream 0 at 28-May-2019 21:24:37.700 CEST
+Begin processing the 412th record. Run 1, Event 8814, LumiSection 89 on stream 0 at 28-May-2019 21:24:49.776 CEST
+Begin processing the 413th record. Run 1, Event 8812, LumiSection 89 on stream 0 at 28-May-2019 21:25:00.304 CEST
+Begin processing the 414th record. Run 1, Event 8818, LumiSection 89 on stream 0 at 28-May-2019 21:25:13.876 CEST
+Begin processing the 415th record. Run 1, Event 8816, LumiSection 89 on stream 0 at 28-May-2019 21:25:23.888 CEST
+Begin processing the 416th record. Run 1, Event 8815, LumiSection 89 on stream 0 at 28-May-2019 21:25:34.301 CEST
+Begin processing the 417th record. Run 1, Event 8802, LumiSection 89 on stream 0 at 28-May-2019 21:25:44.415 CEST
+Begin processing the 418th record. Run 1, Event 8821, LumiSection 89 on stream 0 at 28-May-2019 21:25:57.159 CEST
+Begin processing the 419th record. Run 1, Event 8817, LumiSection 89 on stream 0 at 28-May-2019 21:26:08.122 CEST
+Begin processing the 420th record. Run 1, Event 8820, LumiSection 89 on stream 0 at 28-May-2019 21:26:17.932 CEST
+Begin processing the 421st record. Run 1, Event 8824, LumiSection 89 on stream 0 at 28-May-2019 21:26:27.163 CEST
+Begin processing the 422nd record. Run 1, Event 8822, LumiSection 89 on stream 0 at 28-May-2019 21:26:37.252 CEST
+Begin processing the 423rd record. Run 1, Event 8826, LumiSection 89 on stream 0 at 28-May-2019 21:26:46.476 CEST
+Begin processing the 424th record. Run 1, Event 8819, LumiSection 89 on stream 0 at 28-May-2019 21:26:55.977 CEST
+Begin processing the 425th record. Run 1, Event 8823, LumiSection 89 on stream 0 at 28-May-2019 21:27:05.630 CEST
+Begin processing the 426th record. Run 1, Event 8827, LumiSection 89 on stream 0 at 28-May-2019 21:27:15.699 CEST
+Begin processing the 427th record. Run 1, Event 8828, LumiSection 89 on stream 0 at 28-May-2019 21:27:26.933 CEST
+Begin processing the 428th record. Run 1, Event 8829, LumiSection 89 on stream 0 at 28-May-2019 21:27:36.266 CEST
+Begin processing the 429th record. Run 1, Event 8825, LumiSection 89 on stream 0 at 28-May-2019 21:27:46.703 CEST
+Begin processing the 430th record. Run 1, Event 8830, LumiSection 89 on stream 0 at 28-May-2019 21:27:55.922 CEST
+Begin processing the 431st record. Run 1, Event 8831, LumiSection 89 on stream 0 at 28-May-2019 21:28:05.977 CEST
+Begin processing the 432nd record. Run 1, Event 8835, LumiSection 89 on stream 0 at 28-May-2019 21:28:14.660 CEST
+Begin processing the 433rd record. Run 1, Event 8838, LumiSection 89 on stream 0 at 28-May-2019 21:28:23.402 CEST
+Begin processing the 434th record. Run 1, Event 8839, LumiSection 89 on stream 0 at 28-May-2019 21:28:32.302 CEST
+Begin processing the 435th record. Run 1, Event 8832, LumiSection 89 on stream 0 at 28-May-2019 21:28:41.526 CEST
+Begin processing the 436th record. Run 1, Event 8836, LumiSection 89 on stream 0 at 28-May-2019 21:28:51.144 CEST
+Begin processing the 437th record. Run 1, Event 8833, LumiSection 89 on stream 0 at 28-May-2019 21:29:02.976 CEST
+Begin processing the 438th record. Run 1, Event 8834, LumiSection 89 on stream 0 at 28-May-2019 21:29:13.047 CEST
+Begin processing the 439th record. Run 1, Event 8840, LumiSection 89 on stream 0 at 28-May-2019 21:29:23.755 CEST
+Begin processing the 440th record. Run 1, Event 8837, LumiSection 89 on stream 0 at 28-May-2019 21:29:34.092 CEST
+Begin processing the 441st record. Run 1, Event 8844, LumiSection 89 on stream 0 at 28-May-2019 21:29:46.199 CEST
+Begin processing the 442nd record. Run 1, Event 8845, LumiSection 89 on stream 0 at 28-May-2019 21:29:57.113 CEST
+Begin processing the 443rd record. Run 1, Event 8842, LumiSection 89 on stream 0 at 28-May-2019 21:30:09.599 CEST
+Begin processing the 444th record. Run 1, Event 8843, LumiSection 89 on stream 0 at 28-May-2019 21:30:23.318 CEST
+Begin processing the 445th record. Run 1, Event 8846, LumiSection 89 on stream 0 at 28-May-2019 21:30:34.026 CEST
+Begin processing the 446th record. Run 1, Event 8847, LumiSection 89 on stream 0 at 28-May-2019 21:30:45.615 CEST
+Begin processing the 447th record. Run 1, Event 8849, LumiSection 89 on stream 0 at 28-May-2019 21:30:55.788 CEST
+Begin processing the 448th record. Run 1, Event 8841, LumiSection 89 on stream 0 at 28-May-2019 21:31:07.542 CEST
+Begin processing the 449th record. Run 1, Event 8851, LumiSection 89 on stream 0 at 28-May-2019 21:31:17.792 CEST
+Begin processing the 450th record. Run 1, Event 8850, LumiSection 89 on stream 0 at 28-May-2019 21:31:29.834 CEST
+Begin processing the 451st record. Run 1, Event 8848, LumiSection 89 on stream 0 at 28-May-2019 21:31:41.232 CEST
+Begin processing the 452nd record. Run 1, Event 8854, LumiSection 89 on stream 0 at 28-May-2019 21:31:51.395 CEST
+Begin processing the 453rd record. Run 1, Event 8852, LumiSection 89 on stream 0 at 28-May-2019 21:32:01.525 CEST
+Begin processing the 454th record. Run 1, Event 8855, LumiSection 89 on stream 0 at 28-May-2019 21:32:13.637 CEST
+Begin processing the 455th record. Run 1, Event 8853, LumiSection 89 on stream 0 at 28-May-2019 21:32:25.321 CEST
+Begin processing the 456th record. Run 1, Event 8861, LumiSection 89 on stream 0 at 28-May-2019 21:32:36.029 CEST
+Begin processing the 457th record. Run 1, Event 8857, LumiSection 89 on stream 0 at 28-May-2019 21:32:46.826 CEST
+Begin processing the 458th record. Run 1, Event 8856, LumiSection 89 on stream 0 at 28-May-2019 21:32:57.732 CEST
+Begin processing the 459th record. Run 1, Event 8859, LumiSection 89 on stream 0 at 28-May-2019 21:33:07.740 CEST
+Begin processing the 460th record. Run 1, Event 8862, LumiSection 89 on stream 0 at 28-May-2019 21:33:18.466 CEST
+Begin processing the 461st record. Run 1, Event 8860, LumiSection 89 on stream 0 at 28-May-2019 21:33:28.852 CEST
+Begin processing the 462nd record. Run 1, Event 8863, LumiSection 89 on stream 0 at 28-May-2019 21:33:38.170 CEST
+Begin processing the 463rd record. Run 1, Event 8858, LumiSection 89 on stream 0 at 28-May-2019 21:33:49.839 CEST
+Begin processing the 464th record. Run 1, Event 8867, LumiSection 89 on stream 0 at 28-May-2019 21:33:59.757 CEST
+Begin processing the 465th record. Run 1, Event 8868, LumiSection 89 on stream 0 at 28-May-2019 21:34:11.613 CEST
+Begin processing the 466th record. Run 1, Event 8866, LumiSection 89 on stream 0 at 28-May-2019 21:34:22.059 CEST
+Begin processing the 467th record. Run 1, Event 8865, LumiSection 89 on stream 0 at 28-May-2019 21:34:34.336 CEST
+Begin processing the 468th record. Run 1, Event 8869, LumiSection 89 on stream 0 at 28-May-2019 21:34:45.763 CEST
+Begin processing the 469th record. Run 1, Event 8870, LumiSection 89 on stream 0 at 28-May-2019 21:34:56.045 CEST
+Begin processing the 470th record. Run 1, Event 8873, LumiSection 89 on stream 0 at 28-May-2019 21:35:06.260 CEST
+Begin processing the 471st record. Run 1, Event 8864, LumiSection 89 on stream 0 at 28-May-2019 21:35:16.956 CEST
+Begin processing the 472nd record. Run 1, Event 8874, LumiSection 89 on stream 0 at 28-May-2019 21:35:28.426 CEST
+Begin processing the 473rd record. Run 1, Event 8877, LumiSection 89 on stream 0 at 28-May-2019 21:35:38.616 CEST
+Begin processing the 474th record. Run 1, Event 8876, LumiSection 89 on stream 0 at 28-May-2019 21:35:49.840 CEST
+Begin processing the 475th record. Run 1, Event 8871, LumiSection 89 on stream 0 at 28-May-2019 21:36:00.359 CEST
+Begin processing the 476th record. Run 1, Event 8872, LumiSection 89 on stream 0 at 28-May-2019 21:36:11.083 CEST
+Begin processing the 477th record. Run 1, Event 8875, LumiSection 89 on stream 0 at 28-May-2019 21:36:22.584 CEST
+Begin processing the 478th record. Run 1, Event 8878, LumiSection 89 on stream 0 at 28-May-2019 21:36:32.276 CEST
+Begin processing the 479th record. Run 1, Event 8880, LumiSection 89 on stream 0 at 28-May-2019 21:36:43.577 CEST
+Begin processing the 480th record. Run 1, Event 8883, LumiSection 89 on stream 0 at 28-May-2019 21:36:55.184 CEST
+Begin processing the 481st record. Run 1, Event 8884, LumiSection 89 on stream 0 at 28-May-2019 21:37:06.476 CEST
+Begin processing the 482nd record. Run 1, Event 8881, LumiSection 89 on stream 0 at 28-May-2019 21:37:17.306 CEST
+Begin processing the 483rd record. Run 1, Event 8882, LumiSection 89 on stream 0 at 28-May-2019 21:37:26.954 CEST
+Begin processing the 484th record. Run 1, Event 8879, LumiSection 89 on stream 0 at 28-May-2019 21:37:38.443 CEST
+Begin processing the 485th record. Run 1, Event 8885, LumiSection 89 on stream 0 at 28-May-2019 21:37:49.272 CEST
+Begin processing the 486th record. Run 1, Event 8887, LumiSection 89 on stream 0 at 28-May-2019 21:37:59.924 CEST
+Begin processing the 487th record. Run 1, Event 8888, LumiSection 89 on stream 0 at 28-May-2019 21:38:08.867 CEST
+Begin processing the 488th record. Run 1, Event 8890, LumiSection 89 on stream 0 at 28-May-2019 21:38:19.141 CEST
+Begin processing the 489th record. Run 1, Event 8895, LumiSection 89 on stream 0 at 28-May-2019 21:38:28.848 CEST
+Begin processing the 490th record. Run 1, Event 8889, LumiSection 89 on stream 0 at 28-May-2019 21:38:39.228 CEST
+Begin processing the 491st record. Run 1, Event 8886, LumiSection 89 on stream 0 at 28-May-2019 21:38:51.369 CEST
+Begin processing the 492nd record. Run 1, Event 8892, LumiSection 89 on stream 0 at 28-May-2019 21:39:02.543 CEST
+Begin processing the 493rd record. Run 1, Event 8893, LumiSection 89 on stream 0 at 28-May-2019 21:39:13.273 CEST
+Begin processing the 494th record. Run 1, Event 8894, LumiSection 89 on stream 0 at 28-May-2019 21:39:23.927 CEST
+Begin processing the 495th record. Run 1, Event 8891, LumiSection 89 on stream 0 at 28-May-2019 21:39:34.961 CEST
+Begin processing the 496th record. Run 1, Event 8899, LumiSection 89 on stream 0 at 28-May-2019 21:39:46.195 CEST
+Begin processing the 497th record. Run 1, Event 8896, LumiSection 89 on stream 0 at 28-May-2019 21:39:55.983 CEST
+Begin processing the 498th record. Run 1, Event 8897, LumiSection 89 on stream 0 at 28-May-2019 21:40:06.581 CEST
+Begin processing the 499th record. Run 1, Event 8900, LumiSection 89 on stream 0 at 28-May-2019 21:40:16.073 CEST
+Begin processing the 500th record. Run 1, Event 8898, LumiSection 89 on stream 0 at 28-May-2019 21:40:26.344 CEST
+28-May-2019 21:40:30 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/D53E3C85-F44C-894B-B57A-0D93309B4DD9.root
+28-May-2019 21:40:30 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CD195B20-F5F1-504A-BF57-48500AE83D5A.root
+%MSG-w XrdAdaptor:  file_open 28-May-2019 21:40:32 CEST PostProcessEvent
+Data is served from T2_UK_SGrid_RALPP instead of original site T2_CH_CERN
+%MSG
+28-May-2019 21:40:32 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CD195B20-F5F1-504A-BF57-48500AE83D5A.root
+Begin processing the 501st record. Run 1, Event 2408, LumiSection 25 on stream 0 at 28-May-2019 21:40:45.545 CEST
+Begin processing the 502nd record. Run 1, Event 2403, LumiSection 25 on stream 0 at 28-May-2019 21:40:56.041 CEST
+Begin processing the 503rd record. Run 1, Event 2407, LumiSection 25 on stream 0 at 28-May-2019 21:41:06.830 CEST
+Begin processing the 504th record. Run 1, Event 2402, LumiSection 25 on stream 0 at 28-May-2019 21:41:16.704 CEST
+Begin processing the 505th record. Run 1, Event 2404, LumiSection 25 on stream 0 at 28-May-2019 21:41:28.040 CEST
+Begin processing the 506th record. Run 1, Event 2409, LumiSection 25 on stream 0 at 28-May-2019 21:41:40.986 CEST
+Begin processing the 507th record. Run 1, Event 2406, LumiSection 25 on stream 0 at 28-May-2019 21:41:51.716 CEST
+Begin processing the 508th record. Run 1, Event 2401, LumiSection 25 on stream 0 at 28-May-2019 21:42:06.317 CEST
+Begin processing the 509th record. Run 1, Event 2405, LumiSection 25 on stream 0 at 28-May-2019 21:42:20.278 CEST
+Begin processing the 510th record. Run 1, Event 2411, LumiSection 25 on stream 0 at 28-May-2019 21:42:33.210 CEST
+Begin processing the 511th record. Run 1, Event 2415, LumiSection 25 on stream 0 at 28-May-2019 21:42:43.528 CEST
+Begin processing the 512th record. Run 1, Event 2416, LumiSection 25 on stream 0 at 28-May-2019 21:42:55.839 CEST
+Begin processing the 513th record. Run 1, Event 2412, LumiSection 25 on stream 0 at 28-May-2019 21:43:12.101 CEST
+Begin processing the 514th record. Run 1, Event 2410, LumiSection 25 on stream 0 at 28-May-2019 21:43:23.021 CEST
+Begin processing the 515th record. Run 1, Event 2414, LumiSection 25 on stream 0 at 28-May-2019 21:43:33.762 CEST
+Begin processing the 516th record. Run 1, Event 2413, LumiSection 25 on stream 0 at 28-May-2019 21:43:45.463 CEST
+Begin processing the 517th record. Run 1, Event 2421, LumiSection 25 on stream 0 at 28-May-2019 21:43:57.965 CEST
+Begin processing the 518th record. Run 1, Event 2420, LumiSection 25 on stream 0 at 28-May-2019 21:44:14.326 CEST
+Begin processing the 519th record. Run 1, Event 2417, LumiSection 25 on stream 0 at 28-May-2019 21:44:24.961 CEST
+Begin processing the 520th record. Run 1, Event 2418, LumiSection 25 on stream 0 at 28-May-2019 21:44:40.478 CEST
+Begin processing the 521st record. Run 1, Event 2423, LumiSection 25 on stream 0 at 28-May-2019 21:44:58.328 CEST
+Begin processing the 522nd record. Run 1, Event 2419, LumiSection 25 on stream 0 at 28-May-2019 21:45:19.024 CEST
+Begin processing the 523rd record. Run 1, Event 2425, LumiSection 25 on stream 0 at 28-May-2019 21:45:38.347 CEST
+Begin processing the 524th record. Run 1, Event 2426, LumiSection 25 on stream 0 at 28-May-2019 21:46:02.261 CEST
+Begin processing the 525th record. Run 1, Event 2422, LumiSection 25 on stream 0 at 28-May-2019 21:46:29.139 CEST
+Begin processing the 526th record. Run 1, Event 2428, LumiSection 25 on stream 0 at 28-May-2019 21:46:57.278 CEST
+Begin processing the 527th record. Run 1, Event 2427, LumiSection 25 on stream 0 at 28-May-2019 21:47:24.630 CEST
+Begin processing the 528th record. Run 1, Event 2424, LumiSection 25 on stream 0 at 28-May-2019 21:47:55.146 CEST
+Begin processing the 529th record. Run 1, Event 2429, LumiSection 25 on stream 0 at 28-May-2019 21:48:24.065 CEST
+Begin processing the 530th record. Run 1, Event 2431, LumiSection 25 on stream 0 at 28-May-2019 21:48:53.748 CEST
+Begin processing the 531st record. Run 1, Event 2436, LumiSection 25 on stream 0 at 28-May-2019 21:49:20.252 CEST
+Begin processing the 532nd record. Run 1, Event 2433, LumiSection 25 on stream 0 at 28-May-2019 21:49:50.048 CEST
+Begin processing the 533rd record. Run 1, Event 2435, LumiSection 25 on stream 0 at 28-May-2019 21:50:13.961 CEST
+Begin processing the 534th record. Run 1, Event 2434, LumiSection 25 on stream 0 at 28-May-2019 21:50:39.043 CEST
+Begin processing the 535th record. Run 1, Event 2438, LumiSection 25 on stream 0 at 28-May-2019 21:51:02.597 CEST
+Begin processing the 536th record. Run 1, Event 2432, LumiSection 25 on stream 0 at 28-May-2019 21:51:29.427 CEST
+Begin processing the 537th record. Run 1, Event 2439, LumiSection 25 on stream 0 at 28-May-2019 21:51:57.223 CEST
+Begin processing the 538th record. Run 1, Event 2430, LumiSection 25 on stream 0 at 28-May-2019 21:52:22.849 CEST
+[2019-05-28 21:52:29.923357 +0200][Warning][XRootDTransport   ] [131.225.188.173:33830 #0.0] Logged in, accepting empty login response.
+%MSG-w XrdAdaptor:  (NoModuleName) 28-May-2019 21:52:30 CEST pre-events
+Data is now served from T2_UK_SGrid_RALPP, fnal.gov instead of previous T2_UK_SGrid_RALPP
+%MSG
+Begin processing the 539th record. Run 1, Event 2445, LumiSection 25 on stream 0 at 28-May-2019 21:52:50.129 CEST
+%MSG-w XrdAdaptor:  source 28-May-2019 21:52:54 CEST PostProcessEvent
+Data is now served from fnal.gov instead of previous T2_UK_SGrid_RALPP, fnal.gov
+%MSG
+Begin processing the 540th record. Run 1, Event 2446, LumiSection 25 on stream 0 at 28-May-2019 21:52:59.007 CEST
+Begin processing the 541st record. Run 1, Event 2440, LumiSection 25 on stream 0 at 28-May-2019 21:53:13.116 CEST
+Begin processing the 542nd record. Run 1, Event 2437, LumiSection 25 on stream 0 at 28-May-2019 21:53:26.280 CEST
+Begin processing the 543rd record. Run 1, Event 2444, LumiSection 25 on stream 0 at 28-May-2019 21:53:38.294 CEST
+Begin processing the 544th record. Run 1, Event 2443, LumiSection 25 on stream 0 at 28-May-2019 21:53:51.630 CEST
+Begin processing the 545th record. Run 1, Event 2449, LumiSection 25 on stream 0 at 28-May-2019 21:54:03.889 CEST
+Begin processing the 546th record. Run 1, Event 2448, LumiSection 25 on stream 0 at 28-May-2019 21:54:17.250 CEST
+Begin processing the 547th record. Run 1, Event 2452, LumiSection 25 on stream 0 at 28-May-2019 21:54:30.952 CEST
+Begin processing the 548th record. Run 1, Event 2447, LumiSection 25 on stream 0 at 28-May-2019 21:54:43.659 CEST
+Begin processing the 549th record. Run 1, Event 2442, LumiSection 25 on stream 0 at 28-May-2019 21:54:57.902 CEST
+Begin processing the 550th record. Run 1, Event 2441, LumiSection 25 on stream 0 at 28-May-2019 21:55:11.339 CEST
+Begin processing the 551st record. Run 1, Event 2450, LumiSection 25 on stream 0 at 28-May-2019 21:55:24.806 CEST
+Begin processing the 552nd record. Run 1, Event 2456, LumiSection 25 on stream 0 at 28-May-2019 21:55:38.424 CEST
+Begin processing the 553rd record. Run 1, Event 2451, LumiSection 25 on stream 0 at 28-May-2019 21:55:52.174 CEST
+Begin processing the 554th record. Run 1, Event 2454, LumiSection 25 on stream 0 at 28-May-2019 21:56:05.856 CEST
+Begin processing the 555th record. Run 1, Event 2457, LumiSection 25 on stream 0 at 28-May-2019 21:56:19.317 CEST
+Begin processing the 556th record. Run 1, Event 2453, LumiSection 25 on stream 0 at 28-May-2019 21:56:31.935 CEST
+Begin processing the 557th record. Run 1, Event 2455, LumiSection 25 on stream 0 at 28-May-2019 21:56:44.046 CEST
+Begin processing the 558th record. Run 1, Event 2461, LumiSection 25 on stream 0 at 28-May-2019 21:56:57.946 CEST
+Begin processing the 559th record. Run 1, Event 2460, LumiSection 25 on stream 0 at 28-May-2019 21:57:11.263 CEST
+Begin processing the 560th record. Run 1, Event 2458, LumiSection 25 on stream 0 at 28-May-2019 21:57:26.379 CEST
+Begin processing the 561st record. Run 1, Event 2463, LumiSection 25 on stream 0 at 28-May-2019 21:57:40.628 CEST
+Begin processing the 562nd record. Run 1, Event 2468, LumiSection 25 on stream 0 at 28-May-2019 21:57:55.042 CEST
+Begin processing the 563rd record. Run 1, Event 2464, LumiSection 25 on stream 0 at 28-May-2019 21:58:08.784 CEST
+Begin processing the 564th record. Run 1, Event 2465, LumiSection 25 on stream 0 at 28-May-2019 21:58:23.597 CEST
+Begin processing the 565th record. Run 1, Event 2459, LumiSection 25 on stream 0 at 28-May-2019 21:58:38.602 CEST
+Begin processing the 566th record. Run 1, Event 2469, LumiSection 25 on stream 0 at 28-May-2019 21:58:50.160 CEST
+Begin processing the 567th record. Run 1, Event 2462, LumiSection 25 on stream 0 at 28-May-2019 21:59:03.378 CEST
+Begin processing the 568th record. Run 1, Event 2472, LumiSection 25 on stream 0 at 28-May-2019 21:59:19.510 CEST
+Begin processing the 569th record. Run 1, Event 2475, LumiSection 25 on stream 0 at 28-May-2019 21:59:33.564 CEST
+Begin processing the 570th record. Run 1, Event 2467, LumiSection 25 on stream 0 at 28-May-2019 21:59:45.128 CEST
+Begin processing the 571st record. Run 1, Event 2471, LumiSection 25 on stream 0 at 28-May-2019 22:00:00.334 CEST
+Begin processing the 572nd record. Run 1, Event 2466, LumiSection 25 on stream 0 at 28-May-2019 22:00:18.408 CEST
+Begin processing the 573rd record. Run 1, Event 2473, LumiSection 25 on stream 0 at 28-May-2019 22:00:34.167 CEST
+Begin processing the 574th record. Run 1, Event 2476, LumiSection 25 on stream 0 at 28-May-2019 22:00:47.362 CEST
+Begin processing the 575th record. Run 1, Event 2479, LumiSection 25 on stream 0 at 28-May-2019 22:01:00.883 CEST
+Begin processing the 576th record. Run 1, Event 2470, LumiSection 25 on stream 0 at 28-May-2019 22:01:13.997 CEST
+Begin processing the 577th record. Run 1, Event 2482, LumiSection 25 on stream 0 at 28-May-2019 22:01:29.512 CEST
+Begin processing the 578th record. Run 1, Event 2474, LumiSection 25 on stream 0 at 28-May-2019 22:01:43.585 CEST
+Begin processing the 579th record. Run 1, Event 2477, LumiSection 25 on stream 0 at 28-May-2019 22:01:58.615 CEST
+Begin processing the 580th record. Run 1, Event 2480, LumiSection 25 on stream 0 at 28-May-2019 22:02:13.281 CEST
+Begin processing the 581st record. Run 1, Event 2481, LumiSection 25 on stream 0 at 28-May-2019 22:02:25.280 CEST
+Begin processing the 582nd record. Run 1, Event 2486, LumiSection 25 on stream 0 at 28-May-2019 22:02:40.236 CEST
+Begin processing the 583rd record. Run 1, Event 2484, LumiSection 25 on stream 0 at 28-May-2019 22:02:54.916 CEST
+Begin processing the 584th record. Run 1, Event 2485, LumiSection 25 on stream 0 at 28-May-2019 22:03:09.284 CEST
+Begin processing the 585th record. Run 1, Event 2487, LumiSection 25 on stream 0 at 28-May-2019 22:03:27.148 CEST
+Begin processing the 586th record. Run 1, Event 2489, LumiSection 25 on stream 0 at 28-May-2019 22:03:40.980 CEST
+Begin processing the 587th record. Run 1, Event 2490, LumiSection 25 on stream 0 at 28-May-2019 22:03:54.566 CEST
+Begin processing the 588th record. Run 1, Event 2478, LumiSection 25 on stream 0 at 28-May-2019 22:04:08.504 CEST
+Begin processing the 589th record. Run 1, Event 2491, LumiSection 25 on stream 0 at 28-May-2019 22:04:23.113 CEST
+Begin processing the 590th record. Run 1, Event 2483, LumiSection 25 on stream 0 at 28-May-2019 22:04:35.740 CEST
+Begin processing the 591st record. Run 1, Event 2494, LumiSection 25 on stream 0 at 28-May-2019 22:04:49.595 CEST
+Begin processing the 592nd record. Run 1, Event 2496, LumiSection 25 on stream 0 at 28-May-2019 22:05:03.533 CEST
+Begin processing the 593rd record. Run 1, Event 2492, LumiSection 25 on stream 0 at 28-May-2019 22:05:17.976 CEST
+Begin processing the 594th record. Run 1, Event 2495, LumiSection 25 on stream 0 at 28-May-2019 22:05:32.369 CEST
+Begin processing the 595th record. Run 1, Event 2497, LumiSection 25 on stream 0 at 28-May-2019 22:05:48.824 CEST
+Begin processing the 596th record. Run 1, Event 2498, LumiSection 25 on stream 0 at 28-May-2019 22:06:03.173 CEST
+Begin processing the 597th record. Run 1, Event 2493, LumiSection 25 on stream 0 at 28-May-2019 22:06:17.361 CEST
+Begin processing the 598th record. Run 1, Event 2499, LumiSection 25 on stream 0 at 28-May-2019 22:06:33.077 CEST
+Begin processing the 599th record. Run 1, Event 2500, LumiSection 25 on stream 0 at 28-May-2019 22:06:46.438 CEST
+Begin processing the 600th record. Run 1, Event 2488, LumiSection 25 on stream 0 at 28-May-2019 22:06:59.521 CEST
+28-May-2019 22:07:05 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CD195B20-F5F1-504A-BF57-48500AE83D5A.root
+28-May-2019 22:07:05 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CCFEF3EC-6BB3-414F-96ED-0EF066356853.root
+%MSG-w XrdAdaptor:  file_open 28-May-2019 22:07:07 CEST PostProcessEvent
+Data is served from T2_UK_SGrid_RALPP instead of original site T2_CH_CERN
+%MSG
+28-May-2019 22:07:07 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CCFEF3EC-6BB3-414F-96ED-0EF066356853.root
+[2019-05-28 22:07:12.394011 +0200][Warning][XRootDTransport   ] [131.225.207.213:22701 #0.0] Logged in, accepting empty login response.
+%MSG-w XrdAdaptor:  (NoModuleName) 28-May-2019 22:07:12 CEST pre-events
+Data is now served from T2_UK_SGrid_RALPP, fnal.gov instead of previous T2_UK_SGrid_RALPP
+%MSG
+Begin processing the 601st record. Run 1, Event 7406, LumiSection 75 on stream 0 at 28-May-2019 22:07:39.817 CEST
+%MSG-w XrdAdaptor:  PostModuleEvent 28-May-2019 22:07:45 CEST PostProcessEvent
+Data is now served from fnal.gov instead of previous T2_UK_SGrid_RALPP, fnal.gov
+%MSG
+Begin processing the 602nd record. Run 1, Event 7404, LumiSection 75 on stream 0 at 28-May-2019 22:07:49.931 CEST
+Begin processing the 603rd record. Run 1, Event 7401, LumiSection 75 on stream 0 at 28-May-2019 22:08:00.724 CEST
+Begin processing the 604th record. Run 1, Event 7409, LumiSection 75 on stream 0 at 28-May-2019 22:08:12.633 CEST
+Begin processing the 605th record. Run 1, Event 7403, LumiSection 75 on stream 0 at 28-May-2019 22:08:23.220 CEST
+Begin processing the 606th record. Run 1, Event 7408, LumiSection 75 on stream 0 at 28-May-2019 22:08:32.268 CEST
+Begin processing the 607th record. Run 1, Event 7407, LumiSection 75 on stream 0 at 28-May-2019 22:08:41.860 CEST
+Begin processing the 608th record. Run 1, Event 7414, LumiSection 75 on stream 0 at 28-May-2019 22:08:52.913 CEST
+Begin processing the 609th record. Run 1, Event 7412, LumiSection 75 on stream 0 at 28-May-2019 22:09:03.940 CEST
+Begin processing the 610th record. Run 1, Event 7415, LumiSection 75 on stream 0 at 28-May-2019 22:09:13.221 CEST
+Begin processing the 611th record. Run 1, Event 7413, LumiSection 75 on stream 0 at 28-May-2019 22:09:23.361 CEST
+Begin processing the 612th record. Run 1, Event 7402, LumiSection 75 on stream 0 at 28-May-2019 22:09:34.835 CEST
+Begin processing the 613th record. Run 1, Event 7405, LumiSection 75 on stream 0 at 28-May-2019 22:09:44.477 CEST
+Begin processing the 614th record. Run 1, Event 7411, LumiSection 75 on stream 0 at 28-May-2019 22:09:54.947 CEST
+Begin processing the 615th record. Run 1, Event 7418, LumiSection 75 on stream 0 at 28-May-2019 22:10:04.581 CEST
+Begin processing the 616th record. Run 1, Event 7422, LumiSection 75 on stream 0 at 28-May-2019 22:10:14.933 CEST
+Begin processing the 617th record. Run 1, Event 7419, LumiSection 75 on stream 0 at 28-May-2019 22:10:23.999 CEST
+Begin processing the 618th record. Run 1, Event 7420, LumiSection 75 on stream 0 at 28-May-2019 22:10:33.861 CEST
+Begin processing the 619th record. Run 1, Event 7410, LumiSection 75 on stream 0 at 28-May-2019 22:10:43.316 CEST
+Begin processing the 620th record. Run 1, Event 7421, LumiSection 75 on stream 0 at 28-May-2019 22:10:54.361 CEST
+Begin processing the 621st record. Run 1, Event 7423, LumiSection 75 on stream 0 at 28-May-2019 22:11:04.136 CEST
+Begin processing the 622nd record. Run 1, Event 7417, LumiSection 75 on stream 0 at 28-May-2019 22:11:13.708 CEST
+Begin processing the 623rd record. Run 1, Event 7416, LumiSection 75 on stream 0 at 28-May-2019 22:11:23.035 CEST
+Begin processing the 624th record. Run 1, Event 7428, LumiSection 75 on stream 0 at 28-May-2019 22:11:32.339 CEST
+Begin processing the 625th record. Run 1, Event 7429, LumiSection 75 on stream 0 at 28-May-2019 22:11:43.116 CEST
+Begin processing the 626th record. Run 1, Event 7425, LumiSection 75 on stream 0 at 28-May-2019 22:11:53.213 CEST
+Begin processing the 627th record. Run 1, Event 7427, LumiSection 75 on stream 0 at 28-May-2019 22:12:02.508 CEST
+Begin processing the 628th record. Run 1, Event 7431, LumiSection 75 on stream 0 at 28-May-2019 22:12:12.328 CEST
+Begin processing the 629th record. Run 1, Event 7424, LumiSection 75 on stream 0 at 28-May-2019 22:12:22.698 CEST
+Begin processing the 630th record. Run 1, Event 7433, LumiSection 75 on stream 0 at 28-May-2019 22:12:32.855 CEST
+Begin processing the 631st record. Run 1, Event 7426, LumiSection 75 on stream 0 at 28-May-2019 22:12:40.964 CEST
+Begin processing the 632nd record. Run 1, Event 7430, LumiSection 75 on stream 0 at 28-May-2019 22:12:50.866 CEST
+Begin processing the 633rd record. Run 1, Event 7432, LumiSection 75 on stream 0 at 28-May-2019 22:12:59.722 CEST
+Begin processing the 634th record. Run 1, Event 7437, LumiSection 75 on stream 0 at 28-May-2019 22:13:09.381 CEST
+Begin processing the 635th record. Run 1, Event 7441, LumiSection 75 on stream 0 at 28-May-2019 22:13:18.157 CEST
+Begin processing the 636th record. Run 1, Event 7434, LumiSection 75 on stream 0 at 28-May-2019 22:13:26.724 CEST
+Begin processing the 637th record. Run 1, Event 7435, LumiSection 75 on stream 0 at 28-May-2019 22:13:35.385 CEST
+Begin processing the 638th record. Run 1, Event 7440, LumiSection 75 on stream 0 at 28-May-2019 22:13:45.086 CEST
+Begin processing the 639th record. Run 1, Event 7438, LumiSection 75 on stream 0 at 28-May-2019 22:13:53.606 CEST
+Begin processing the 640th record. Run 1, Event 7439, LumiSection 75 on stream 0 at 28-May-2019 22:14:03.273 CEST
+Begin processing the 641st record. Run 1, Event 7436, LumiSection 75 on stream 0 at 28-May-2019 22:14:12.485 CEST
+Begin processing the 642nd record. Run 1, Event 7443, LumiSection 75 on stream 0 at 28-May-2019 22:14:21.449 CEST
+Begin processing the 643rd record. Run 1, Event 7447, LumiSection 75 on stream 0 at 28-May-2019 22:14:30.233 CEST
+Begin processing the 644th record. Run 1, Event 7444, LumiSection 75 on stream 0 at 28-May-2019 22:14:38.410 CEST
+Begin processing the 645th record. Run 1, Event 7442, LumiSection 75 on stream 0 at 28-May-2019 22:14:48.112 CEST
+Begin processing the 646th record. Run 1, Event 7448, LumiSection 75 on stream 0 at 28-May-2019 22:14:58.168 CEST
+Begin processing the 647th record. Run 1, Event 7446, LumiSection 75 on stream 0 at 28-May-2019 22:15:08.352 CEST
+Begin processing the 648th record. Run 1, Event 7451, LumiSection 75 on stream 0 at 28-May-2019 22:15:18.452 CEST
+Begin processing the 649th record. Run 1, Event 7454, LumiSection 75 on stream 0 at 28-May-2019 22:15:27.566 CEST
+Begin processing the 650th record. Run 1, Event 7452, LumiSection 75 on stream 0 at 28-May-2019 22:15:36.701 CEST
+Begin processing the 651st record. Run 1, Event 7449, LumiSection 75 on stream 0 at 28-May-2019 22:15:45.759 CEST
+Begin processing the 652nd record. Run 1, Event 7450, LumiSection 75 on stream 0 at 28-May-2019 22:15:54.663 CEST
+Begin processing the 653rd record. Run 1, Event 7456, LumiSection 75 on stream 0 at 28-May-2019 22:16:03.347 CEST
+Begin processing the 654th record. Run 1, Event 7453, LumiSection 75 on stream 0 at 28-May-2019 22:16:11.924 CEST
+Begin processing the 655th record. Run 1, Event 7457, LumiSection 75 on stream 0 at 28-May-2019 22:16:22.112 CEST
+Begin processing the 656th record. Run 1, Event 7461, LumiSection 75 on stream 0 at 28-May-2019 22:16:32.639 CEST
+Begin processing the 657th record. Run 1, Event 7445, LumiSection 75 on stream 0 at 28-May-2019 22:16:41.716 CEST
+Begin processing the 658th record. Run 1, Event 7455, LumiSection 75 on stream 0 at 28-May-2019 22:16:50.501 CEST
+Begin processing the 659th record. Run 1, Event 7458, LumiSection 75 on stream 0 at 28-May-2019 22:16:58.922 CEST
+Begin processing the 660th record. Run 1, Event 7459, LumiSection 75 on stream 0 at 28-May-2019 22:17:07.664 CEST
+Begin processing the 661st record. Run 1, Event 7463, LumiSection 75 on stream 0 at 28-May-2019 22:17:16.915 CEST
+Begin processing the 662nd record. Run 1, Event 7460, LumiSection 75 on stream 0 at 28-May-2019 22:17:26.455 CEST
+Begin processing the 663rd record. Run 1, Event 7467, LumiSection 75 on stream 0 at 28-May-2019 22:17:35.126 CEST
+Begin processing the 664th record. Run 1, Event 7464, LumiSection 75 on stream 0 at 28-May-2019 22:17:45.045 CEST
+Begin processing the 665th record. Run 1, Event 7471, LumiSection 75 on stream 0 at 28-May-2019 22:17:53.676 CEST
+Begin processing the 666th record. Run 1, Event 7468, LumiSection 75 on stream 0 at 28-May-2019 22:18:02.236 CEST
+Begin processing the 667th record. Run 1, Event 7462, LumiSection 75 on stream 0 at 28-May-2019 22:18:10.473 CEST
+Begin processing the 668th record. Run 1, Event 7465, LumiSection 75 on stream 0 at 28-May-2019 22:18:19.503 CEST
+Begin processing the 669th record. Run 1, Event 7470, LumiSection 75 on stream 0 at 28-May-2019 22:18:29.242 CEST
+Begin processing the 670th record. Run 1, Event 7469, LumiSection 75 on stream 0 at 28-May-2019 22:18:39.654 CEST
+Begin processing the 671st record. Run 1, Event 7472, LumiSection 75 on stream 0 at 28-May-2019 22:18:48.292 CEST
+Begin processing the 672nd record. Run 1, Event 7475, LumiSection 75 on stream 0 at 28-May-2019 22:18:56.681 CEST
+Begin processing the 673rd record. Run 1, Event 7466, LumiSection 75 on stream 0 at 28-May-2019 22:19:06.013 CEST
+Begin processing the 674th record. Run 1, Event 7480, LumiSection 75 on stream 0 at 28-May-2019 22:19:14.679 CEST
+Begin processing the 675th record. Run 1, Event 7476, LumiSection 75 on stream 0 at 28-May-2019 22:19:23.714 CEST
+Begin processing the 676th record. Run 1, Event 7478, LumiSection 75 on stream 0 at 28-May-2019 22:19:33.254 CEST
+Begin processing the 677th record. Run 1, Event 7479, LumiSection 75 on stream 0 at 28-May-2019 22:19:41.332 CEST
+Begin processing the 678th record. Run 1, Event 7473, LumiSection 75 on stream 0 at 28-May-2019 22:19:49.480 CEST
+Begin processing the 679th record. Run 1, Event 7474, LumiSection 75 on stream 0 at 28-May-2019 22:19:58.370 CEST
+Begin processing the 680th record. Run 1, Event 7477, LumiSection 75 on stream 0 at 28-May-2019 22:20:07.103 CEST
+Begin processing the 681st record. Run 1, Event 7483, LumiSection 75 on stream 0 at 28-May-2019 22:20:16.919 CEST
+Begin processing the 682nd record. Run 1, Event 7485, LumiSection 75 on stream 0 at 28-May-2019 22:20:25.820 CEST
+Begin processing the 683rd record. Run 1, Event 7486, LumiSection 75 on stream 0 at 28-May-2019 22:20:34.706 CEST
+Begin processing the 684th record. Run 1, Event 7487, LumiSection 75 on stream 0 at 28-May-2019 22:20:43.354 CEST
+Begin processing the 685th record. Run 1, Event 7481, LumiSection 75 on stream 0 at 28-May-2019 22:20:53.404 CEST
+Begin processing the 686th record. Run 1, Event 7490, LumiSection 75 on stream 0 at 28-May-2019 22:21:02.644 CEST
+Begin processing the 687th record. Run 1, Event 7489, LumiSection 75 on stream 0 at 28-May-2019 22:21:12.202 CEST
+Begin processing the 688th record. Run 1, Event 7493, LumiSection 75 on stream 0 at 28-May-2019 22:21:21.418 CEST
+Begin processing the 689th record. Run 1, Event 7482, LumiSection 75 on stream 0 at 28-May-2019 22:21:30.751 CEST
+Begin processing the 690th record. Run 1, Event 7484, LumiSection 75 on stream 0 at 28-May-2019 22:21:39.548 CEST
+Begin processing the 691st record. Run 1, Event 7494, LumiSection 75 on stream 0 at 28-May-2019 22:21:49.611 CEST
+Begin processing the 692nd record. Run 1, Event 7495, LumiSection 75 on stream 0 at 28-May-2019 22:21:58.815 CEST
+Begin processing the 693rd record. Run 1, Event 7497, LumiSection 75 on stream 0 at 28-May-2019 22:22:07.670 CEST
+Begin processing the 694th record. Run 1, Event 7500, LumiSection 75 on stream 0 at 28-May-2019 22:22:17.840 CEST
+Begin processing the 695th record. Run 1, Event 7496, LumiSection 75 on stream 0 at 28-May-2019 22:22:28.458 CEST
+Begin processing the 696th record. Run 1, Event 7499, LumiSection 75 on stream 0 at 28-May-2019 22:22:38.157 CEST
+Begin processing the 697th record. Run 1, Event 7491, LumiSection 75 on stream 0 at 28-May-2019 22:22:48.440 CEST
+Begin processing the 698th record. Run 1, Event 7498, LumiSection 75 on stream 0 at 28-May-2019 22:22:57.157 CEST
+Begin processing the 699th record. Run 1, Event 7488, LumiSection 75 on stream 0 at 28-May-2019 22:23:07.015 CEST
+Begin processing the 700th record. Run 1, Event 7492, LumiSection 75 on stream 0 at 28-May-2019 22:23:16.812 CEST
+28-May-2019 22:23:20 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CCFEF3EC-6BB3-414F-96ED-0EF066356853.root
+28-May-2019 22:23:20 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CB8C9032-3904-3445-BB99-12F7D2406CA0.root
+%MSG-w XrdAdaptor:  file_open 28-May-2019 22:23:22 CEST PostProcessEvent
+Data is served from T2_UK_SGrid_RALPP instead of original site T2_CH_CERN
+%MSG
+28-May-2019 22:23:23 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CB8C9032-3904-3445-BB99-12F7D2406CA0.root
+Begin processing the 701st record. Run 1, Event 6106, LumiSection 62 on stream 0 at 28-May-2019 22:24:04.096 CEST
+Begin processing the 702nd record. Run 1, Event 6104, LumiSection 62 on stream 0 at 28-May-2019 22:24:23.611 CEST
+Begin processing the 703rd record. Run 1, Event 6103, LumiSection 62 on stream 0 at 28-May-2019 22:24:42.886 CEST
+Begin processing the 704th record. Run 1, Event 6102, LumiSection 62 on stream 0 at 28-May-2019 22:24:59.528 CEST
+Begin processing the 705th record. Run 1, Event 6105, LumiSection 62 on stream 0 at 28-May-2019 22:25:22.228 CEST
+Begin processing the 706th record. Run 1, Event 6108, LumiSection 62 on stream 0 at 28-May-2019 22:25:42.714 CEST
+Begin processing the 707th record. Run 1, Event 6112, LumiSection 62 on stream 0 at 28-May-2019 22:25:58.952 CEST
+Begin processing the 708th record. Run 1, Event 6101, LumiSection 62 on stream 0 at 28-May-2019 22:26:14.838 CEST
+Begin processing the 709th record. Run 1, Event 6107, LumiSection 62 on stream 0 at 28-May-2019 22:26:30.358 CEST
+Begin processing the 710th record. Run 1, Event 6110, LumiSection 62 on stream 0 at 28-May-2019 22:26:46.785 CEST
+Begin processing the 711th record. Run 1, Event 6113, LumiSection 62 on stream 0 at 28-May-2019 22:27:01.646 CEST
+Begin processing the 712th record. Run 1, Event 6116, LumiSection 62 on stream 0 at 28-May-2019 22:27:16.484 CEST
+Begin processing the 713th record. Run 1, Event 6111, LumiSection 62 on stream 0 at 28-May-2019 22:27:32.197 CEST
+Begin processing the 714th record. Run 1, Event 6114, LumiSection 62 on stream 0 at 28-May-2019 22:27:48.493 CEST
+Begin processing the 715th record. Run 1, Event 6118, LumiSection 62 on stream 0 at 28-May-2019 22:28:08.181 CEST
+Begin processing the 716th record. Run 1, Event 6109, LumiSection 62 on stream 0 at 28-May-2019 22:28:23.612 CEST
+Begin processing the 717th record. Run 1, Event 6117, LumiSection 62 on stream 0 at 28-May-2019 22:28:37.449 CEST
+Begin processing the 718th record. Run 1, Event 6121, LumiSection 62 on stream 0 at 28-May-2019 22:28:49.748 CEST
+Begin processing the 719th record. Run 1, Event 6122, LumiSection 62 on stream 0 at 28-May-2019 22:29:04.459 CEST
+Begin processing the 720th record. Run 1, Event 6124, LumiSection 62 on stream 0 at 28-May-2019 22:29:17.340 CEST
+Begin processing the 721st record. Run 1, Event 6123, LumiSection 62 on stream 0 at 28-May-2019 22:29:30.033 CEST
+Begin processing the 722nd record. Run 1, Event 6119, LumiSection 62 on stream 0 at 28-May-2019 22:29:44.927 CEST
+Begin processing the 723rd record. Run 1, Event 6115, LumiSection 62 on stream 0 at 28-May-2019 22:30:00.470 CEST
+Begin processing the 724th record. Run 1, Event 6120, LumiSection 62 on stream 0 at 28-May-2019 22:30:15.188 CEST
+Begin processing the 725th record. Run 1, Event 6125, LumiSection 62 on stream 0 at 28-May-2019 22:30:31.375 CEST
+Begin processing the 726th record. Run 1, Event 6128, LumiSection 62 on stream 0 at 28-May-2019 22:30:45.314 CEST
+Begin processing the 727th record. Run 1, Event 6129, LumiSection 62 on stream 0 at 28-May-2019 22:30:57.893 CEST
+Begin processing the 728th record. Run 1, Event 6127, LumiSection 62 on stream 0 at 28-May-2019 22:31:10.305 CEST
+Begin processing the 729th record. Run 1, Event 6126, LumiSection 62 on stream 0 at 28-May-2019 22:31:23.250 CEST
+Begin processing the 730th record. Run 1, Event 6130, LumiSection 62 on stream 0 at 28-May-2019 22:31:37.530 CEST
+Begin processing the 731st record. Run 1, Event 6131, LumiSection 62 on stream 0 at 28-May-2019 22:31:51.455 CEST
+Begin processing the 732nd record. Run 1, Event 6135, LumiSection 62 on stream 0 at 28-May-2019 22:32:04.709 CEST
+Begin processing the 733rd record. Run 1, Event 6136, LumiSection 62 on stream 0 at 28-May-2019 22:32:13.149 CEST
+Begin processing the 734th record. Run 1, Event 6132, LumiSection 62 on stream 0 at 28-May-2019 22:32:24.539 CEST
+Begin processing the 735th record. Run 1, Event 6134, LumiSection 62 on stream 0 at 28-May-2019 22:32:37.106 CEST
+Begin processing the 736th record. Run 1, Event 6143, LumiSection 62 on stream 0 at 28-May-2019 22:32:48.121 CEST
+Begin processing the 737th record. Run 1, Event 6142, LumiSection 62 on stream 0 at 28-May-2019 22:33:00.656 CEST
+Begin processing the 738th record. Run 1, Event 6141, LumiSection 62 on stream 0 at 28-May-2019 22:33:11.816 CEST
+Begin processing the 739th record. Run 1, Event 6139, LumiSection 62 on stream 0 at 28-May-2019 22:33:26.461 CEST
+Begin processing the 740th record. Run 1, Event 6133, LumiSection 62 on stream 0 at 28-May-2019 22:33:42.573 CEST
+Begin processing the 741st record. Run 1, Event 6144, LumiSection 62 on stream 0 at 28-May-2019 22:33:58.547 CEST
+Begin processing the 742nd record. Run 1, Event 6138, LumiSection 62 on stream 0 at 28-May-2019 22:34:10.514 CEST
+Begin processing the 743rd record. Run 1, Event 6137, LumiSection 62 on stream 0 at 28-May-2019 22:34:26.874 CEST
+Begin processing the 744th record. Run 1, Event 6145, LumiSection 62 on stream 0 at 28-May-2019 22:34:42.776 CEST
+Begin processing the 745th record. Run 1, Event 6146, LumiSection 62 on stream 0 at 28-May-2019 22:34:57.488 CEST
+Begin processing the 746th record. Run 1, Event 6140, LumiSection 62 on stream 0 at 28-May-2019 22:35:08.453 CEST
+Begin processing the 747th record. Run 1, Event 6147, LumiSection 62 on stream 0 at 28-May-2019 22:35:21.792 CEST
+Begin processing the 748th record. Run 1, Event 6151, LumiSection 62 on stream 0 at 28-May-2019 22:35:33.059 CEST
+Begin processing the 749th record. Run 1, Event 6154, LumiSection 62 on stream 0 at 28-May-2019 22:35:44.035 CEST
+Begin processing the 750th record. Run 1, Event 6150, LumiSection 62 on stream 0 at 28-May-2019 22:35:54.845 CEST
+Begin processing the 751st record. Run 1, Event 6153, LumiSection 62 on stream 0 at 28-May-2019 22:36:04.421 CEST
+Begin processing the 752nd record. Run 1, Event 6152, LumiSection 62 on stream 0 at 28-May-2019 22:36:16.812 CEST
+Begin processing the 753rd record. Run 1, Event 6149, LumiSection 62 on stream 0 at 28-May-2019 22:36:28.409 CEST
+Begin processing the 754th record. Run 1, Event 6155, LumiSection 62 on stream 0 at 28-May-2019 22:36:39.733 CEST
+Begin processing the 755th record. Run 1, Event 6156, LumiSection 62 on stream 0 at 28-May-2019 22:36:49.923 CEST
+Begin processing the 756th record. Run 1, Event 6148, LumiSection 62 on stream 0 at 28-May-2019 22:37:00.601 CEST
+Begin processing the 757th record. Run 1, Event 6158, LumiSection 62 on stream 0 at 28-May-2019 22:37:08.946 CEST
+Begin processing the 758th record. Run 1, Event 6157, LumiSection 62 on stream 0 at 28-May-2019 22:37:21.206 CEST
+Begin processing the 759th record. Run 1, Event 6161, LumiSection 62 on stream 0 at 28-May-2019 22:37:30.884 CEST
+Begin processing the 760th record. Run 1, Event 6163, LumiSection 62 on stream 0 at 28-May-2019 22:37:42.606 CEST
+Begin processing the 761st record. Run 1, Event 6166, LumiSection 62 on stream 0 at 28-May-2019 22:37:52.027 CEST
+Begin processing the 762nd record. Run 1, Event 6165, LumiSection 62 on stream 0 at 28-May-2019 22:38:00.766 CEST
+Begin processing the 763rd record. Run 1, Event 6164, LumiSection 62 on stream 0 at 28-May-2019 22:38:09.738 CEST
+Begin processing the 764th record. Run 1, Event 6162, LumiSection 62 on stream 0 at 28-May-2019 22:38:21.671 CEST
+Begin processing the 765th record. Run 1, Event 6170, LumiSection 62 on stream 0 at 28-May-2019 22:38:32.290 CEST
+Begin processing the 766th record. Run 1, Event 6168, LumiSection 62 on stream 0 at 28-May-2019 22:38:44.506 CEST
+Begin processing the 767th record. Run 1, Event 6167, LumiSection 62 on stream 0 at 28-May-2019 22:38:54.409 CEST
+Begin processing the 768th record. Run 1, Event 6159, LumiSection 62 on stream 0 at 28-May-2019 22:39:06.146 CEST
+Begin processing the 769th record. Run 1, Event 6160, LumiSection 62 on stream 0 at 28-May-2019 22:39:16.395 CEST
+Begin processing the 770th record. Run 1, Event 6173, LumiSection 62 on stream 0 at 28-May-2019 22:39:22.349 CEST
+Begin processing the 771st record. Run 1, Event 6172, LumiSection 62 on stream 0 at 28-May-2019 22:39:29.787 CEST
+Begin processing the 772nd record. Run 1, Event 6171, LumiSection 62 on stream 0 at 28-May-2019 22:39:40.543 CEST
+Begin processing the 773rd record. Run 1, Event 6176, LumiSection 62 on stream 0 at 28-May-2019 22:39:49.158 CEST
+Begin processing the 774th record. Run 1, Event 6180, LumiSection 62 on stream 0 at 28-May-2019 22:39:58.563 CEST
+Begin processing the 775th record. Run 1, Event 6178, LumiSection 62 on stream 0 at 28-May-2019 22:40:11.080 CEST
+Begin processing the 776th record. Run 1, Event 6177, LumiSection 62 on stream 0 at 28-May-2019 22:40:21.220 CEST
+Begin processing the 777th record. Run 1, Event 6174, LumiSection 62 on stream 0 at 28-May-2019 22:40:29.882 CEST
+Begin processing the 778th record. Run 1, Event 6175, LumiSection 62 on stream 0 at 28-May-2019 22:40:41.066 CEST
+Begin processing the 779th record. Run 1, Event 6181, LumiSection 62 on stream 0 at 28-May-2019 22:40:51.585 CEST
+Begin processing the 780th record. Run 1, Event 6169, LumiSection 62 on stream 0 at 28-May-2019 22:41:00.561 CEST
+Begin processing the 781st record. Run 1, Event 6184, LumiSection 62 on stream 0 at 28-May-2019 22:41:10.055 CEST
+Begin processing the 782nd record. Run 1, Event 6183, LumiSection 62 on stream 0 at 28-May-2019 22:41:20.162 CEST
+Begin processing the 783rd record. Run 1, Event 6182, LumiSection 62 on stream 0 at 28-May-2019 22:41:29.525 CEST
+Begin processing the 784th record. Run 1, Event 6185, LumiSection 62 on stream 0 at 28-May-2019 22:41:42.123 CEST
+Begin processing the 785th record. Run 1, Event 6186, LumiSection 62 on stream 0 at 28-May-2019 22:41:52.717 CEST
+Begin processing the 786th record. Run 1, Event 6187, LumiSection 62 on stream 0 at 28-May-2019 22:42:02.924 CEST
+Begin processing the 787th record. Run 1, Event 6190, LumiSection 62 on stream 0 at 28-May-2019 22:42:13.505 CEST
+Begin processing the 788th record. Run 1, Event 6188, LumiSection 62 on stream 0 at 28-May-2019 22:42:22.968 CEST
+Begin processing the 789th record. Run 1, Event 6179, LumiSection 62 on stream 0 at 28-May-2019 22:42:32.096 CEST
+Begin processing the 790th record. Run 1, Event 6192, LumiSection 62 on stream 0 at 28-May-2019 22:42:41.432 CEST
+Begin processing the 791st record. Run 1, Event 6191, LumiSection 62 on stream 0 at 28-May-2019 22:42:49.017 CEST
+Begin processing the 792nd record. Run 1, Event 6189, LumiSection 62 on stream 0 at 28-May-2019 22:43:02.043 CEST
+Begin processing the 793rd record. Run 1, Event 6194, LumiSection 62 on stream 0 at 28-May-2019 22:43:12.367 CEST
+Begin processing the 794th record. Run 1, Event 6199, LumiSection 62 on stream 0 at 28-May-2019 22:43:22.290 CEST
+Begin processing the 795th record. Run 1, Event 6196, LumiSection 62 on stream 0 at 28-May-2019 22:43:32.356 CEST
+Begin processing the 796th record. Run 1, Event 6197, LumiSection 62 on stream 0 at 28-May-2019 22:43:40.267 CEST
+Begin processing the 797th record. Run 1, Event 6193, LumiSection 62 on stream 0 at 28-May-2019 22:43:47.056 CEST
+Begin processing the 798th record. Run 1, Event 6195, LumiSection 62 on stream 0 at 28-May-2019 22:43:54.728 CEST
+Begin processing the 799th record. Run 1, Event 6200, LumiSection 62 on stream 0 at 28-May-2019 22:44:06.457 CEST
+Begin processing the 800th record. Run 1, Event 6198, LumiSection 62 on stream 0 at 28-May-2019 22:44:17.456 CEST
+28-May-2019 22:44:20 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CB8C9032-3904-3445-BB99-12F7D2406CA0.root
+28-May-2019 22:44:20 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CAD74EE2-7F73-4A48-9D36-FEFE17D7481F.root
+%MSG-w XrdAdaptor:  file_open 28-May-2019 22:44:22 CEST PostProcessEvent
+Data is served from T2_UK_SGrid_RALPP instead of original site T2_CH_CERN
+%MSG
+28-May-2019 22:44:23 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CAD74EE2-7F73-4A48-9D36-FEFE17D7481F.root
+Begin processing the 801st record. Run 1, Event 5903, LumiSection 60 on stream 0 at 28-May-2019 22:44:39.957 CEST
+[2019-05-28 22:44:47.316555 +0200][Warning][XRootDTransport   ] [131.225.206.75:17028 #0.0] Logged in, accepting empty login response.
+%MSG-w XrdAdaptor:  (NoModuleName) 28-May-2019 22:44:47 CEST pre-events
+Data is now served from T2_UK_SGrid_RALPP, fnal.gov instead of previous T2_UK_SGrid_RALPP
+%MSG
+Begin processing the 802nd record. Run 1, Event 5904, LumiSection 60 on stream 0 at 28-May-2019 22:44:52.134 CEST
+%MSG-w XrdAdaptor:  source 28-May-2019 22:45:01 CEST PostProcessEvent
+Data is now served from T2_UK_SGrid_RALPP instead of previous T2_UK_SGrid_RALPP, fnal.gov
+%MSG
+Begin processing the 803rd record. Run 1, Event 5906, LumiSection 60 on stream 0 at 28-May-2019 22:45:01.378 CEST
+Begin processing the 804th record. Run 1, Event 5901, LumiSection 60 on stream 0 at 28-May-2019 22:45:11.977 CEST
+Begin processing the 805th record. Run 1, Event 5907, LumiSection 60 on stream 0 at 28-May-2019 22:45:22.459 CEST
+Begin processing the 806th record. Run 1, Event 5902, LumiSection 60 on stream 0 at 28-May-2019 22:45:34.022 CEST
+Begin processing the 807th record. Run 1, Event 5910, LumiSection 60 on stream 0 at 28-May-2019 22:45:46.199 CEST
+Begin processing the 808th record. Run 1, Event 5909, LumiSection 60 on stream 0 at 28-May-2019 22:45:57.045 CEST
+Begin processing the 809th record. Run 1, Event 5911, LumiSection 60 on stream 0 at 28-May-2019 22:46:06.815 CEST
+Begin processing the 810th record. Run 1, Event 5905, LumiSection 60 on stream 0 at 28-May-2019 22:46:18.186 CEST
+Begin processing the 811th record. Run 1, Event 5908, LumiSection 60 on stream 0 at 28-May-2019 22:46:31.450 CEST
+Begin processing the 812th record. Run 1, Event 5914, LumiSection 60 on stream 0 at 28-May-2019 22:46:41.857 CEST
+Begin processing the 813th record. Run 1, Event 5913, LumiSection 60 on stream 0 at 28-May-2019 22:46:54.011 CEST
+Begin processing the 814th record. Run 1, Event 5912, LumiSection 60 on stream 0 at 28-May-2019 22:47:04.552 CEST
+Begin processing the 815th record. Run 1, Event 5916, LumiSection 60 on stream 0 at 28-May-2019 22:47:15.676 CEST
+Begin processing the 816th record. Run 1, Event 5917, LumiSection 60 on stream 0 at 28-May-2019 22:47:27.657 CEST
+Begin processing the 817th record. Run 1, Event 5921, LumiSection 60 on stream 0 at 28-May-2019 22:47:38.145 CEST
+Begin processing the 818th record. Run 1, Event 5915, LumiSection 60 on stream 0 at 28-May-2019 22:47:50.134 CEST
+Begin processing the 819th record. Run 1, Event 5919, LumiSection 60 on stream 0 at 28-May-2019 22:48:02.885 CEST
+Begin processing the 820th record. Run 1, Event 5923, LumiSection 60 on stream 0 at 28-May-2019 22:48:13.973 CEST
+Begin processing the 821st record. Run 1, Event 5922, LumiSection 60 on stream 0 at 28-May-2019 22:48:26.692 CEST
+Begin processing the 822nd record. Run 1, Event 5924, LumiSection 60 on stream 0 at 28-May-2019 22:48:41.908 CEST
+Begin processing the 823rd record. Run 1, Event 5920, LumiSection 60 on stream 0 at 28-May-2019 22:48:53.551 CEST
+Begin processing the 824th record. Run 1, Event 5926, LumiSection 60 on stream 0 at 28-May-2019 22:49:04.792 CEST
+Begin processing the 825th record. Run 1, Event 5930, LumiSection 60 on stream 0 at 28-May-2019 22:49:18.257 CEST
+Begin processing the 826th record. Run 1, Event 5918, LumiSection 60 on stream 0 at 28-May-2019 22:49:32.221 CEST
+Begin processing the 827th record. Run 1, Event 5929, LumiSection 60 on stream 0 at 28-May-2019 22:49:46.300 CEST
+Begin processing the 828th record. Run 1, Event 5933, LumiSection 60 on stream 0 at 28-May-2019 22:50:02.000 CEST
+Begin processing the 829th record. Run 1, Event 5925, LumiSection 60 on stream 0 at 28-May-2019 22:50:14.358 CEST
+Begin processing the 830th record. Run 1, Event 5931, LumiSection 60 on stream 0 at 28-May-2019 22:50:25.568 CEST
+Begin processing the 831st record. Run 1, Event 5934, LumiSection 60 on stream 0 at 28-May-2019 22:50:38.994 CEST
+Begin processing the 832nd record. Run 1, Event 5927, LumiSection 60 on stream 0 at 28-May-2019 22:50:52.569 CEST
+Begin processing the 833rd record. Run 1, Event 5939, LumiSection 60 on stream 0 at 28-May-2019 22:51:04.926 CEST
+Begin processing the 834th record. Run 1, Event 5932, LumiSection 60 on stream 0 at 28-May-2019 22:51:19.343 CEST
+Begin processing the 835th record. Run 1, Event 5935, LumiSection 60 on stream 0 at 28-May-2019 22:51:32.434 CEST
+Begin processing the 836th record. Run 1, Event 5937, LumiSection 60 on stream 0 at 28-May-2019 22:51:47.398 CEST
+Begin processing the 837th record. Run 1, Event 5928, LumiSection 60 on stream 0 at 28-May-2019 22:52:00.277 CEST
+Begin processing the 838th record. Run 1, Event 5943, LumiSection 60 on stream 0 at 28-May-2019 22:52:17.505 CEST
+Begin processing the 839th record. Run 1, Event 5941, LumiSection 60 on stream 0 at 28-May-2019 22:52:33.114 CEST
+Begin processing the 840th record. Run 1, Event 5938, LumiSection 60 on stream 0 at 28-May-2019 22:52:50.381 CEST
+Begin processing the 841st record. Run 1, Event 5942, LumiSection 60 on stream 0 at 28-May-2019 22:53:03.397 CEST
+Begin processing the 842nd record. Run 1, Event 5944, LumiSection 60 on stream 0 at 28-May-2019 22:53:19.324 CEST
+Begin processing the 843rd record. Run 1, Event 5946, LumiSection 60 on stream 0 at 28-May-2019 22:53:42.610 CEST
+Begin processing the 844th record. Run 1, Event 5945, LumiSection 60 on stream 0 at 28-May-2019 22:54:01.667 CEST
+Begin processing the 845th record. Run 1, Event 5940, LumiSection 60 on stream 0 at 28-May-2019 22:54:24.145 CEST
+Begin processing the 846th record. Run 1, Event 5936, LumiSection 60 on stream 0 at 28-May-2019 22:54:47.143 CEST
+Begin processing the 847th record. Run 1, Event 5949, LumiSection 60 on stream 0 at 28-May-2019 22:55:04.805 CEST
+Begin processing the 848th record. Run 1, Event 5947, LumiSection 60 on stream 0 at 28-May-2019 22:55:25.459 CEST
+Begin processing the 849th record. Run 1, Event 5952, LumiSection 60 on stream 0 at 28-May-2019 22:55:49.187 CEST
+Begin processing the 850th record. Run 1, Event 5953, LumiSection 60 on stream 0 at 28-May-2019 22:56:09.318 CEST
+Begin processing the 851st record. Run 1, Event 5950, LumiSection 60 on stream 0 at 28-May-2019 22:56:29.229 CEST
+Begin processing the 852nd record. Run 1, Event 5954, LumiSection 60 on stream 0 at 28-May-2019 22:56:46.672 CEST
+Begin processing the 853rd record. Run 1, Event 5951, LumiSection 60 on stream 0 at 28-May-2019 22:57:06.928 CEST
+Begin processing the 854th record. Run 1, Event 5948, LumiSection 60 on stream 0 at 28-May-2019 22:57:23.638 CEST
+Begin processing the 855th record. Run 1, Event 5958, LumiSection 60 on stream 0 at 28-May-2019 22:57:41.365 CEST
+Begin processing the 856th record. Run 1, Event 5959, LumiSection 60 on stream 0 at 28-May-2019 22:57:51.685 CEST
+Begin processing the 857th record. Run 1, Event 5955, LumiSection 60 on stream 0 at 28-May-2019 22:58:09.235 CEST
+Begin processing the 858th record. Run 1, Event 5960, LumiSection 60 on stream 0 at 28-May-2019 22:58:26.248 CEST
+Begin processing the 859th record. Run 1, Event 5962, LumiSection 60 on stream 0 at 28-May-2019 22:58:44.038 CEST
+Begin processing the 860th record. Run 1, Event 5956, LumiSection 60 on stream 0 at 28-May-2019 22:58:58.802 CEST
+Begin processing the 861st record. Run 1, Event 5957, LumiSection 60 on stream 0 at 28-May-2019 22:59:17.011 CEST
+Begin processing the 862nd record. Run 1, Event 5963, LumiSection 60 on stream 0 at 28-May-2019 22:59:37.530 CEST
+Begin processing the 863rd record. Run 1, Event 5964, LumiSection 60 on stream 0 at 28-May-2019 22:59:55.478 CEST
+Begin processing the 864th record. Run 1, Event 5966, LumiSection 60 on stream 0 at 28-May-2019 23:00:19.737 CEST
+Begin processing the 865th record. Run 1, Event 5967, LumiSection 60 on stream 0 at 28-May-2019 23:00:40.236 CEST
+Begin processing the 866th record. Run 1, Event 5965, LumiSection 60 on stream 0 at 28-May-2019 23:00:58.781 CEST
+Begin processing the 867th record. Run 1, Event 5970, LumiSection 60 on stream 0 at 28-May-2019 23:01:22.175 CEST
+Begin processing the 868th record. Run 1, Event 5961, LumiSection 60 on stream 0 at 28-May-2019 23:01:41.134 CEST
+Begin processing the 869th record. Run 1, Event 5968, LumiSection 60 on stream 0 at 28-May-2019 23:02:01.075 CEST
+Begin processing the 870th record. Run 1, Event 5969, LumiSection 60 on stream 0 at 28-May-2019 23:02:18.469 CEST
+Begin processing the 871st record. Run 1, Event 5971, LumiSection 60 on stream 0 at 28-May-2019 23:02:35.532 CEST
+Begin processing the 872nd record. Run 1, Event 5977, LumiSection 60 on stream 0 at 28-May-2019 23:02:53.915 CEST
+Begin processing the 873rd record. Run 1, Event 5973, LumiSection 60 on stream 0 at 28-May-2019 23:03:10.530 CEST
+Begin processing the 874th record. Run 1, Event 5975, LumiSection 60 on stream 0 at 28-May-2019 23:03:28.256 CEST
+Begin processing the 875th record. Run 1, Event 5974, LumiSection 60 on stream 0 at 28-May-2019 23:03:44.028 CEST
+Begin processing the 876th record. Run 1, Event 5972, LumiSection 60 on stream 0 at 28-May-2019 23:03:58.102 CEST
+Begin processing the 877th record. Run 1, Event 5981, LumiSection 60 on stream 0 at 28-May-2019 23:04:14.404 CEST
+Begin processing the 878th record. Run 1, Event 5980, LumiSection 60 on stream 0 at 28-May-2019 23:04:32.048 CEST
+Begin processing the 879th record. Run 1, Event 5976, LumiSection 60 on stream 0 at 28-May-2019 23:04:43.560 CEST
+Begin processing the 880th record. Run 1, Event 5978, LumiSection 60 on stream 0 at 28-May-2019 23:04:58.615 CEST
+Begin processing the 881st record. Run 1, Event 5985, LumiSection 60 on stream 0 at 28-May-2019 23:05:10.322 CEST
+Begin processing the 882nd record. Run 1, Event 5982, LumiSection 60 on stream 0 at 28-May-2019 23:05:25.040 CEST
+Begin processing the 883rd record. Run 1, Event 5988, LumiSection 60 on stream 0 at 28-May-2019 23:05:38.780 CEST
+Begin processing the 884th record. Run 1, Event 5979, LumiSection 60 on stream 0 at 28-May-2019 23:05:53.645 CEST
+Begin processing the 885th record. Run 1, Event 5983, LumiSection 60 on stream 0 at 28-May-2019 23:06:10.966 CEST
+Begin processing the 886th record. Run 1, Event 5987, LumiSection 60 on stream 0 at 28-May-2019 23:06:22.322 CEST
+Begin processing the 887th record. Run 1, Event 5986, LumiSection 60 on stream 0 at 28-May-2019 23:06:32.163 CEST
+Begin processing the 888th record. Run 1, Event 5992, LumiSection 60 on stream 0 at 28-May-2019 23:06:41.936 CEST
+Begin processing the 889th record. Run 1, Event 5984, LumiSection 60 on stream 0 at 28-May-2019 23:07:00.492 CEST
+Begin processing the 890th record. Run 1, Event 5990, LumiSection 60 on stream 0 at 28-May-2019 23:07:14.580 CEST
+Begin processing the 891st record. Run 1, Event 5991, LumiSection 60 on stream 0 at 28-May-2019 23:07:30.653 CEST
+Begin processing the 892nd record. Run 1, Event 5996, LumiSection 60 on stream 0 at 28-May-2019 23:07:44.082 CEST
+Begin processing the 893rd record. Run 1, Event 5998, LumiSection 60 on stream 0 at 28-May-2019 23:07:58.090 CEST
+Begin processing the 894th record. Run 1, Event 5997, LumiSection 60 on stream 0 at 28-May-2019 23:08:09.507 CEST
+Begin processing the 895th record. Run 1, Event 5994, LumiSection 60 on stream 0 at 28-May-2019 23:08:24.333 CEST
+Begin processing the 896th record. Run 1, Event 5995, LumiSection 60 on stream 0 at 28-May-2019 23:08:38.042 CEST
+Begin processing the 897th record. Run 1, Event 5993, LumiSection 60 on stream 0 at 28-May-2019 23:08:51.919 CEST
+Begin processing the 898th record. Run 1, Event 5989, LumiSection 60 on stream 0 at 28-May-2019 23:09:06.889 CEST
+Begin processing the 899th record. Run 1, Event 6000, LumiSection 60 on stream 0 at 28-May-2019 23:09:19.259 CEST
+Begin processing the 900th record. Run 1, Event 5999, LumiSection 60 on stream 0 at 28-May-2019 23:09:31.223 CEST
+28-May-2019 23:09:34 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CAD74EE2-7F73-4A48-9D36-FEFE17D7481F.root
+28-May-2019 23:09:34 CEST  Initiating request to open file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CA33E7AB-505C-854F-AAD0-DB30EA18D790.root
+[2019-05-28 23:12:35.734585 +0200][Error  ][XRootD            ] [[2001:630:58:1c20::82f6:2fe5]:1094] Unable to get the response to request kXR_open (file: /store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CA33E7AB-505C-854F-AAD0-DB30EA18D790.root, mode: 0660, flags: kXR_open_read kXR_async kXR_retstat )
+%MSG-w XrdAdaptorInternal:  file_open 28-May-2019 23:12:35 CEST PostProcessEvent
+Failed to open file at URL root://[2001:630:58:1c20::82f6:2fe5]:1094//store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CA33E7AB-505C-854F-AAD0-DB30EA18D790.root.
+%MSG
+[2019-05-28 23:12:36.686024 +0200][Warning][XRootDTransport   ] [131.225.206.121:17093 #0.0] Logged in, accepting empty login response.
+%MSG-w XrdAdaptor:  file_open 28-May-2019 23:12:36 CEST PostProcessEvent
+Data is served from fnal.gov instead of original site T2_CH_CERN
+%MSG
+28-May-2019 23:12:37 CEST  Successfully opened file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CA33E7AB-505C-854F-AAD0-DB30EA18D790.root
+Begin processing the 901st record. Run 1, Event 3106, LumiSection 32 on stream 0 at 28-May-2019 23:12:50.904 CEST
+Begin processing the 902nd record. Run 1, Event 3102, LumiSection 32 on stream 0 at 28-May-2019 23:13:01.634 CEST
+Begin processing the 903rd record. Run 1, Event 3101, LumiSection 32 on stream 0 at 28-May-2019 23:13:11.768 CEST
+Begin processing the 904th record. Run 1, Event 3109, LumiSection 32 on stream 0 at 28-May-2019 23:13:22.882 CEST
+Begin processing the 905th record. Run 1, Event 3104, LumiSection 32 on stream 0 at 28-May-2019 23:13:34.604 CEST
+Begin processing the 906th record. Run 1, Event 3105, LumiSection 32 on stream 0 at 28-May-2019 23:13:45.079 CEST
+Begin processing the 907th record. Run 1, Event 3103, LumiSection 32 on stream 0 at 28-May-2019 23:13:56.291 CEST
+Begin processing the 908th record. Run 1, Event 3107, LumiSection 32 on stream 0 at 28-May-2019 23:14:07.830 CEST
+Begin processing the 909th record. Run 1, Event 3111, LumiSection 32 on stream 0 at 28-May-2019 23:14:19.584 CEST
+Begin processing the 910th record. Run 1, Event 3115, LumiSection 32 on stream 0 at 28-May-2019 23:14:30.790 CEST
+Begin processing the 911th record. Run 1, Event 3108, LumiSection 32 on stream 0 at 28-May-2019 23:14:41.370 CEST
+Begin processing the 912th record. Run 1, Event 3110, LumiSection 32 on stream 0 at 28-May-2019 23:14:52.806 CEST
+Begin processing the 913th record. Run 1, Event 3112, LumiSection 32 on stream 0 at 28-May-2019 23:15:05.117 CEST
+Begin processing the 914th record. Run 1, Event 3113, LumiSection 32 on stream 0 at 28-May-2019 23:15:16.915 CEST
+Begin processing the 915th record. Run 1, Event 3121, LumiSection 32 on stream 0 at 28-May-2019 23:15:28.934 CEST
+Begin processing the 916th record. Run 1, Event 3119, LumiSection 32 on stream 0 at 28-May-2019 23:15:41.404 CEST
+Begin processing the 917th record. Run 1, Event 3116, LumiSection 32 on stream 0 at 28-May-2019 23:15:53.763 CEST
+Begin processing the 918th record. Run 1, Event 3114, LumiSection 32 on stream 0 at 28-May-2019 23:16:06.768 CEST
+Begin processing the 919th record. Run 1, Event 3118, LumiSection 32 on stream 0 at 28-May-2019 23:16:18.307 CEST
+Begin processing the 920th record. Run 1, Event 3117, LumiSection 32 on stream 0 at 28-May-2019 23:16:31.104 CEST
+Begin processing the 921st record. Run 1, Event 3122, LumiSection 32 on stream 0 at 28-May-2019 23:16:42.393 CEST
+Begin processing the 922nd record. Run 1, Event 3123, LumiSection 32 on stream 0 at 28-May-2019 23:16:54.356 CEST
+Begin processing the 923rd record. Run 1, Event 3127, LumiSection 32 on stream 0 at 28-May-2019 23:17:04.017 CEST
+Begin processing the 924th record. Run 1, Event 3120, LumiSection 32 on stream 0 at 28-May-2019 23:17:14.007 CEST
+Begin processing the 925th record. Run 1, Event 3126, LumiSection 32 on stream 0 at 28-May-2019 23:17:25.418 CEST
+Begin processing the 926th record. Run 1, Event 3124, LumiSection 32 on stream 0 at 28-May-2019 23:17:37.040 CEST
+Begin processing the 927th record. Run 1, Event 3131, LumiSection 32 on stream 0 at 28-May-2019 23:17:48.242 CEST
+Begin processing the 928th record. Run 1, Event 3128, LumiSection 32 on stream 0 at 28-May-2019 23:17:57.478 CEST
+Begin processing the 929th record. Run 1, Event 3125, LumiSection 32 on stream 0 at 28-May-2019 23:18:06.219 CEST
+Begin processing the 930th record. Run 1, Event 3132, LumiSection 32 on stream 0 at 28-May-2019 23:18:18.797 CEST
+Begin processing the 931st record. Run 1, Event 3134, LumiSection 32 on stream 0 at 28-May-2019 23:18:31.021 CEST
+Begin processing the 932nd record. Run 1, Event 3133, LumiSection 32 on stream 0 at 28-May-2019 23:18:43.931 CEST
+Begin processing the 933rd record. Run 1, Event 3136, LumiSection 32 on stream 0 at 28-May-2019 23:18:56.110 CEST
+Begin processing the 934th record. Run 1, Event 3135, LumiSection 32 on stream 0 at 28-May-2019 23:19:09.008 CEST
+Begin processing the 935th record. Run 1, Event 3137, LumiSection 32 on stream 0 at 28-May-2019 23:19:21.942 CEST
+Begin processing the 936th record. Run 1, Event 3129, LumiSection 32 on stream 0 at 28-May-2019 23:19:33.535 CEST
+Begin processing the 937th record. Run 1, Event 3130, LumiSection 32 on stream 0 at 28-May-2019 23:19:43.316 CEST
+Begin processing the 938th record. Run 1, Event 3138, LumiSection 32 on stream 0 at 28-May-2019 23:19:53.806 CEST
+Begin processing the 939th record. Run 1, Event 3139, LumiSection 32 on stream 0 at 28-May-2019 23:20:04.213 CEST
+Begin processing the 940th record. Run 1, Event 3141, LumiSection 32 on stream 0 at 28-May-2019 23:20:14.901 CEST
+Begin processing the 941st record. Run 1, Event 3140, LumiSection 32 on stream 0 at 28-May-2019 23:20:27.684 CEST
+Begin processing the 942nd record. Run 1, Event 3142, LumiSection 32 on stream 0 at 28-May-2019 23:20:36.293 CEST
+Begin processing the 943rd record. Run 1, Event 3143, LumiSection 32 on stream 0 at 28-May-2019 23:20:48.412 CEST
+Begin processing the 944th record. Run 1, Event 3146, LumiSection 32 on stream 0 at 28-May-2019 23:21:00.524 CEST
+Begin processing the 945th record. Run 1, Event 3148, LumiSection 32 on stream 0 at 28-May-2019 23:21:13.557 CEST
+Begin processing the 946th record. Run 1, Event 3145, LumiSection 32 on stream 0 at 28-May-2019 23:21:24.608 CEST
+Begin processing the 947th record. Run 1, Event 3144, LumiSection 32 on stream 0 at 28-May-2019 23:21:35.694 CEST
+Begin processing the 948th record. Run 1, Event 3149, LumiSection 32 on stream 0 at 28-May-2019 23:21:46.181 CEST
+Begin processing the 949th record. Run 1, Event 3147, LumiSection 32 on stream 0 at 28-May-2019 23:21:57.624 CEST
+Begin processing the 950th record. Run 1, Event 3152, LumiSection 32 on stream 0 at 28-May-2019 23:22:07.942 CEST
+Begin processing the 951st record. Run 1, Event 3153, LumiSection 32 on stream 0 at 28-May-2019 23:22:21.140 CEST
+Begin processing the 952nd record. Run 1, Event 3156, LumiSection 32 on stream 0 at 28-May-2019 23:22:33.813 CEST
+Begin processing the 953rd record. Run 1, Event 3154, LumiSection 32 on stream 0 at 28-May-2019 23:22:44.947 CEST
+Begin processing the 954th record. Run 1, Event 3151, LumiSection 32 on stream 0 at 28-May-2019 23:22:55.317 CEST
+Begin processing the 955th record. Run 1, Event 3160, LumiSection 32 on stream 0 at 28-May-2019 23:23:07.749 CEST
+Begin processing the 956th record. Run 1, Event 3157, LumiSection 32 on stream 0 at 28-May-2019 23:23:19.521 CEST
+Begin processing the 957th record. Run 1, Event 3155, LumiSection 32 on stream 0 at 28-May-2019 23:23:31.818 CEST
+Begin processing the 958th record. Run 1, Event 3159, LumiSection 32 on stream 0 at 28-May-2019 23:23:44.936 CEST
+Begin processing the 959th record. Run 1, Event 3158, LumiSection 32 on stream 0 at 28-May-2019 23:23:56.469 CEST
+Begin processing the 960th record. Run 1, Event 3150, LumiSection 32 on stream 0 at 28-May-2019 23:24:08.049 CEST
+Begin processing the 961st record. Run 1, Event 3161, LumiSection 32 on stream 0 at 28-May-2019 23:24:19.217 CEST
+Begin processing the 962nd record. Run 1, Event 3165, LumiSection 32 on stream 0 at 28-May-2019 23:24:30.738 CEST
+Begin processing the 963rd record. Run 1, Event 3163, LumiSection 32 on stream 0 at 28-May-2019 23:24:41.654 CEST
+Begin processing the 964th record. Run 1, Event 3162, LumiSection 32 on stream 0 at 28-May-2019 23:24:52.736 CEST
+Begin processing the 965th record. Run 1, Event 3167, LumiSection 32 on stream 0 at 28-May-2019 23:25:03.057 CEST
+Begin processing the 966th record. Run 1, Event 3170, LumiSection 32 on stream 0 at 28-May-2019 23:25:13.943 CEST
+Begin processing the 967th record. Run 1, Event 3168, LumiSection 32 on stream 0 at 28-May-2019 23:25:26.883 CEST
+Begin processing the 968th record. Run 1, Event 3164, LumiSection 32 on stream 0 at 28-May-2019 23:25:37.538 CEST
+Begin processing the 969th record. Run 1, Event 3171, LumiSection 32 on stream 0 at 28-May-2019 23:25:49.689 CEST
+Begin processing the 970th record. Run 1, Event 3172, LumiSection 32 on stream 0 at 28-May-2019 23:26:00.067 CEST
+Begin processing the 971st record. Run 1, Event 3169, LumiSection 32 on stream 0 at 28-May-2019 23:26:11.891 CEST
+Begin processing the 972nd record. Run 1, Event 3166, LumiSection 32 on stream 0 at 28-May-2019 23:26:23.780 CEST
+Begin processing the 973rd record. Run 1, Event 3174, LumiSection 32 on stream 0 at 28-May-2019 23:26:35.501 CEST
+Begin processing the 974th record. Run 1, Event 3178, LumiSection 32 on stream 0 at 28-May-2019 23:26:45.697 CEST
+Begin processing the 975th record. Run 1, Event 3173, LumiSection 32 on stream 0 at 28-May-2019 23:26:56.533 CEST
+Begin processing the 976th record. Run 1, Event 3175, LumiSection 32 on stream 0 at 28-May-2019 23:27:07.912 CEST
+Begin processing the 977th record. Run 1, Event 3180, LumiSection 32 on stream 0 at 28-May-2019 23:27:20.426 CEST
+Begin processing the 978th record. Run 1, Event 3179, LumiSection 32 on stream 0 at 28-May-2019 23:27:31.785 CEST
+Begin processing the 979th record. Run 1, Event 3181, LumiSection 32 on stream 0 at 28-May-2019 23:27:41.772 CEST
+Begin processing the 980th record. Run 1, Event 3184, LumiSection 32 on stream 0 at 28-May-2019 23:27:53.156 CEST
+Begin processing the 981st record. Run 1, Event 3177, LumiSection 32 on stream 0 at 28-May-2019 23:28:05.007 CEST
+Begin processing the 982nd record. Run 1, Event 3185, LumiSection 32 on stream 0 at 28-May-2019 23:28:15.460 CEST
+Begin processing the 983rd record. Run 1, Event 3176, LumiSection 32 on stream 0 at 28-May-2019 23:28:27.257 CEST
+Begin processing the 984th record. Run 1, Event 3182, LumiSection 32 on stream 0 at 28-May-2019 23:28:37.867 CEST
+Begin processing the 985th record. Run 1, Event 3190, LumiSection 32 on stream 0 at 28-May-2019 23:28:49.028 CEST
+Begin processing the 986th record. Run 1, Event 3183, LumiSection 32 on stream 0 at 28-May-2019 23:29:01.803 CEST
+Begin processing the 987th record. Run 1, Event 3188, LumiSection 32 on stream 0 at 28-May-2019 23:29:12.001 CEST
+Begin processing the 988th record. Run 1, Event 3189, LumiSection 32 on stream 0 at 28-May-2019 23:29:22.294 CEST
+Begin processing the 989th record. Run 1, Event 3186, LumiSection 32 on stream 0 at 28-May-2019 23:29:32.587 CEST
+Begin processing the 990th record. Run 1, Event 3193, LumiSection 32 on stream 0 at 28-May-2019 23:29:44.791 CEST
+Begin processing the 991st record. Run 1, Event 3187, LumiSection 32 on stream 0 at 28-May-2019 23:29:55.249 CEST
+Begin processing the 992nd record. Run 1, Event 3192, LumiSection 32 on stream 0 at 28-May-2019 23:30:08.213 CEST
+Begin processing the 993rd record. Run 1, Event 3195, LumiSection 32 on stream 0 at 28-May-2019 23:30:19.788 CEST
+Begin processing the 994th record. Run 1, Event 3198, LumiSection 32 on stream 0 at 28-May-2019 23:30:33.215 CEST
+Begin processing the 995th record. Run 1, Event 3194, LumiSection 32 on stream 0 at 28-May-2019 23:30:43.594 CEST
+Begin processing the 996th record. Run 1, Event 3191, LumiSection 32 on stream 0 at 28-May-2019 23:30:57.158 CEST
+Begin processing the 997th record. Run 1, Event 3196, LumiSection 32 on stream 0 at 28-May-2019 23:31:11.234 CEST
+Begin processing the 998th record. Run 1, Event 3199, LumiSection 32 on stream 0 at 28-May-2019 23:31:22.966 CEST
+Begin processing the 999th record. Run 1, Event 3197, LumiSection 32 on stream 0 at 28-May-2019 23:31:37.804 CEST
+Begin processing the 1000th record. Run 1, Event 3200, LumiSection 32 on stream 0 at 28-May-2019 23:31:51.256 CEST
+28-May-2019 23:31:55 CEST  Closed file root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_4_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D21PU200-v1/20000/CA33E7AB-505C-854F-AAD0-DB30EA18D790.root
+L1TrackNtupleMaker::endJob
+
+=============================================
+
+MessageLogger Summary
+
+ type     category        sev    module        subroutine        count    total
+ ---- -------------------- -- ---------------- ----------------  -----    -----
+    1 XrdAdaptor           -w (NoModuleName)                         9        9
+    2 XrdAdaptor           -w PostModuleEvent                        4        4
+    3 XrdAdaptor           -w file_open                             10       10
+    4 XrdAdaptor           -w source                                 5        5
+    5 XrdAdaptorInternal   -w file_open                              1        1
+    6 fileAction           -s file_close                            10       10
+    7 fileAction           -s file_open                             20       20
+
+ type    category    Examples: run/evt        run/evt          run/evt
+ ---- -------------------- ---------------- ---------------- ----------------
+    1 XrdAdaptor           pre-events       pre-events       pre-events
+    2 XrdAdaptor           PostProcessEvent PostProcessEvent PostProcessEvent
+    3 XrdAdaptor           pre-events       PostProcessEvent PostProcessEvent
+    4 XrdAdaptor           PostProcessEvent PostProcessEvent PostProcessEvent
+    5 XrdAdaptorInternal   PostProcessEvent                  
+    6 fileAction           PostProcessEvent PostProcessEvent PostGlobalEndRun
+    7 fileAction           pre-events       pre-events       PostProcessEvent
+
+Severity    # Occurrences   Total Occurrences
+--------    -------------   -----------------
+Warning                29                  29
+System                 30                  30
+
+dropped waiting message count 0
+SysError in <TFile::WriteBuffer>: error writing to file fpgahist.root (-1) (No such file or directory)
