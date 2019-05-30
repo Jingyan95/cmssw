@@ -905,7 +905,14 @@ public:
 	validproj[i] = false;
       }
 
-      
+      if (rproj_[i]<60.0) {
+        if (iphider[i]<-(1<<(nbitsphiprojderL123-1))) iphider[i] = -(1<<(nbitsphiprojderL123-1));
+        if (iphider[i]>=(1<<(nbitsphiprojderL123-1))) iphider[i] = (1<<(nbitsphiprojderL123-1))-1;
+      }
+      else {
+        if (iphider[i]<-(1<<(nbitsphiprojderL456-1))) iphider[i] = -(1<<(nbitsphiprojderL456-1));
+        if (iphider[i]>=(1<<(nbitsphiprojderL456-1))) iphider[i] = (1<<(nbitsphiprojderL456-1))-1;
+      }
     }
 
     iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
@@ -947,6 +954,9 @@ public:
 	  iphiderdisk[i]  = 0;
 	  irderdisk[i]    = 0;
 	}
+
+        if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
+        if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
       }
     }
 
@@ -1330,6 +1340,14 @@ public:
 	validproj[i] = false;
       }
 
+      if (rproj_[i]<60.0) {
+        if (iphider[i]<-(1<<(nbitsphiprojderL123-1))) iphider[i] = -(1<<(nbitsphiprojderL123-1));
+        if (iphider[i]>=(1<<(nbitsphiprojderL123-1))) iphider[i] = (1<<(nbitsphiprojderL123-1))-1;
+      }
+      else {
+        if (iphider[i]<-(1<<(nbitsphiprojderL456-1))) iphider[i] = -(1<<(nbitsphiprojderL456-1));
+        if (iphider[i]>=(1<<(nbitsphiprojderL456-1))) iphider[i] = (1<<(nbitsphiprojderL456-1))-1;
+      }
     }
 
     iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
@@ -1363,6 +1381,9 @@ public:
 	iphiderdisk[i]  = 0;
 	irderdisk[i]    = 0;
       }
+
+      if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
+      if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
     }
 
     bool success = true;
@@ -1719,7 +1740,14 @@ public:
 	validproj[i] = false;
       }
 
-      
+      if (rproj_[i]<60.0) {
+        if (iphider[i]<-(1<<(nbitsphiprojderL123-1))) iphider[i] = -(1<<(nbitsphiprojderL123-1));
+        if (iphider[i]>=(1<<(nbitsphiprojderL123-1))) iphider[i] = (1<<(nbitsphiprojderL123-1))-1;
+      }
+      else {
+        if (iphider[i]<-(1<<(nbitsphiprojderL456-1))) iphider[i] = -(1<<(nbitsphiprojderL456-1));
+        if (iphider[i]>=(1<<(nbitsphiprojderL456-1))) iphider[i] = (1<<(nbitsphiprojderL456-1))-1;
+      }
     }
 
     iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
@@ -1755,6 +1783,9 @@ public:
 	iphiderdisk[i]  = 0;
 	irderdisk[i]    = 0;
       }
+
+      if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
+      if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
     }
 
     bool success = true;

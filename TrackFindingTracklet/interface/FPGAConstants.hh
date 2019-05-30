@@ -339,10 +339,10 @@ static int nbitsphiprojL123=nbitsphistubL123;
 static int nbitsphiprojL456=nbitsphistubL456;
 
 static int nbitszprojL123=12;
-static int nbitszprojL456=hourglassExtended?12:8;
+static int nbitszprojL456=8;
 
-static int nbitsphiprojderL123=hourglassExtended?16:8+2;
-static int nbitsphiprojderL456=hourglassExtended?16:8+2;
+static int nbitsphiprojderL123=8+2;
+static int nbitsphiprojderL456=8+2;
 
 static int nbitszprojderL123=8+2;
 static int nbitszprojderL456=7+2;
@@ -439,9 +439,9 @@ static int phiderdiskbitshift=20;
 static int rderdiskbitshift=7;
 
 
-static int phiresidbits=hourglassExtended?16:12; 
-static int zresidbits=hourglassExtended?16:9;
-static int rresidbits=hourglassExtended?16:7;
+static int phiresidbits=12; 
+static int zresidbits=9;
+static int rresidbits=7;
 
 //Trackfit
 static int fitrinvbitshift=9;  //6 OK?

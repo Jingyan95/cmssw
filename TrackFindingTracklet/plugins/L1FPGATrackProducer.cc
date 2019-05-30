@@ -276,13 +276,6 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
 
 
   hourglassExtended=iConfig.getUntrackedParameter<bool>("Extended",false);
-  //updating the values for hourglass Extended configuration
-  nbitszprojL456=hourglassExtended?12:8;
-  nbitsphiprojderL123=hourglassExtended?16:8+2;
-  nbitsphiprojderL456=hourglassExtended?16:8+2;
-  phiresidbits=hourglassExtended?16:12;
-  zresidbits=hourglassExtended?16:9;
-  rresidbits=hourglassExtended?16:7;
   nHelixPar=iConfig.getUntrackedParameter<int>("Hnpar",4);
 
   krinvpars = FPGATrackletCalculator::ITC_L1L2.rinv_final.get_K();
