@@ -37,15 +37,19 @@ public:
       unsigned int nbits=3;
       if (layer_>=4) nbits=4;
       
-      for(unsigned int irinv=0;irinv<32;irinv++){
-	double rinv=(irinv-15.5)*(1<<(nbitsrinv-5))*krinvpars;
-	double projbend=bend(rmean[layer_-1],rinv);
-	for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
-	  double stubbend=Stub::benddecode(ibend,layer_<=3);
-	  bool pass=fabs(stubbend-projbend)<2.0;
-	  table_.push_back(pass);
-	}
-      }
+      //loop over z
+      for(unsigned int iz=0; iz<8;iz++){
+        double z=0+iz*15;
+        for(unsigned int irinv=0;irinv<32;irinv++){
+          double rinv=(irinv-15.5)*(1<<(nbitsrinv-5))*krinvpars;
+          double projbend=bendz(rmean[layer_-1],z,rinv);
+          for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
+            double stubbend=Stub::benddecode(ibend,layer_<=3);
+            bool pass=fabs(stubbend-projbend)<2.0;
+            table_.push_back(pass);
+          }
+        }
+      }  
 
       if (writeMETables){
 	ofstream out;
@@ -284,7 +288,18 @@ public:
 	
 	int nbits=isPSmodule?3:4;
 
-	unsigned int index=(projrinv<<nbits)+stub.first->bend().value();
+	//zbins
+	int nbitszL123= 12;
+	int nbitszL456= 8;
+	    
+        int izbits=nbitszL123;
+	if (layer_>=4) izbits=nbitszL456;
+
+	int iz= stub.first->z().value();
+	int izbin= (iz>>(izbits-4))&7;
+	   
+
+	unsigned int index=(izbin<<(nbits+5))+(projrinv<<nbits)+stub.first->bend().value();
 
 	//Check if stub z position consistent
 	int idrz=stubfinerz-projfinerzadj;
@@ -342,6 +357,40 @@ public:
 
     return bend;
     
+  }
+
+   double bendz(double r, double z, double rinv) {
+
+   double dr;
+   double CF;
+   if ((z<=31.5 && r<=30) || (25<=z && z<=70 && 30<=r && r<=45) || (33.3<=z && z<=120 && 45<=r && r<=60)) {
+     dr = 0.26; 
+    
+   } 
+   else if ((31.5<=z && z<=120 && r<=30) || (70<=z && z<=120 && 30<=r && r<=45)){ 
+     dr = 0.4;
+     
+   } 
+   else if ((z<=25 && 30<=r && r<=45)||(z<=33.3 && 45<=r && r<=60)) {
+     dr = 0.16; 
+     
+   }
+   else  {
+    dr = 0.18;
+
+   }
+   if ((15<=z && z<=120 && r<=30) || (25<=z && z<=120 && r<=45) || (33.3<=z && z<=120 && r<=60)){
+     CF = 0.886454*(z/r) + 0.504148;
+
+   }
+   else {
+     CF = 1;
+   }
+
+   double delta=r*dr*0.5*rinv;
+   double bend=-delta/(0.009*CF);
+   if (r<55.0) bend=-delta/(0.01*CF);
+   return bend;
   }
 
   

@@ -316,8 +316,15 @@ public:
 	      unsigned int nvmbitsouter=nbits(nvmouter);
 	      int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
 	      int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
-	      
-	      int index = (iphiinnerbin<<outerphibits_)+iphiouterbin;
+
+	      //Setting up z bits and bin 
+	      FPGAWord z=innerstub.first->z();
+	      int znbits=z.nbits();
+	      int iz=abs(z.value());
+	      int izbin=iz*8/(1<<(znbits-1));
+
+	      //adding z in index
+	      int index = (izbin<<(innerphibits_+outerphibits_))+(iphiinnerbin<<outerphibits_)+iphiouterbin;
 
 
 	      assert(index<(int)phitable_.size());		
@@ -527,59 +534,62 @@ public:
 	vmbendouter.push_back(false);
       }
 
-      for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
-	phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
-	phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
-	for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
-	  phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
-	  phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
+      //loop over z
+      for (unsigned int iz=0;iz<8; iz++){
+	double z=0+iz*15;
 
-          double bendinnermin=20.0;
-          double bendinnermax=-20.0;
-          double bendoutermin=20.0;
-          double bendoutermax=-20.0;
-          double rinvmin=1.0; 
-          for(int i1=0;i1<2;i1++) {
-            for(int i2=0;i2<2;i2++) {
-              double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
-              double abendinner=bend(rinner,rinv1); 
-              double abendouter=bend(router,rinv1);
-              if (abendinner<bendinnermin) bendinnermin=abendinner;
-              if (abendinner>bendinnermax) bendinnermax=abendinner;
-              if (abendouter<bendoutermin) bendoutermin=abendouter;
-              if (abendouter>bendoutermax) bendoutermax=abendouter;
-              if (fabs(rinv1)<rinvmin) {
-                rinvmin=fabs(rinv1);
-              }
+	for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
+	  phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
+	  phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
+	  for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
+	    phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
+	    phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
+
+	    double bendinnermin=20.0;
+	    double bendinnermax=-20.0;
+	    double bendoutermin=20.0;
+	    double bendoutermax=-20.0;
+	    double rinvmin=1.0; 
+	    for(int i1=0;i1<2;i1++) {
+	      for(int i2=0;i2<2;i2++) {
+		double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
+		double abendinner=bendz(rinner,z,rinv1); 
+		double abendouter=bendz(router,z,rinv1);
+		if (abendinner<bendinnermin) bendinnermin=abendinner;
+		if (abendinner>bendinnermax) bendinnermax=abendinner;
+		if (abendouter<bendoutermin) bendoutermin=abendouter;
+		if (abendouter>bendoutermax) bendoutermax=abendouter;
+		if (fabs(rinv1)<rinvmin) {
+		  rinvmin=fabs(rinv1);
+		}
 		      
-            }
-          }
+	      }
+	    }
 
-          phitable_.push_back(rinvmin<rinvcutte);
+	    phitable_.push_back(rinvmin<rinvcutte);
 
-	  int nbins1=8;
-	  if (layer1_>=4) nbins1=16;
-	  for(int ibend=0;ibend<nbins1;ibend++) {
-	    double bend=Stub::benddecode(ibend,layer1_<=3); 
+	    int nbins1=8;
+	    if (layer1_>=4) nbins1=16;
+	    for(int ibend=0;ibend<nbins1;ibend++) {
+	      double bend=Stub::benddecode(ibend,layer1_<=3); 
+	      bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;	    
+	      if (passinner) vmbendinner[ibend]=true;
+	      pttableinner_.push_back(passinner);
 	    
-	    bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;	    
-	    if (passinner) vmbendinner[ibend]=true;
-	    pttableinner_.push_back(passinner);
-	    
-	  }
+	    }
 	  
-	  int nbins2=8;
-	  if (layer2_>=4) nbins2=16;
-	  for(int ibend=0;ibend<nbins2;ibend++) {
-	    double bend=Stub::benddecode(ibend,layer2_<=3); 
+	    int nbins2=8;
+	    if (layer2_>=4) nbins2=16;
+	    for(int ibend=0;ibend<nbins2;ibend++) {
+	      double bend=Stub::benddecode(ibend,layer2_<=3); 
+	      bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	      if (passouter) vmbendouter[ibend]=true;
+	      pttableouter_.push_back(passouter);
 	    
-	    bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
-	    if (passouter) vmbendouter[ibend]=true;
-	    pttableouter_.push_back(passouter);
-	    
-	  }
+	    }
 
-        }
+	  }
+	}
       }
 
       innervmstubs_->setbendtable(vmbendinner);
@@ -789,6 +799,35 @@ public:
     
     return 2.0*sin(dphi)/dr/sqrt(1.0+2*r1*r2*(1.0-cos(dphi))/(dr*dr));
     
+  }
+
+  double bendz(double r, double z, double rinv) {
+
+    double dr;
+    double CF;
+    if ((z<=33.3 && r<30) || (25<=z && z<=70 && 30<r && r<45) || (33.3<=z && z<120 && 45<r && r<60)) {
+      dr = 0.26;  
+    } 
+    else if ((33.3<z && z<120 && r<=30) || (70<z && z<120 && 30<r && r<45) || (((120<z && z<=135) || (145<z && z<=155)) && r<=62.5) || (((135<=z && z<145) ||(155<=z && z<170)) && r<=70) || (170<z && z<240 && r<=77.5) || (240<z && z<=265 && r<82.5) || (z>=265 && r<=87.5)) {
+      dr = 0.4;
+    } 
+    else if ((z<=25 && 30<r && r<=45)||(z<33.3 && 45<r && r<60)) {
+      dr = 0.16; 
+    }
+    else  {
+      dr = 0.18;
+    }
+    if ((15<=z && z<120 && r<=30) || (25<=z && z<120 && r<45) || (33.3<z && z<120 && r<60)){
+      CF = 0.886454*(z/r) + 0.504148;
+    }
+    else {
+      CF = 1;
+    }
+
+    double delta=r*dr*0.5*rinv;
+    double bend=delta/(0.009*CF);
+    if (r<55.0) bend=delta/(0.01*CF);
+    return bend;
   }
 
   double bend(double r, double rinv) {
