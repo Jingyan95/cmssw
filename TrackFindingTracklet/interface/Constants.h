@@ -286,8 +286,9 @@ static const double ptcut=1.91; //Minimum pt
 static const double rinvcut=0.01*0.3*3.8/ptcut; //0.01 to convert to cm-1
 static const double ptcutte=1.6; //Minimum pt in TE
 static const double rinvcutte=0.01*0.3*3.8/ptcutte; //0.01 to convert to cm-1 in TE
-static const double bendcut=1.5;
+static const double bendcut=1.5; //parameter to compare bend and bendinner in TE
 static const double bendcutdisk=2.0;
+static const double bendcutME=2.0; //parameter to compare projbend to calculated bend in ME
 static const double z0cut=15.0;
 
 

@@ -39,16 +39,16 @@ public:
       
       //loop over z
       for(unsigned int iz=0; iz<8;iz++){
-        double z=0+iz*15;
-        for(unsigned int irinv=0;irinv<32;irinv++){
-          double rinv=(irinv-15.5)*(1<<(nbitsrinv-5))*krinvpars;
-          double projbend=bendz(rmean[layer_-1],z,rinv);
-          for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
-            double stubbend=Stub::benddecode(ibend,layer_<=3);
-            bool pass=fabs(stubbend-projbend)<2.0;
-            table_.push_back(pass);
-          }
-        }
+	double z=0+iz*15;
+	for(unsigned int irinv=0;irinv<32;irinv++){
+	  double rinv=(irinv-15.5)*(1<<(nbitsrinv-5))*krinvpars;
+	  double projbend=bend_tilt_corr_ME(rmean[layer_-1],z,rinv);
+	  for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
+	    double stubbend=Stub::benddecode(ibend,layer_<=3);
+	    bool pass=fabs(stubbend-projbend)<bendcutME;
+	    table_.push_back(pass);
+	  }
+	}
       }  
 
       if (writeMETables){
@@ -289,9 +289,7 @@ public:
 	int nbits=isPSmodule?3:4;
 
 	//zbins
-	int nbitszL123= 12;
-	int nbitszL456= 8;
-	    
+
         int izbits=nbitszL123;
 	if (layer_>=4) izbits=nbitszL456;
 
@@ -359,10 +357,10 @@ public:
     
   }
 
-   double bendz(double r, double z, double rinv) {
+   double bend_tilt_corr_ME(double r, double z, double rinv) {
 
-   double dr;
-   double CF;
+   double dr= 0.18 ;
+   double CF=1;
    if ((z<=31.5 && r<=30) || (25<=z && z<=70 && 30<=r && r<=45) || (33.3<=z && z<=120 && 45<=r && r<=60)) {
      dr = 0.26; 
     
@@ -375,17 +373,12 @@ public:
      dr = 0.16; 
      
    }
-   else  {
-    dr = 0.18;
-
-   }
+  
    if ((15<=z && z<=120 && r<=30) || (25<=z && z<=120 && r<=45) || (33.3<=z && z<=120 && r<=60)){
      CF = 0.886454*(z/r) + 0.504148;
 
    }
-   else {
-     CF = 1;
-   }
+  
 
    double delta=r*dr*0.5*rinv;
    double bend=-delta/(0.009*CF);

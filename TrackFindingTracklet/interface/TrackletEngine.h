@@ -553,8 +553,8 @@ public:
 	    for(int i1=0;i1<2;i1++) {
 	      for(int i2=0;i2<2;i2++) {
 		double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
-		double abendinner=bendz(rinner,z,rinv1); 
-		double abendouter=bendz(router,z,rinv1);
+		double abendinner=bend_tilt_corr_TE(rinner,z,rinv1); 
+		double abendouter=bend_tilt_corr_TE(router,z,rinv1);
 		if (abendinner<bendinnermin) bendinnermin=abendinner;
 		if (abendinner>bendinnermax) bendinnermax=abendinner;
 		if (abendouter<bendoutermin) bendoutermin=abendouter;
@@ -801,10 +801,10 @@ public:
     
   }
 
-  double bendz(double r, double z, double rinv) {
+  double bend_tilt_corr_TE(double r, double z, double rinv) {
 
-    double dr;
-    double CF;
+    double dr= 0.18;
+    double CF= 1;
     if ((z<=33.3 && r<30) || (25<=z && z<=70 && 30<r && r<45) || (33.3<=z && z<120 && 45<r && r<60)) {
       dr = 0.26;  
     } 
@@ -814,14 +814,9 @@ public:
     else if ((z<=25 && 30<r && r<=45)||(z<33.3 && 45<r && r<60)) {
       dr = 0.16; 
     }
-    else  {
-      dr = 0.18;
-    }
+   
     if ((15<=z && z<120 && r<=30) || (25<=z && z<120 && r<45) || (33.3<z && z<120 && r<60)){
       CF = 0.886454*(z/r) + 0.504148;
-    }
-    else {
-      CF = 1;
     }
 
     double delta=r*dr*0.5*rinv;
