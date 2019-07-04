@@ -1,5 +1,5 @@
 #include "L1Trigger/TrackFindingTMTT/interface/KF4ParamsCombV2.h"
-#include "L1Trigger/TrackFindingTMTT/interface/kalmanState.h"
+#include "L1Trigger/TrackFindingTMTT/interface/KalmanState.h"
 #include "L1Trigger/TrackFindingTMTT/interface/StubCluster.h"
 //#include "L1Trigger/TrackFindingTMTT/interface/Matrix.h"
 #include <TMatrixD.h>
@@ -70,7 +70,7 @@ std::string KF4ParamsCombV2::getParams(){
     return "KF4ParamsCombV2";
 }
 
-std::map<std::string, double> KF4ParamsCombV2::getTrackParams( const kalmanState *state )const{
+std::map<std::string, double> KF4ParamsCombV2::getTrackParams( const KalmanState *state )const{
 
     std::vector<double> x = state->xa();
 
@@ -146,7 +146,7 @@ TMatrixD KF4ParamsCombV2::H(const StubCluster* stubCluster)const{
     h(1,3) = 1;
     return h;
 }
-TMatrixD KF4ParamsCombV2::PxxModel( const kalmanState *state, const StubCluster *stubCluster, unsigned stub_itr )const{
+TMatrixD KF4ParamsCombV2::PxxModel( const KalmanState *state, const StubCluster *stubCluster, unsigned stub_itr )const{
     //not easy to implement the multiple scattering.
     TMatrixD p(4,4);
 
@@ -155,7 +155,7 @@ TMatrixD KF4ParamsCombV2::PxxModel( const kalmanState *state, const StubCluster 
 	if( i_eta > 24 ) i_eta = 24;
 	double dl = matx_outer[i_eta] / nlayer_eta[i_eta];
 
-	const kalmanState * last_update_state = state->last_update_state();
+	const KalmanState * last_update_state = state->last_update_state();
 	unsigned last_itr(1);
 	if( last_update_state ) last_itr = last_update_state->nIterations();
 	dl = ( stub_itr - last_itr ) * dl; 
@@ -174,7 +174,7 @@ TMatrixD KF4ParamsCombV2::PxxModel( const kalmanState *state, const StubCluster 
     return p;
 }
 
-TMatrixD KF4ParamsCombV2::PddMeas(const StubCluster* stubCluster, const kalmanState *state )const{
+TMatrixD KF4ParamsCombV2::PddMeas(const StubCluster* stubCluster, const KalmanState *state )const{
 
     const std::vector<double> &x = state->xa();
 
@@ -204,7 +204,7 @@ TMatrixD KF4ParamsCombV2::PddMeas(const StubCluster* stubCluster, const kalmanSt
 }
 
 
-bool KF4ParamsCombV2::isGoodState( const kalmanState &state )const
+bool KF4ParamsCombV2::isGoodState( const KalmanState &state )const
 {
     unsigned nStubLayers = state.nStubLayers();
     bool goodState( true );

@@ -2,7 +2,7 @@
  
  
 #include "L1Trigger/TrackFindingTMTT/interface/KF5ParamsComb.h"
-#include "L1Trigger/TrackFindingTMTT/interface/kalmanState.h"
+#include "L1Trigger/TrackFindingTMTT/interface/KalmanState.h"
 #include "L1Trigger/TrackFindingTMTT/interface/StubCluster.h"
 #define CKF_DEBUG
 
@@ -93,7 +93,7 @@ KF5ParamsComb::KF5ParamsComb(const Settings* settings, const uint nPar, const st
 }
 
 
-std::map<std::string, double> KF5ParamsComb::getTrackParams(const kalmanState *state )const{
+std::map<std::string, double> KF5ParamsComb::getTrackParams(const KalmanState *state )const{
 
   std::vector<double> x = state->xa();
   std::map<std::string, double> y;
@@ -107,7 +107,7 @@ std::map<std::string, double> KF5ParamsComb::getTrackParams(const kalmanState *s
 
 /* Get track params with beam-spot constraint & track fit chi2 from applying it. */
 
-std::map<std::string, double> KF5ParamsComb::getTrackParams_BeamConstr( const kalmanState *state, double& chi2 ) const {
+std::map<std::string, double> KF5ParamsComb::getTrackParams_BeamConstr( const KalmanState *state, double& chi2 ) const {
   std::map<std::string, double> y;
   std::vector<double> x = state->xa();
   TMatrixD cov_xa       = state->pxxa(); 
@@ -205,7 +205,7 @@ TMatrixD KF5ParamsComb::seedP(const L1track3D& l1track3D)const{
 
 /* The forecast matrix
  * (here equals identity matrix) */
-TMatrixD KF5ParamsComb::F(const StubCluster* stubCluster, const kalmanState *state )const{
+TMatrixD KF5ParamsComb::F(const StubCluster* stubCluster, const KalmanState *state )const{
   TMatrixD F(nPar_,nPar_);
   for(unsigned int n = 0; n < nPar_; n++)
     F(n, n) = 1;
@@ -222,7 +222,7 @@ std::vector<double> KF5ParamsComb::d(const StubCluster* stubCluster )const{
 }
 
 // Assumed hit resolution in (phi,z)
-TMatrixD KF5ParamsComb::PddMeas(const StubCluster* stubCluster, const kalmanState *state )const{
+TMatrixD KF5ParamsComb::PddMeas(const StubCluster* stubCluster, const KalmanState *state )const{
 
   double inv2R = (getSettings()->invPtToInvR()) * 0.5 * state->candidate().qOverPt(); // alternatively use state->xa().at(INV2R)
   double inv2R2 = inv2R * inv2R;
@@ -323,7 +323,7 @@ TMatrixD KF5ParamsComb::PddMeas(const StubCluster* stubCluster, const kalmanStat
 }
 
 // State uncertainty due to scattering -- HISTORIC NOT USED
-TMatrixD KF5ParamsComb::PxxModel( const kalmanState *state, const StubCluster *stubCluster )const
+TMatrixD KF5ParamsComb::PxxModel( const KalmanState *state, const StubCluster *stubCluster )const
 {
 
   TMatrixD p(nPar_,nPar_);
@@ -337,7 +337,7 @@ TMatrixD KF5ParamsComb::PxxModel( const kalmanState *state, const StubCluster *s
 
     unsigned stub_itr = state->nextLayer();
 
-    const kalmanState * last_update_state = state->last_update_state();
+    const KalmanState * last_update_state = state->last_update_state();
     unsigned last_itr(1);
     if( last_update_state ) last_itr = last_update_state->nextLayer();
     dl = ( stub_itr - last_itr ) * dl; 
@@ -354,7 +354,7 @@ TMatrixD KF5ParamsComb::PxxModel( const kalmanState *state, const StubCluster *s
   return p;
 }
 
-bool KF5ParamsComb::isGoodState( const kalmanState &state )const
+bool KF5ParamsComb::isGoodState( const KalmanState &state )const
 {
 
   unsigned nStubLayers = state.nStubLayers();

@@ -15,15 +15,15 @@ class KF4ParamsCombV2 : public KF4ParamsComb{
 	std::string getParams();
 
     protected:
-	std::map<std::string, double> getTrackParams( const kalmanState *state )const;
+	std::map<std::string, double> getTrackParams( const KalmanState *state )const;
 	std::vector<double> seedx(const L1track3D& l1track3D)const;
 	TMatrixD seedP(const L1track3D& l1track3D)const;
 	std::vector<double> d(const StubCluster* stubCluster )const;
 	TMatrixD H(const StubCluster* stubCluster)const;
-	TMatrixD PxxModel( const kalmanState* state, const StubCluster* stubCluster, unsigned stub_itr )const;
-	TMatrixD PddMeas(const StubCluster* stubCluster, const kalmanState *state )const;
+	TMatrixD PxxModel( const KalmanState* state, const StubCluster* stubCluster, unsigned stub_itr )const;
+	TMatrixD PddMeas(const StubCluster* stubCluster, const KalmanState *state )const;
 	std::map<std::string, double> convertParams(std::vector<double> x)const;
-	bool isGoodState( const kalmanState &state )const;
+	bool isGoodState( const KalmanState &state )const;
 
 	std::vector<double> residual(const StubCluster* stubCluster, std::vector<double> &x )const;
 
