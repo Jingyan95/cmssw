@@ -83,11 +83,17 @@ class L1KalmanComb : public TrackFitGeneric{
 	virtual bool isGoodState( const kalmanState &state )const{ return true; }
 
 	double calcChi2( const kalmanState &state )const;
-	void printTP( std::ostream &os, const TP *tp )const;
-
 
 	virtual double getRofState( unsigned layerId, const vector<double> &xa )const{ return 0;}
 	std::vector<const kalmanState *> doKF( const L1track3D &l1track3D, const std::vector<const StubCluster *> &stubClusters, const TP *tpa );
+
+        void printTPSummary( std::ostream &os, const TP *tp, bool addReturn=true ) const;
+	void printTP( std::ostream &os, const TP *tp ) const;
+        void printStubLayers( std::ostream &os, std::vector<const Stub *> &stubs ) const;
+        void printStubCluster( std::ostream &os, const StubCluster * stubCluster, bool addReturn=true ) const;
+        void printStubClusters( std::ostream &os, std::vector<const StubCluster *> &stubClusters ) const;
+        void printStub( std::ostream &os, const Stub * stub, bool addReturn=true ) const;
+        void printStubs( std::ostream &os, std::vector<const Stub *> &stubs ) const;
 
 	void fillSeedHists( const kalmanState *state, const TP *tpa );
 	void fillCandHists( const kalmanState &state, const TP *tpa=0 );

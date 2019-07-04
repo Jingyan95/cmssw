@@ -43,7 +43,7 @@ static bool orderStubsByR(const Stub* a, const Stub* b){
 }
 #endif
 
-void printTPSummary( std::ostream &os, const TP *tp, bool addReturn=true ){
+void L1KalmanComb::printTPSummary( std::ostream &os, const TP *tp, bool addReturn) const {
 	
   if( tp ){
 		
@@ -60,7 +60,7 @@ void printTPSummary( std::ostream &os, const TP *tp, bool addReturn=true ){
   }
 }
 
-void L1KalmanComb::printTP( std::ostream &os, const TP *tp )const{
+void L1KalmanComb::printTP( std::ostream &os, const TP *tp ) const {
         
   std::map<std::string, double> tpParams;
   bool useForAlgEff(false);
@@ -85,7 +85,7 @@ void L1KalmanComb::printTP( std::ostream &os, const TP *tp )const{
   os << endl;
 }
 
-static void printStubLayers( std::ostream &os, std::vector<const Stub *> &stubs ){
+void L1KalmanComb::printStubLayers( std::ostream &os, std::vector<const Stub *> &stubs ) const {
 
   if( stubs.size() == 0 ) os << "stub layers = []" << endl;
   else{
@@ -95,7 +95,7 @@ static void printStubLayers( std::ostream &os, std::vector<const Stub *> &stubs 
   }
 }
 
-static void printStubCluster( std::ostream &os, const StubCluster * stubCluster, bool addReturn=true ){
+void L1KalmanComb::printStubCluster( std::ostream &os, const StubCluster * stubCluster, bool addReturn ) const {
   os << "stub: ";
   //   os << "addr=" << stub << " "; 
   os << "layer=" << stubCluster->layerId() << " ";
@@ -114,13 +114,14 @@ static void printStubCluster( std::ostream &os, const StubCluster * stubCluster,
   else os << " | ";
 }
 
-static void printStubClusters( std::ostream &os, std::vector<const StubCluster *> &stubClusters ){
+void L1KalmanComb::printStubClusters( std::ostream &os, std::vector<const StubCluster *> &stubClusters ) const {
 
   for( auto &stubcl : stubClusters ){
     printStubCluster( os, stubcl );
   }
 }
-static void printStub( std::ostream &os, const Stub * stub, bool addReturn=true ){
+
+void L1KalmanComb::printStub( std::ostream &os, const Stub * stub, bool addReturn ) const {
   os << "stub ";
   //   os << "addr=" << stub << " "; 
   os << "index=" << stub->index() << " ";
@@ -139,7 +140,7 @@ static void printStub( std::ostream &os, const Stub * stub, bool addReturn=true 
 
 }
 
-static void printStubs( std::ostream &os, std::vector<const Stub *> &stubs ){
+void L1KalmanComb::printStubs( std::ostream &os, std::vector<const Stub *> &stubs ) const {
 
   for( auto &stub : stubs ){
     printStub( os, stub );
