@@ -19,7 +19,11 @@ cd L1Trigger/TrackFindingTracklet/test/
 
 cmsRun L1TrackNtupleMaker_cfg.py 
 
-By default, the above runs on D21 samples. To run on D41 geometry, need to both change the flag in L1TrackNtupleMaker_cfg.py as well as change flag "geomTDR" to false in TrackFindingTracklet/interface/FPGAConstants.hh
+By default, the above runs on D21 samples. To run on D41 geometry, need to both change the flag in L1TrackNtupleMaker_cfg.py as well as change flag "geomTDR" to false in TrackFindingTracklet/interface/Constants.h
+
+By default, it runs "Hybrid" L1 tracking emulation. Edit parameter USEHYBRID is Constants.h to use "Tracklet" emulation. Or edit parameter L1TRKALGO in L1TrackNtupleMaker_cfg.py to use either "TMTT" emulation, or simple floating point simulations of the Hybrid or Tracklet L1 tracking.
+(N.B. To run the floating point Hybrid, you need to checkout additional code, as explained in
+https://gitlab.cern.ch/cms-tracker-phase2-backend-development/BE_software/hybridfloat/blob/master/README.md).
 
 ```
 
@@ -44,7 +48,7 @@ or to run and make selection on truth tracks (for efficiency / resolution plots)
 
 ## Configuration parameters
 
-Are hard-coded in TrackFindingTracklet/interface/FPGAConstants.hh & TrackFindingTMTT/src/Settings.cc
+Are hard-coded in TrackFindingTracklet/interface/Constants.h & TrackFindingTMTT/src/Settings.cc
 
 ## PLOTS 
 
@@ -60,7 +64,7 @@ root
 ```
 
 (You can make similar plots for the tracks available before the track fit or before duplicate removal by disabling these algos.
-To do this, edit FPGAConstants.hh, setting fakefit=true and/or RemovalType="").
+To do this, edit Constants.h, setting fakefit=true and/or RemovalType="").
 
 If running stand-alone, to make efficiency and resolution plots (that compare the integer based emulation to the floating point algorithm), set "writeResEff=true" in FPGAConstants.h to write a .txt file with the info,
 and process it using macros in TrackFindingTracklet/test/PlotMacros/ . Warning: the efficiency isn't defined in the standard way.
@@ -77,10 +81,10 @@ info at any point in code. But this utility is not yet fully working.
 
 ### DETAILED PERFORMANCE PLOTS (via txt files)
 
-To generate performance plots you need to enable the relevant output (by editing cfg param named below in FPGAConstants.hh), and after run the root script (from TrackFindingTracklet/test/PlotMacros/) to generate the plots.
+To generate performance plots you need to enable the relevant output (by editing cfg param named below in Constants.h), and after run the root script (from TrackFindingTracklet/test/PlotMacros/) to generate the plots.
 
 ```sh
-FPGAConstants.hh            root script
+Constants.h            root script
 ==================================================================
 writeResEff                .L trackres/eff.cc++           trackres/eff()
 writeStubsLayer            .L stubslayer.cc++             stubslayer()
@@ -119,7 +123,7 @@ root -l vmmatches.cc
 
 To turn on/off writing the files that dump the memory content
 of the FPGA memories change the 'writememfiles' variable in the
-FPGAConstants.hh file.
+Constants.h file.
 
 To clean up all the output files that were produced do:
 
@@ -137,7 +141,7 @@ sort hitpattern.txt | uniq | sort -r -n -k 3 > fitpatter.txt
 
 To produce a ROOT-Tree with the output of the emulation:
 
-   1) Search FPGAConstants.hh for "USEROOT" (at the top) and uncomment "#define USEROOT"
+   1) Search Constants.h for "USEROOT" (at the top) and uncomment "#define USEROOT"
 		
    2) Search Makefile.inc for "ROOT-Tree" and uncomment the loading of the FPGAEvent_cxx.so
 
