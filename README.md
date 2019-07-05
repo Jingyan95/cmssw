@@ -21,8 +21,8 @@ cmsRun L1TrackNtupleMaker_cfg.py
 
 By default, the above runs on D21 samples. To run on D41 geometry, need to both change the flag in L1TrackNtupleMaker_cfg.py as well as change flag "geomTDR" to false in TrackFindingTracklet/interface/Constants.h
 
-By default, it runs "Hybrid" L1 tracking emulation. Edit parameter USEHYBRID is Constants.h to use "Tracklet" emulation. Or edit parameter L1TRKALGO in L1TrackNtupleMaker_cfg.py to use either "TMTT" emulation, or simple floating point simulations of the Hybrid or Tracklet L1 tracking.
-(N.B. To run the floating point Hybrid, you need to checkout additional code, as explained in
+By default, it runs "Hybrid" L1 tracking emulation. Edit parameter USEHYBRID is Constants.h to instead use "Tracklet" emulation. Or edit parameter L1TRKALGO in L1TrackNtupleMaker_cfg.py to use either "TMTT" emulation, or simple floating point simulations of the Hybrid or Tracklet L1 tracking.
+(N.B. To run the simple floating point Hybrid, you need to checkout additional code, as explained in
 https://gitlab.cern.ch/cms-tracker-phase2-backend-development/BE_software/hybridfloat/blob/master/README.md).
 
 ```
