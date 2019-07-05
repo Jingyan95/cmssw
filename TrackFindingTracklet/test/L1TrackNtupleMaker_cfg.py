@@ -22,6 +22,10 @@ L1TRKALGO = 'HYBRID'
 # Write output dataset?
 WRITE_DATA = False
 
+if (L1TRKALGO == 'HYBRID_FLOAT'):
+    if ( not os.path.exists( os.environ['CMSSW_BASE']+'/src/L1Trigger/HybridFloat' ) ):
+        print "=== ERROR: Please checkout HybridFloat code from git before using this option ==="; exit
+
 ############################################################
 # import standard configurations
 ############################################################
