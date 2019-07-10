@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------------------------------------------------
 // Basic example ROOT script for making tracking performance plots using the ntuples produced by L1TrackNtupleMaker.cc
 //
-//    e.g.  .x  L1TrackNtuplePlot.C("TTbar_PU200_hybrid")
+// e.g. in root do: .L L1TrackNtuplePlot.C++, L1TrackNtuplePlot("TTbar_PU200_hybrid")
 // 
 // By Louise Skinnari, June 2013  
 // ----------------------------------------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ void makeResidualIntervalPlot( TString type, TString dir, TString variable, TH1F
 
 void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0, int TP_select_pdgid=0, int TP_select_eventid=0, 
 		       bool useTightCuts=false, bool useDeadRegion=false, 
-		       float TP_minPt=2.0, float TP_maxPt=100.0, float TP_maxEta=2.4, float TP_maxD0=1.0) {
+		       float TP_minPt=2.0, float TP_maxPt=100.0, float TP_maxEta=2.4, float TP_maxDxy=1.0, float TP_maxD0=1.0) {
 
   // type:              this is the input file you want to process (minus ".root" extension)
   // TP_select_pdgid:   if non-zero, only select TPs with a given PDG ID
@@ -83,7 +83,7 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
     L1Tk_maxChi2dof = L1Tk_TIGHT_maxChi2dof;
   }
   
-  bool doDetailedPlots = true; //turn on to make full set of plots
+  bool doDetailedPlots = false; //turn on to make full set of plots
   bool doGausFit = false;       //do gaussian fit for resolution vs eta/pt plots
   bool doLooseMatch = false;    //looser MC truth matching
 
@@ -838,7 +838,8 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
       }
 
       // kinematic cuts
-      if (fabs(tp_dxy->at(it)) > TP_maxD0) continue;
+      if (fabs(tp_dxy->at(it)) > TP_maxDxy) continue;
+      if (fabs(tp_d0->at(it)) > TP_maxD0) continue;
       if (tp_pt->at(it) < 0.2) continue;
       if (tp_pt->at(it) > TP_maxPt) continue;
       if (fabs(tp_eta->at(it)) > TP_maxEta) continue;
