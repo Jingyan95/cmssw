@@ -290,6 +290,9 @@ static const double bendcut=1.5; //parameter to compare bend and bendinner in TE
 static const double bendcutdisk=2.0;
 static const double bendcutME=2.0; //parameter to compare projbend to calculated bend in ME
 static const double z0cut=15.0;
+static const double diskSpacingCut[3]={63.7, 67.7, 87.5};
+static const double barrelSpacingCut[6]={15.0, 25.0, 31.5, 33.3, 70.0, 120.0};
+
 
 
 static const unsigned int NSector=9; 

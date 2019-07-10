@@ -42,7 +42,7 @@ public:
 	double z=0+iz*15;
 	for(unsigned int irinv=0;irinv<32;irinv++){
 	  double rinv=(irinv-15.5)*(1<<(nbitsrinv-5))*krinvpars;
-	  double projbend=bend_tilt_corr_ME(rmean[layer_-1],z,rinv);
+	  double projbend=bend_tilt_corr_ME(z,layer_,rinv);
 	  for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
 	    double stubbend=Stub::benddecode(ibend,layer_<=3);
 	    bool pass=fabs(stubbend-projbend)<bendcutME;
@@ -357,34 +357,39 @@ public:
     
   }
 
-   double bend_tilt_corr_ME(double r, double z, double rinv) {
+  double bend_tilt_corr_ME(double z, int layer, double rinv) {
 
-   double dr= 0.18 ;
-   double CF=1;
-   if ((z<=31.5 && r<=30) || (25<=z && z<=70 && 30<=r && r<=45) || (33.3<=z && z<=120 && 45<=r && r<=60)) {
-     dr = 0.26; 
+    double dr= 0.18 ;
+    double CF=1;
+    double r=rmean[layer-1];
+
+    if ((layer==1 && z<=barrelSpacingCut[2]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[4]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
+      
+      dr = 0.26; 
     
-   } 
-   else if ((31.5<=z && z<=120 && r<=30) || (70<=z && z<=120 && 30<=r && r<=45)){ 
-     dr = 0.4;
+    } 
+    else if ((layer==1 && barrelSpacingCut[2]<=z && z<=barrelSpacingCut[5]) || (layer==2 && barrelSpacingCut[4]<=z && z<=barrelSpacingCut[5])){
      
-   } 
-   else if ((z<=25 && 30<=r && r<=45)||(z<=33.3 && 45<=r && r<=60)) {
-     dr = 0.16; 
+      dr = 0.4;
      
-   }
-  
-   if ((15<=z && z<=120 && r<=30) || (25<=z && z<=120 && r<=45) || (33.3<=z && z<=120 && r<=60)){
-     CF = 0.886454*(z/r) + 0.504148;
+    } 
+    else if ((layer==2 && z<=barrelSpacingCut[1]) || (layer==3 && z<=barrelSpacingCut[3])){
 
-   }
+	dr = 0.16; 
+     
+      }
+      if ((layer==1 && barrelSpacingCut[0]<=z && z<=barrelSpacingCut[5]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[5]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
+	
+	CF = 0.886454*(z/r) + 0.504148;
+
+      }
   
 
-   double delta=r*dr*0.5*rinv;
-   double bend=-delta/(0.009*CF);
-   if (r<55.0) bend=-delta/(0.01*CF);
-   return bend;
-  }
+      double delta=r*dr*0.5*rinv;
+      double bend=-delta/(0.009*CF);
+      if (r<55.0) bend=-delta/(0.01*CF);
+      return bend;
+      }
 
   
 private:
