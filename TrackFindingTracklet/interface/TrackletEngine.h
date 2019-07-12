@@ -193,9 +193,15 @@ public:
 	    int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
 	    int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
 	   
-  
-	    int index = (iphiinnerbin<<outerphibits_)+iphiouterbin;
-	    
+	    FPGAWord z=innerstub.first->z(); 
+	    int znbits=z.nbits();
+	    int iz=abs(z.value());
+	    int izbin=iz*8/(1<<(znbits-1));
+	   
+	   
+	    int index = (izbin<<(outerphibits_+innerphibits_))+(iphiinnerbin<<outerphibits_)+iphiouterbin;
+
+
 	    assert(index<(int)phitable_.size());		
 	    
 	      
@@ -323,10 +329,9 @@ public:
 	      int iz=abs(z.value());
 	      int izbin=iz*8/(1<<(znbits-1));
 
-	      //adding z in index
 	      int index = (izbin<<(innerphibits_+outerphibits_))+(iphiinnerbin<<outerphibits_)+iphiouterbin;
-
-
+	      
+	      
 	      assert(index<(int)phitable_.size());		
 
 	      
@@ -711,9 +716,6 @@ public:
 
       double phiinner[2];
       double phiouter[2];
-      double router[2];
-      //FOR TRIAL
-      // double OGrouter[2];
 
 
       std::vector<bool> vmbendinner;
@@ -725,91 +727,68 @@ public:
       }
       
 
-      router[0]=rmean[layer1_-1]+5; //Approximate but probably good enough for LUT
-      router[1]=rmean[layer1_]+10; //Approximate but probably good enough for LUT
+      //router[0]=rmean[layer1_-1]+5; //Approximate but probably good enough for LUT
+      //router[1]=rmean[layer1_]+10; //Approximate but probably good enough for LUT
    
-      //def we need
-      //int outerrbits=3;
-      //int outerrbins=(1<<outerrbits);
-      //loop over router
-      //for (int irouterbin = 0; irouterbin < outerrbins; irouterbin++) {
-      //router[0] = rmindiskl2overlapvm+irouterbin*(rmaxdiskl1overlapvm-rmindiskl2overlapvm)/outerrbins; 
-      //router[1] = rmindiskl2overlapvm+(irouterbin+1)*(rmaxdiskl1overlapvm-rmindiskl2overlapvm)/outerrbins; 
+      for (unsigned int izinner=0;izinner<8; izinner++){
+	double zinner=0+izinner*15;
 
-      // for (unsigned int izinner=0;izinner<8; izinner++){
-      //double zinner=(izinner==0)?9.65:0+izinner*15;
-	//double zinner=0+izinner*15;
-
-      for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
-	phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
-	phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
-	for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
-	  phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
-	  phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
+	for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
+	  phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
+	  phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
+	  for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
+	    phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
+	    phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
 	  
-	  double bendinnermin=20.0;
-	  double bendinnermax=-20.0;
-	  double bendoutermin=20.0;
-	  double bendoutermax=-20.0;
-	  double rinvmin=1.0; 
-	  for(int i1=0;i1<2;i1++) {
-	    for(int i2=0;i2<2;i2++) {
-	      for(int i3=0;i3<2;i3++) {
-		double rinner=rmean[layer1_-1];
-		double zouter=zmean[disk2_-1];
-		//double router=zouter*rinner/zinner;
-		double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router[i3]);
-		//double zinner= zouter*rinner/router[i3];
-		//double abendinner=bend_tilt_corr_TE(zinner,layer1_,rinv1);
-		//double abendouter=bendDisk_TE(router,disk2_,rinv1);
-		double abendinner=bend(rinner,rinv1);
-		double abendouter=bend(router[i3], rinv1);
-		// cout<<"\nrouter calculado="<<router[i3]<<endl;
-		// cout<<"router approx="<<OGrouter[i3]<<endl;
-		if (abendinner<bendinnermin) bendinnermin=abendinner;
-		if (abendinner>bendinnermax) bendinnermax=abendinner;
-		if (abendouter<bendoutermin) bendoutermin=abendouter;
-		if (abendouter>bendoutermax) bendoutermax=abendouter;
-		//if ((bendinnermin ==20)||(bendinnermax ==-20)||(bendoutermin ==20)||(bendoutermax ==-20)) cout<<"\nabendinner,outer= "<<abendinner<<" ; "<<abendouter<<"zinner= "<<zinner<<"   router= "<<router<<"   zouter= "<<zouter<<"  rinner= "<<rinner<<"   rinv= "<<rinv1<<endl;
-		// cout<<"\nbendinnermin= "<<bendinnermin<<endl;
-		// cout<<"bendinnermax= "<<bendinnermax<<endl;
-		// cout<<"***BEND DIFF INNER= "<<bendinnermax-bendinnermin<<endl;
-		//cout<<"bendoutermin= "<<bendoutermin<<endl;
-		//cout<<"bendoutermax= "<<bendoutermax<<endl;
-		//cout<<"**BEND DIFF OUTER= "<<bendoutermax-bendoutermin<<endl;
-		if (fabs(rinv1)<rinvmin) {
-		  rinvmin=fabs(rinv1);
+	    double bendinnermin=20.0;
+	    double bendinnermax=-20.0;
+	    double bendoutermin=20.0;
+	    double bendoutermax=-20.0;
+	    double rinvmin=1.0; 
+	    for(int i1=0;i1<2;i1++) {
+	      for(int i2=0;i2<2;i2++) {
+		for(int i3=0;i3<2;i3++) {
+		  double rinner=rmean[layer1_-1];
+		  double zouter=zmean[disk2_-1];
+		  double router=zouter*rinner/zinner;
+		  double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
+		  double abendinner=bend_tilt_corr_TE(zinner,layer1_,rinv1);
+		  double abendouter=bendDisk_TE(router,disk2_,rinv1);
+		  if (abendinner<bendinnermin) bendinnermin=abendinner;
+		  if (abendinner>bendinnermax) bendinnermax=abendinner;
+		  if (abendouter<bendoutermin) bendoutermin=abendouter;
+		  if (abendouter>bendoutermax) bendoutermax=abendouter;
+		  if (fabs(rinv1)<rinvmin) {
+		    rinvmin=fabs(rinv1);
+		  }
 		}
 	      }
 	    }
-	  }
 	    
-	  phitable_.push_back(rinvmin<rinvcutte);
 
+	    (izinner!=0)? phitable_.push_back(rinvmin<rinvcutte):phitable_.push_back(false);
 	  
-	  for(int ibend=0;ibend<8;ibend++) {
-	    double bend=Stub::benddecode(ibend,true); 
+	    for(int ibend=0;ibend<8;ibend++) {
+	      double bend=Stub::benddecode(ibend,true); 
+	      bool passinner=(izinner!=0)?bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut:false;
 	    
-	    bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;
+	      if (passinner) vmbendinner[ibend]=true;
+	      pttableinner_.push_back(passinner);
 	    
-	    if (passinner) vmbendinner[ibend]=true;
-	    pttableinner_.push_back(passinner);
-	    
-	  }
+	    }
 
-	  for(int ibend=0;ibend<8;ibend++) {
-	    double bend=Stub::benddecode(ibend,true); 
+	    for(int ibend=0;ibend<8;ibend++) {
+	      double bend=Stub::benddecode(ibend,true); 	    
+	      bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	      if (passouter) vmbendouter[ibend]=true;
+	      pttableouter_.push_back(passouter);
 	    
-	    bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
-	    if (passouter) vmbendouter[ibend]=true;
-	    pttableouter_.push_back(passouter);
-	    
-	  }
+	    }
 
+	  }
 	}
-      }
       
-	//}
+      }
     
       innervmstubs_->setbendtable(vmbendinner);
       outervmstubs_->setbendtable(vmbendouter);
