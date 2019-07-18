@@ -37,7 +37,6 @@ public:
       unsigned int nbits=3;
       if (layer_>=4) nbits=4;
       
-      //loop over z
       for(unsigned int iz=0; iz<8;iz++){
 	double z=0+iz*15;
 	for(unsigned int irinv=0;irinv<32;irinv++){
@@ -45,7 +44,7 @@ public:
 	  double projbend=bend_tilt_corr_ME(z,layer_,rinv);
 	  for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
 	    double stubbend=Stub::benddecode(ibend,layer_<=3);
-	    bool pass=fabs(stubbend-projbend)<bendcutME;
+	    bool pass=fabs(stubbend-projbend)<bendcutbarrelME;
 	    table_.push_back(pass);
 	  }
 	}
@@ -77,12 +76,12 @@ public:
 	double projbend=0.5*(iprojbend-15.0);
 	for(unsigned int ibend=0;ibend<8;ibend++){
 	  double stubbend=Stub::benddecode(ibend,true);
-	  bool pass=fabs(stubbend-projbend)<1.5;
+	  bool pass=fabs(stubbend-projbend)<bendcutPSdiskME;
 	  tablePS_.push_back(pass);
 	}
 	for(unsigned int ibend=0;ibend<16;ibend++){
 	  double stubbend=Stub::benddecode(ibend,false);
-	  bool pass=fabs(stubbend-projbend)<1.5;
+	  bool pass=fabs(stubbend-projbend)<bendcut2SdiskME;
 	  table2S_.push_back(pass);
 	}
       }
@@ -297,7 +296,7 @@ public:
 	int izbin= (iz>>(izbits-4))&7;
 	   
 
-	unsigned int index=(izbin<<(nbits+5))+(projrinv<<nbits)+stub.first->bend().value();
+	unsigned int index=barrel?(izbin<<(nbits+5))+(projrinv<<nbits)+stub.first->bend().value():(projrinv<<nbits)+stub.first->bend().value();
 
 	//Check if stub z position consistent
 	int idrz=stubfinerz-projfinerzadj;
@@ -343,19 +342,6 @@ public:
     
   }
 
- 
-  double bend(double r, double rinv) {
-
-    double dr=0.18;
-    
-    double delta=r*dr*0.5*rinv;
-
-    double bend=-delta/0.009;
-    if (r<55.0) bend=-delta/0.01;
-
-    return bend;
-    
-  }
 
   double bend_tilt_corr_ME(double z, int layer, double rinv) {
 

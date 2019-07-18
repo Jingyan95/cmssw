@@ -857,18 +857,6 @@ public:
   }
 
 
-  double bend(double r, double rinv) {
-
-    double dr=0.18;
-    
-    double delta=r*dr*0.5*rinv;
-
-    double bend=delta/0.009;
-    if (r<55.0) bend=delta/0.01;
-
-    return bend;
-    
-  }
 
   void writeTETable() {
 
