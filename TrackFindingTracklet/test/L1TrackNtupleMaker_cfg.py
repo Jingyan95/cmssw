@@ -1,4 +1,4 @@
-############################################################
+ß############################################################
 # define basic process
 ############################################################
 
@@ -132,11 +132,15 @@ elif (L1TRKALGO == 'TMTT'):
     L1TRK_PROC  =  process.TMTrackProducer
     L1TRK_NAME  = "TMTrackProducer"
     L1TRK_LABEL = "TML1TracksKF4ParamsComb"
+    L1TRK_PROC.EnableMCtruth = cms.bool(False) # Reduce CPU use by disabling internal histos.
+    L1TRK_PROC.EnableHistos  = cms.bool(False)
 elif (L1TRKALGO == 'HYBRID_FLOAT'):
     process.load("L1Trigger.HybridFloat.HybridTrackProducer_cff")
     L1TRK_PROC  =  process.HybridTrackProducer
     L1TRK_NAME  = "HybridTrackProducer"
     L1TRK_LABEL = "HybridL1TracksKF4ParamsComb"
+    L1TRK_PROC.EnableMCtruth = cms.bool(False) # Reduce CPU use by disabling internal histos.
+    L1TRK_PROC.EnableHistos  = cms.bool(False)
 elif (L1TRKALGO == 'TRACKLET_FLOAT'):
     process.load("L1Trigger.TrackFindingTracklet.L1TrackletTracks_cff")
     L1TRK_PROC  =  process.HybridTrackProducer.TTTracksFromTracklet
