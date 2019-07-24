@@ -778,8 +778,9 @@ public:
 	    }
 
 	    for(int ibend=0;ibend<8;ibend++) {
-	      double bend=Stub::benddecode(ibend,true); 	    
-	      bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	      double bend=Stub::benddecode(ibend,true); 
+	    
+	      bool passouter=(izinner!=0)?bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut:false;
 	      if (passouter) vmbendouter[ibend]=true;
 	      pttableouter_.push_back(passouter);
 	    
