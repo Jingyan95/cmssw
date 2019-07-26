@@ -8,19 +8,6 @@ namespace TMTT {
 
 Settings::Settings() {
   //
-  // Cfg params & constants required only for HYBRID tracking (as taken from DB for TMTT).
-  //
-  hybrid_=true;
-  psStripPitch_=0.01;
-  psNStrips_=960;
-  psPixelLength_=0.1467;
-  ssStripPitch_=0.009;
-  ssNStrips_=1016;
-  ssStripLength_=5.0250;
-  zMaxNonTilted_[1] = 15.3; // max z at which non-tilted modules are found in inner 3 barrel layers.
-  zMaxNonTilted_[2] = 24.6; 
-  zMaxNonTilted_[3] = 33.9; 
-  //
   // TMTT related configuration parameters, including Kalman Filter.
   // Meaning of these parameters explained in TrackFindingTMTT/python/TMTrackProducer_Defaults_cfi.py
   //
@@ -65,6 +52,19 @@ Settings::Settings() {
   kalmanFillInternalHists_=false;
   kalmanMultiScattTerm_=0.00075;
   kalmanMultiScattFactor_=0.0;
+  //
+  // Cfg params & constants required only for HYBRID tracking (as taken from DB for TMTT).
+  //
+  hybrid_=true;
+  psStripPitch_=0.01;
+  psNStrips_=960;
+  psPixelLength_=0.1467;
+  ssStripPitch_=0.009;
+  ssNStrips_=1016;
+  ssStripLength_=5.0250;
+  zMaxNonTilted_[1] = 15.3; // max z at which non-tilted modules are found in inner 3 barrel layers.
+  zMaxNonTilted_[2] = 24.6; 
+  zMaxNonTilted_[3] = 33.9; 
 
   bField_=3.8112;
 
