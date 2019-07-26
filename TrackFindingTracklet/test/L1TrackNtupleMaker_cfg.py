@@ -16,7 +16,7 @@ GEOMETRY = "D21"
 
 # Specify L1 tracking algo ('HYBRID', 'HYBRID_DISPLACED', 'TMTT','HYBRID_FLOAT', 'TRACKLET_FLOAT'),
 # (where HYBRID & HYBRID_DISPLACED both run either Tracklet or Hybrid emulation, 
-#  depending on settings in Constants.h).
+#  depending on pragma in Constants.h. ).
 L1TRKALGO = 'HYBRID'
  
 # Write output dataset?
@@ -117,6 +117,7 @@ if GEOMETRY != "TkOnly":
 process.TTClusterStub = cms.Path(process.TrackTriggerClustersStubs)
 process.TTClusterStubTruth = cms.Path(process.TrackTriggerAssociatorClustersStubs) 
 
+NHELIXPAR = 4
 if   (L1TRKALGO == 'HYBRID'):
     process.load("L1Trigger.TrackFindingTracklet.Tracklet_cfi") 
     L1TRK_PROC  =  process.TTTracksFromTrackletEmulation
@@ -127,6 +128,7 @@ elif (L1TRKALGO == 'HYBRID_DISPLACED'):
     L1TRK_PROC  =  process.TTTracksFromExtendedTrackletEmulation
     L1TRK_NAME  = "TTTracksFromExtendedTrackletEmulation"
     L1TRK_LABEL = "Level1TTTracks"
+    NHELIXPAR = 5
 elif (L1TRKALGO == 'TMTT'):
     process.load("L1Trigger.TrackFindingTMTT.TMTrackProducer_Ultimate_cff")
     L1TRK_PROC  =  process.TMTrackProducer
@@ -174,7 +176,7 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        DebugMode = cms.bool(False),      # printout lots of debug statements
                                        SaveAllTracks = cms.bool(True),   # save *all* L1 tracks, not just truth matched to primary particle
                                        SaveStubs = cms.bool(False),      # save some info for *all* stubs
-                                       L1Tk_nPar = cms.int32(4),         # use 4 or 5-parameter L1 track fit ??
+                                       L1Tk_nPar = cms.int32(NHELIXPAR), # use 4 or 5-parameter L1 tracking?
                                        L1Tk_minNStub = cms.int32(4),     # L1 tracks with >= 4 stubs
                                        TP_minNStub = cms.int32(4),       # require TP to have >= X number of stubs associated with it
                                        TP_minNStubLayer = cms.int32(4),  # require TP to have stubs in >= X layers/disks
