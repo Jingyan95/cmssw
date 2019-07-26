@@ -15,7 +15,7 @@
 
 static const bool doKF=true; //true => use KF (assumes USEHYBRID is defined)
 static const bool printDebugKF=false; // if true print lots of debugging statements related to the KF fit
-static const bool bookHistos=true; //set to true/false to turn on/off histogram booking internal to the tracking
+static const bool bookHistos=true; //set to true/false to turn on/off histogram booking internal to the tracking (class "HistImp")
 
 static unsigned int nHelixPar = 4; // 4 or 5 param helix fit.
 static bool hourglassExtended=false; // turn on displaced tracking, also edit L1TrackNtupleMaker_cfg.py (search for "Extended" on several lines)
