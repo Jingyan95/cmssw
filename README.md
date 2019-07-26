@@ -12,7 +12,7 @@ cmsenv
 git init
 git clone (-b myBranch) ssh://git@gitlab.cern.ch:7999/cms-tracker-phase2-backend-development/BE_software/L1Tracking.git L1Trigger
 
-Optional: to update your branch with changes made to the master, since your branch was created: git pull --rebase origin master)
+Optional: to update your branch with changes made to the master, since your branch was created: "git pull --rebase origin master" ; later requiring "git push --force" if you want to submit your changes.
 
 scram b -j 8
 cd L1Trigger/TrackFindingTracklet/test/ 
