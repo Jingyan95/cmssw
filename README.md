@@ -66,7 +66,7 @@ root
 (You can make similar plots for the tracks available before the track fit or before duplicate removal by disabling these algos.
 To do this, edit Constants.h, setting fakefit=true and/or RemovalType="").
 
-If running stand-alone, to make efficiency and resolution plots (that compare the integer based emulation to the floating point algorithm), set "writeResEff=true" in FPGAConstants.h to write a .txt file with the info,
+If running stand-alone, to make efficiency and resolution plots (that compare the integer based emulation to the floating point algorithm), set "writeResEff=true" in Constants.h to write a .txt file with the info,
 and process it using macros in TrackFindingTracklet/test/PlotMacros/ . Warning: the efficiency isn't defined in the standard way.
 
 ```sh
@@ -77,7 +77,7 @@ root -l trackeff.cc
 ### DETAILED PERFORMANCE PLOTS (via hist utility)
 
 Anders Ryd talk https://indico.cern.ch/event/781634/sessions/305061/#20190314 explains how to make plots & access truth/assoc
-info at any point in code. But this utility is not yet fully working.
+info at any point in code. Enabled via "bookHisto=true" in Constants.h, and booked in class "HistImp". But truth matching only partially available.
 
 ### DETAILED PERFORMANCE PLOTS (via txt files)
 
