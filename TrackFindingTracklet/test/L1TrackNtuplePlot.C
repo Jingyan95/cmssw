@@ -519,13 +519,15 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   //
   // ----------------------------------------------------------------------------------------------------------------
 
+  const float maxD0plot = TP_maxD0;
+
   TH1F* h_tp_phi   = new TH1F("tp_phi",  ";Tracking particle #phi [rad]; Tracking particles / 0.1",       64, -3.2,   3.2);
-  TH1F* h_tp_d0    = new TH1F("tp_d0",   ";Tracking particle d_{0} [cm]; Tracking particles / 0.01 cm",50, -0.25, 0.25);
-  TH1F* h_tp_absd0 = new TH1F("tp_absd0",";Tracking particle |d_{0}| [cm]; Tracking particles / 0.04 cm",50, 0, 2.0);
+  TH1F* h_tp_d0    = new TH1F("tp_d0",   ";Tracking particle d_{0} [cm]; Tracking particles / 0.01 cm",50, -maxD0plot, maxD0plot);
+  TH1F* h_tp_absd0 = new TH1F("tp_absd0",";Tracking particle |d_{0}| [cm]; Tracking particles / 0.04 cm",50, 0, maxD0plot);
 
   TH1F* h_match_tp_phi   = new TH1F("match_tp_phi",  ";Tracking particle #phi [rad]; Tracking particles / 0.1",       64, -3.2,   3.2);
-  TH1F* h_match_tp_d0    = new TH1F("match_tp_d0",   ";Tracking particle d_{0} [cm]; Tracking particles / 0.01 cm",50, -0.25, 0.25);
-  TH1F* h_match_tp_absd0 = new TH1F("match_tp_absd0",";Tracking particle d_{0} [cm]; Tracking particles / 0.04 cm",50, 0, 2.0);
+  TH1F* h_match_tp_d0    = new TH1F("match_tp_d0",   ";Tracking particle d_{0} [cm]; Tracking particles / 0.01 cm",50, -maxD0plot, maxD0plot);
+  TH1F* h_match_tp_absd0 = new TH1F("match_tp_absd0",";Tracking particle d_{0} [cm]; Tracking particles / 0.04 cm",50, 0, maxD0plot);
 
   TH1F* h_match_trk_nstub   = new TH1F("match_trk_nstub",   ";Number of stubs; L1 tracks / 1.0", 15, 0, 15);
   TH1F* h_match_trk_nstub_C = new TH1F("match_trk_nstub_C", ";Number of stubs; L1 tracks / 1.0", 15, 0, 15);
