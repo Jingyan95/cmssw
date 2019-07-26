@@ -8,6 +8,20 @@ namespace TMTT {
 
 Settings::Settings() {
   //
+  // Cfg params & constants required only for HYBRID tracking (as taken from DB for TMTT).
+  //
+  hybrid_=true;
+  psStripPitch_=0.01;
+  psNStrips_=960;
+  psPixelLength_=0.1467;
+  ssStripPitch_=0.009;
+  ssNStrips_=1016;
+  ssStripLength_=5.0250;
+  zMaxNonTilted_[1] = 15.3; // max z at which non-tilted modules are found in inner 3 barrel layers.
+  zMaxNonTilted_[2] = 24.6; 
+  zMaxNonTilted_[3] = 33.9; 
+  //
+  // TMTT related configuration parameters, including Kalman Filter.
   // Meaning of these parameters explained in TrackFindingTMTT/python/TMTrackProducer_Defaults_cfi.py
   //
   reduceLayerID_=true;
@@ -26,7 +40,6 @@ Settings::Settings() {
   numPhiSectors_=9;
   etaRegions_ = {-2.4,-2.16,-1.95,-1.7,-1.43,-1.16,-0.89,-0.61,-0.31,0.0,0.31,0.61,0.89,1.16,1.43,1.7,1.95,2.16,2.4}; // Used by KF
   kalmanRemove2PScut_=true;
-  kalmanD0sigma_=1.0;
   killScenario_=0;
   kalmanMaxSkipLayersHard_=1; // On "hard" input tracks
   kalmanMaxSkipLayersEasy_=2; // On "easy" input tracks 
@@ -52,18 +65,6 @@ Settings::Settings() {
   kalmanFillInternalHists_=false;
   kalmanMultiScattTerm_=0.00075;
   kalmanMultiScattFactor_=0.0;
-
-  // Cfg params & constants required only for HYBRID tracking (as taken from DB for TMTT).
-  hybrid_=true;
-  psStripPitch_=0.01;
-  psNStrips_=960;
-  psPixelLength_=0.1467;
-  ssStripPitch_=0.009;
-  ssNStrips_=1016;
-  ssStripLength_=5.0250;
-  zMaxNonTilted_[1] = 15.3; // max z at which non-tilted modules are found in inner 3 barrel layers.
-  zMaxNonTilted_[2] = 24.6; 
-  zMaxNonTilted_[3] = 33.9; 
 
   bField_=3.8112;
 
@@ -273,7 +274,6 @@ Settings::Settings(const edm::ParameterSet& iConfig) :
   kalmanMaxNumStubs_       ( trackFitSettings_.getParameter<unsigned int>     ( "KalmanMaxNumStubs"      ) ),
   kalmanAddBeamConstr_     ( trackFitSettings_.getParameter<bool>             ( "KalmanAddBeamConstr"    ) ),
   kalmanRemove2PScut_      ( trackFitSettings_.getParameter<bool>             ( "KalmanRemove2PScut"     ) ),
-  kalmanD0sigma_           ( trackFitSettings_.getParameter<double>           ( "KalmanD0sigma"          ) ),
   kalmanMaxSkipLayersHard_ ( trackFitSettings_.getParameter<unsigned>         ( "KalmanMaxSkipLayersHard") ),
   kalmanMaxSkipLayersEasy_ ( trackFitSettings_.getParameter<unsigned>         ( "KalmanMaxSkipLayersEasy") ),
   kalmanMaxStubsEasy_      ( trackFitSettings_.getParameter<unsigned>         ( "KalmanMaxStubsEasy"     ) ),
