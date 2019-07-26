@@ -382,6 +382,8 @@ TMTrackProducer_params = cms.PSet(
      KalmanAddBeamConstr     = cms.bool(True),
      # Remove requirement of at least 2 PS layers per track.
      KalmanRemove2PScut      = cms.bool(False),
+     # Apriori uncertainty in helix d0 assumed in 5 param fit.
+     KalmanD0sigma           = cms.double(1.0),
      # Allow the KF to skip this many layers in total per track.
      KalmanMaxSkipLayersHard = cms.uint32(1), # For HT tracks with many stubs
      KalmanMaxSkipLayersEasy = cms.uint32(2), # For HT tracks with few stubs

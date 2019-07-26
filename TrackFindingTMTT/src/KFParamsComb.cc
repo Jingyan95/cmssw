@@ -184,7 +184,7 @@ TMatrixD KFParamsComb::seedP(const L1track3D& l1track3D)const{
   double invPtToInv2R = getSettings()->invPtToInvR() / 2; 
 
   // Assumed track seed (from HT) uncertainty in transverse impact parameter.
-  const float d0Sigma = 1.0;
+  const float d0Sigma = getSettings()->kalmanD0sigma();
 
   if (getSettings()->hybrid()) {
 

@@ -303,6 +303,9 @@ public:
   bool                 kalmanAddBeamConstr()            const { return kalmanAddBeamConstr_;}
   // Remove requirement of at least 2 PS layers per track.
   bool                 kalmanRemove2PScut()             const { return kalmanRemove2PScut_;}
+  // Apriori uncertainty in helix d0 assumed in 5 param fit.
+  float                kalmanD0sigma()                  const { return kalmanD0sigma_;}
+
   // Allow the KF to skip this many layers in total per track for "hard" or "easy" input tracks
   unsigned int         kalmanMaxSkipLayersHard()        const { return kalmanMaxSkipLayersHard_;}
   unsigned int         kalmanMaxSkipLayersEasy()        const { return kalmanMaxSkipLayersEasy_;}
@@ -613,6 +616,7 @@ private:
   unsigned int         kalmanMaxNumStubs_;
   bool                 kalmanAddBeamConstr_;
   bool                 kalmanRemove2PScut_;
+  float                kalmanD0sigma_;
   unsigned int         kalmanMaxSkipLayersHard_;
   unsigned int         kalmanMaxSkipLayersEasy_;
   unsigned int         kalmanMaxStubsEasy_;
