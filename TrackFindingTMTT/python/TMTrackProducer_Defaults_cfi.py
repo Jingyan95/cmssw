@@ -48,6 +48,7 @@ TMTrackProducer_params = cms.PSet(
      KillLowPtStubs = cms.bool(True),
      # Print stub windows corresponding to KillLowPtStubs, in python cfg format used by CMSSW.
      PrintStubWindows = cms.bool(False),
+     # Bend resolution assumed by bend filter in units of strip pitch. Also used when assigning stubs to sectors if EtaPhiSectors.CalcPhiTrkRes=True. And by the bend filter if HTFillingRphi.UseBendFilter=True.
      # Suggested value: 1.19 if BendResReduced = false, or 1.249 if it is true.
      # N.B. Avoid 1/4-integer values due to rounding error issues.
      BendResolution = cms.double(1.249),
@@ -162,7 +163,7 @@ TMTrackProducer_params = cms.PSet(
      # N.B. If mini-HT is in use, then this cut applies to coarse-HT.
      #MaxStubsInCell       = cms.uint32(99999), # Setting this to anything more than 99 disables this option
      MaxStubsInCell          = cms.uint32(32),    # set it equal to value used in hardware.
-     MaxStubsInCellMiniHough = cms.uint32(16),    # NOT YET ENABLED IN SOFTWARE. Same type of cut for mini-HT (if in use)
+     MaxStubsInCellMiniHough = cms.uint32(16),    # Same type of cut for mini-HT (if in use)
      # If BusySectorKill = True, and more than BusySectorNumStubs stubs are assigned to tracks by an r-phi HT array, then the excess tracks are killed, with lowest Pt ones killed first. This is because HT hardware has finite readout time.
      BusySectorKill       = cms.bool(True),
      BusySectorNumStubs   = cms.uint32(144),
