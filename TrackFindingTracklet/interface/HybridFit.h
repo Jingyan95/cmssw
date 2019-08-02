@@ -82,8 +82,7 @@ class HybridFit{
        std::cout << "dphisectorHG = " << dphisectorHG << std::endl;
       }
 
-      // IRT bug fix
-      //kfphi0 = kfphi0 + iSector_*2*M_PI/NSector - 0.5*dphisectorHG - M_PI;
+      // KF wants global phi0, not phi0 measured with respect to lower edge of sector (Tracklet convention).
       kfphi0 = kfphi0 + iSector_*2*M_PI/NSector - 0.5*dphisectorHG;
 
       if (kfphi0>M_PI) kfphi0-=2*M_PI;
@@ -118,8 +117,7 @@ class HybridFit{
 	if (kfzRef > zRefMax) kf_eta_reg = iEtaSec;
       }
 
-      int kf_phi_sec=tracklet->homeSector() -3;
-      if(kf_phi_sec < 0){kf_phi_sec+=9;}      
+      int kf_phi_sec=tracklet->homeSector();
 
 
       TMTT::L1track3D l1track3d(settings,TMTTstubs,celllocation,helixrphi,helixrz,kfd0,kf_phi_sec,kf_eta_reg,1,false);
@@ -148,8 +146,7 @@ class HybridFit{
 
       if (printDebugKF) cout << "Done with Kalman fit. Pars: pt = " << trk.pt() << ", 1/2R = " << 3.8*3*trk.qOverPt()/2000 << ", phi0 = " << trk.phi0() << ", eta = " << trk.eta() << ", z0 = " << trk.z0() << ", chi2 = "<<trk.chi2()  << ", accepted = "<< trk.accepted() << endl;
 
-      // IRT bug fix
-      //double tracklet_phi0=M_PI+trk.phi0()-iSector_*2*M_PI/NSector+0.5*dphisectorHG;
+      // Tracklet wants phi0 with respect to lower edge of sector, not global phi0.
       double tracklet_phi0=trk.phi0()-iSector_*2*M_PI/NSector+0.5*dphisectorHG;
 
       if (tracklet_phi0>M_PI) tracklet_phi0-=2*M_PI;
