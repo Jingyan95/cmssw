@@ -149,6 +149,8 @@ private:
   //-----------------------------------------------------------------------------------------------
   // tree & branches for mini-ntuple
 
+  bool available_; // ROOT file for histograms is open.
+
   TTree* eventTree;
 
   // all L1 tracks
@@ -320,7 +322,6 @@ void L1TrackNtupleMaker::endJob()
 {
   // things to be done at the exit of the event Loop
   cerr << "L1TrackNtupleMaker::endJob" << endl;
-
 }
 
 ////////////
@@ -334,6 +335,8 @@ void L1TrackNtupleMaker::beginJob()
   //-----------------------------------------------------------------------------------------------
   // book histograms / make ntuple
   edm::Service<TFileService> fs;
+  available_ = fs.isAvailable();
+  if (not available_) return; // No ROOT file open.
 
   SaveTracklet = true;
 
@@ -563,6 +566,7 @@ void L1TrackNtupleMaker::beginJob()
 // ANALYZE
 void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  if (not available_) return; // No ROOT file open.
 
   if (!(MyProcess==13 || MyProcess==11 || MyProcess==211 || MyProcess==6 || MyProcess==15 || MyProcess==1)) {
     cout << "The specified MyProcess is invalid! Exiting..." << endl;
