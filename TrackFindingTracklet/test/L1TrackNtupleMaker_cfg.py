@@ -212,13 +212,16 @@ if (WRITE_DATA):
   process.writeDataset = cms.OutputModule("PoolOutputModule",
       splitLevel = cms.untracked.int32(0),
       eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-      outputCommands = cms.untracked.vstring('keep TTTrack*_*_*_*'),
+      outputCommands = process.RAWSIMEventContent.outputCommands,
       fileName = cms.untracked.string('output_dataset.root'), ## ADAPT IT ##
       dataset = cms.untracked.PSet(
           filterName = cms.untracked.string(''),
           dataTier = cms.untracked.string('GEN-SIM')
       )
-   )
+  )
+  # Include TMTT L1 tracks & associators + stubs.
+  process.writeDataset.outputCommands.append('keep  *TTTrack*_*_*_*')
+  process.writeDataset.outputCommands.append('keep  *TTStub*_*_*_*')
 
   process.pd = cms.EndPath(process.writeDataset)
   process.schedule.append(process.pd)
