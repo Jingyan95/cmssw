@@ -7,10 +7,25 @@ import FWCore.Utilities.FileUtils as FileUtils
 import os
 process = cms.Process("L1TrackNtuple")
 
+############################################################
+# edit options here
+############################################################
+
 GEOMETRY = "D21"
 #GEOMETRY = "D41" # <== to run on D41 samples, please change flag "geomTDR" to *false* in ../interface/FPGAConstants.hh 
 
+# Specify L1 tracking algo ('HYBRID', 'HYBRID_DISPLACED', 'TMTT','HYBRID_FLOAT', 'TRACKLET_FLOAT'),
+# (where HYBRID & HYBRID_DISPLACED both run either Tracklet or Hybrid emulation, 
+#  depending on pragma in Constants.h. ).
+L1TRKALGO = 'HYBRID'
  
+# Write output dataset?
+WRITE_DATA = False
+
+if (L1TRKALGO == 'HYBRID_FLOAT'):
+    if ( not os.path.exists( os.environ['CMSSW_BASE']+'/src/L1Trigger/HybridFloat' ) ):
+        print "=== ERROR: Please checkout HybridFloat code from git before using this option ==="; exit
+
 ############################################################
 # import standard configurations
 ############################################################
@@ -100,32 +115,51 @@ if GEOMETRY != "TkOnly":
     TTClusterAssociatorFromPixelDigis.digiSimLinks = cms.InputTag("simSiPixelDigis","Tracker")
 
 process.TTClusterStub = cms.Path(process.TrackTriggerClustersStubs)
-process.TTClusterStubTruth = cms.Path(process.TrackTriggerAssociatorClustersStubs)
+process.TTClusterStubTruth = cms.Path(process.TrackTriggerAssociatorClustersStubs) 
 
-from L1Trigger.TrackFindingTracklet.Tracklet_cfi import *
+NHELIXPAR = 4
+if   (L1TRKALGO == 'HYBRID'):
+    process.load("L1Trigger.TrackFindingTracklet.Tracklet_cfi") 
+    L1TRK_PROC  =  process.TTTracksFromTrackletEmulation
+    L1TRK_NAME  = "TTTracksFromTrackletEmulation"
+    L1TRK_LABEL = "Level1TTTracks"
+elif (L1TRKALGO == 'HYBRID_DISPLACED'):
+    process.load("L1Trigger.TrackFindingTracklet.Tracklet_cfi") 
+    L1TRK_PROC  =  process.TTTracksFromExtendedTrackletEmulation
+    L1TRK_NAME  = "TTTracksFromExtendedTrackletEmulation"
+    L1TRK_LABEL = "Level1TTTracks"
+    NHELIXPAR = 5
+elif (L1TRKALGO == 'TMTT'):
+    process.load("L1Trigger.TrackFindingTMTT.TMTrackProducer_Ultimate_cff")
+    L1TRK_PROC  =  process.TMTrackProducer
+    L1TRK_NAME  = "TMTrackProducer"
+    L1TRK_LABEL = "TML1TracksKF4ParamsComb"
+    L1TRK_PROC.EnableMCtruth = cms.bool(False) # Reduce CPU use by disabling internal histos.
+    L1TRK_PROC.EnableHistos  = cms.bool(False)
+elif (L1TRKALGO == 'HYBRID_FLOAT'):
+    process.load("L1Trigger.HybridFloat.HybridTrackProducer_cff")
+    L1TRK_PROC  =  process.HybridTrackProducer
+    L1TRK_NAME  = "HybridTrackProducer"
+    L1TRK_LABEL = "HybridL1TracksKF4ParamsComb"
+    L1TRK_PROC.EnableMCtruth = cms.bool(False) # Reduce CPU use by disabling internal histos.
+    L1TRK_PROC.EnableHistos  = cms.bool(False)
+elif (L1TRKALGO == 'TRACKLET_FLOAT'):
+    process.load("L1Trigger.TrackFindingTracklet.L1TrackletTracks_cff")
+    L1TRK_PROC  =  process.HybridTrackProducer.TTTracksFromTracklet
+    L1TRK_NAME  = "TTTracksFromTracklet"
+    L1TRK_LABEL = "Level1TTTracks"
+else:
+    print "ERROR: Unknown L1TRKALGO option"
+    exit(1)
 
-## floating-point simulation
-#process.load("L1Trigger.TrackFindingTracklet.L1TrackletTracks_cff")
-#if GEOMETRY == "D10": 
-#    TTTracksFromTracklet.trackerGeometry = cms.untracked.string("flat")
-#TTTracksFromTracklet.asciiFileName = cms.untracked.string("evlist.txt")
-#TTTracksFromTracklet.failscenario = cms.untracked.int32(0)
-#process.TTTracks = cms.Path(process.L1TrackletTracks)
-#process.TTTracksWithTruth = cms.Path(process.L1TrackletTracksWithAssociators)
-
+process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
+process.load("SimTracker.TrackTriggerAssociation.TrackTriggerAssociator_cff")
+process.TTTrackAssociatorFromPixelDigis.TTTracks = cms.VInputTag( cms.InputTag(L1TRK_NAME, L1TRK_LABEL) )
 
 ## emulation 
-process.load("L1Trigger.TrackFindingTracklet.L1TrackletEmulationTracks_cff")
-process.TTTracksEmulation = cms.Path(process.L1TrackletEmulationTracks)
-process.TTTracksEmulationWithTruth = cms.Path(process.L1TrackletEmulationTracksWithAssociators)
-#TTTracksFromTrackletEmulation.asciiFileName = cms.untracked.string("evlist.txt")
-
-
-## Extended (displaced) emulation
-# process.load("L1Trigger.TrackFindingTracklet.L1ExtendedTrackletEmulationTracks_cff")
-# process.TTTracksExtendedEmulation = cms.Path(process.L1ExtendedTrackletEmulationTracks)
-# process.TTTracksExtendedEmulationWithTruth = cms.Path(process.L1ExtendedTrackletEmulationTracksWithAssociators)
-
+process.TTTracksEmulation = cms.Path(process.offlineBeamSpot*L1TRK_PROC)
+process.TTTracksEmulationWithTruth = cms.Path(process.offlineBeamSpot*L1TRK_PROC*process.TrackTriggerAssociatorTracks)
+#L1TRK_PROC.asciiFileName = cms.untracked.string("evlist.txt")
 
 ############################################################
 # Define the track ntuple process, MyProcess is the (unsigned) PDGID corresponding to the process which is run
@@ -142,17 +176,15 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        DebugMode = cms.bool(False),      # printout lots of debug statements
                                        SaveAllTracks = cms.bool(True),   # save *all* L1 tracks, not just truth matched to primary particle
                                        SaveStubs = cms.bool(False),      # save some info for *all* stubs
-                                       L1Tk_nPar = cms.int32(4),         # use 4 or 5-parameter L1 track fit ??
+                                       L1Tk_nPar = cms.int32(NHELIXPAR), # use 4 or 5-parameter L1 tracking?
                                        L1Tk_minNStub = cms.int32(4),     # L1 tracks with >= 4 stubs
                                        TP_minNStub = cms.int32(4),       # require TP to have >= X number of stubs associated with it
                                        TP_minNStubLayer = cms.int32(4),  # require TP to have stubs in >= X layers/disks
                                        TP_minPt = cms.double(2.0),       # only save TPs with pt > X GeV
                                        TP_maxEta = cms.double(2.5),      # only save TPs with |eta| < X
                                        TP_maxZ0 = cms.double(30.0),      # only save TPs with |z0| < X cm
-                                       #L1TrackInputTag = cms.InputTag("TTTracksFromTracklet", "Level1TTTracks"),                 ## TTTrack input
-                                       L1TrackInputTag = cms.InputTag("TTTracksFromTrackletEmulation", "Level1TTTracks"),         ## TTTrack input
-                                       # L1TrackInputTag = cms.InputTag("TTTracksFromExtendedTrackletEmulation", "Level1TTTracks"), ## TTTrack input (displaced)
-                                       MCTruthTrackInputTag = cms.InputTag("TTTrackAssociatorFromPixelDigis", "Level1TTTracks"),  ## MCTruth input 
+                                       L1TrackInputTag = cms.InputTag(L1TRK_NAME, L1TRK_LABEL), # TTTrack input
+                                       MCTruthTrackInputTag = cms.InputTag("TTTrackAssociatorFromPixelDigis", L1TRK_LABEL),  ## MCTruth input 
                                        # other input collections
                                        L1StubInputTag = cms.InputTag("TTStubsFromPhase2TrackerDigis","StubAccepted"),
                                        MCTruthClusterInputTag = cms.InputTag("TTClusterAssociatorFromPixelDigis", "ClusterAccepted"),
@@ -163,6 +195,7 @@ process.L1TrackNtuple = cms.EDAnalyzer('L1TrackNtupleMaker',
                                        TrackingInJets = cms.bool(True),
                                        GenJetInputTag = cms.InputTag("ak4GenJets", ""),
                                        )
+
 process.ana = cms.Path(process.L1TrackNtuple)
 
 # use this if you want to re-run the stub making
@@ -174,6 +207,22 @@ process.ana = cms.Path(process.L1TrackNtuple)
 # use this to only run tracking + track associator
 process.schedule = cms.Schedule(process.TTTracksEmulationWithTruth,process.ana)
 
-# use this to only run extended tracking + track associator
-# process.schedule = cms.Schedule(process.TTTracksExtendedEmulationWithTruth,process.ana)
+if (WRITE_DATA):
+
+  process.writeDataset = cms.OutputModule("PoolOutputModule",
+      splitLevel = cms.untracked.int32(0),
+      eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
+      outputCommands = process.RAWSIMEventContent.outputCommands,
+      fileName = cms.untracked.string('output_dataset.root'), ## ADAPT IT ##
+      dataset = cms.untracked.PSet(
+          filterName = cms.untracked.string(''),
+          dataTier = cms.untracked.string('GEN-SIM')
+      )
+  )
+  # Include TMTT L1 tracks & associators + stubs.
+  process.writeDataset.outputCommands.append('keep  *TTTrack*_*_*_*')
+  process.writeDataset.outputCommands.append('keep  *TTStub*_*_*_*')
+
+  process.pd = cms.EndPath(process.writeDataset)
+  process.schedule.append(process.pd)
 

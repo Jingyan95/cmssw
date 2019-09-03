@@ -2,7 +2,7 @@
  
  
 #include "L1Trigger/TrackFindingTMTT/interface/KFParamsComb.h"
-#include "L1Trigger/TrackFindingTMTT/interface/kalmanState.h"
+#include "L1Trigger/TrackFindingTMTT/interface/KalmanState.h"
 #include "L1Trigger/TrackFindingTMTT/interface/StubCluster.h"
 #include "DataFormats/Math/interface/deltaPhi.h"
 //#define CKF_DEBUG
@@ -87,7 +87,7 @@ KFParamsComb::KFParamsComb(const Settings* settings, const uint nPar, const stri
 }
 
 
-std::map<std::string, double> KFParamsComb::getTrackParams(const kalmanState *state )const{
+std::map<std::string, double> KFParamsComb::getTrackParams(const KalmanState *state )const{
 
   std::vector<double> x = state->xa();
   std::map<std::string, double> y;
@@ -103,7 +103,7 @@ std::map<std::string, double> KFParamsComb::getTrackParams(const kalmanState *st
 
 /* If using 5 param helix fit, get track params with beam-spot constraint & track fit chi2 from applying it. */
 
-std::map<std::string, double> KFParamsComb::getTrackParams_BeamConstr( const kalmanState *state, double& chi2 ) const {
+std::map<std::string, double> KFParamsComb::getTrackParams_BeamConstr( const KalmanState *state, double& chi2 ) const {
   if (nPar_ == 5) {
     std::map<std::string, double> y;
     std::vector<double> x = state->xa();
@@ -190,8 +190,13 @@ TMatrixD KFParamsComb::seedP(const L1track3D& l1track3D)const{
 
     p(INV2R,INV2R) = 0.0157 * 0.0157 * invPtToInv2R * invPtToInv2R * 4; 
     p(PHI0,PHI0) = 0.0051 * 0.0051 * 4; 
-    p(Z0,Z0) = 5.0 * 5.0; // N.B. r-z seed uncertainties could be smaller for hybrid, except if seeded in 2S?
+    p(Z0,Z0) = 5.0 * 5.0; 
     p(T,T) = 0.25 * 0.25 * 4;
+    // N.B. (z0, tanL, d0) seed uncertainties could be smaller for hybrid, if seeded in PS? -- not tried
+    //if (l1track3D.seedPS() > 0) { // Tracklet seed used PS layers
+    //  p(Z0,Z0) /= (4.*4.).;
+    //  p(T,T) /= (4.*4.);
+    // }
     if (nPar_ == 5) {
       p(D0,D0) = d0Sigma * d0Sigma; 
     } 
@@ -218,7 +223,7 @@ TMatrixD KFParamsComb::seedP(const L1track3D& l1track3D)const{
 
 /* The forecast matrix
  * (here equals identity matrix) */
-TMatrixD KFParamsComb::F(const StubCluster* stubCluster, const kalmanState *state )const{
+TMatrixD KFParamsComb::F(const StubCluster* stubCluster, const KalmanState *state )const{
   TMatrixD F(nPar_,nPar_); 
   for(unsigned int n = 0; n < nPar_; n++)
     F(n, n) = 1;
@@ -235,7 +240,7 @@ std::vector<double> KFParamsComb::d(const StubCluster* stubCluster )const{
 }
 
 // Assumed hit resolution in (phi,z)
-TMatrixD KFParamsComb::PddMeas(const StubCluster* stubCluster, const kalmanState *state )const{
+TMatrixD KFParamsComb::PddMeas(const StubCluster* stubCluster, const KalmanState *state )const{
 
   double inv2R = (getSettings()->invPtToInvR()) * 0.5 * state->candidate().qOverPt(); // alternatively use state->xa().at(INV2R)
   double inv2R2 = inv2R * inv2R;
@@ -336,7 +341,7 @@ TMatrixD KFParamsComb::PddMeas(const StubCluster* stubCluster, const kalmanState
 }
 
 // State uncertainty due to scattering -- HISTORIC NOT USED
-TMatrixD KFParamsComb::PxxModel( const kalmanState *state, const StubCluster *stubCluster )const
+TMatrixD KFParamsComb::PxxModel( const KalmanState *state, const StubCluster *stubCluster )const
 {
 
   TMatrixD p(nPar_,nPar_);
@@ -350,7 +355,7 @@ TMatrixD KFParamsComb::PxxModel( const kalmanState *state, const StubCluster *st
 
     unsigned stub_itr = state->nextLayer();
 
-    const kalmanState * last_update_state = state->last_update_state();
+    const KalmanState * last_update_state = state->last_update_state();
     unsigned last_itr(1);
     if( last_update_state ) last_itr = last_update_state->nextLayer();
     dl = ( stub_itr - last_itr ) * dl; 
@@ -367,7 +372,7 @@ TMatrixD KFParamsComb::PxxModel( const kalmanState *state, const StubCluster *st
   return p;
 }
 
-bool KFParamsComb::isGoodState( const kalmanState &state )const
+bool KFParamsComb::isGoodState( const KalmanState &state )const
 {
   // Cut values. (Layer 0 entry here is dummy). -- todo : make configurable
 

@@ -125,7 +125,8 @@ void DigitalStub::makeGPinput(unsigned int iPhiSec) {
   rt_orig_ = r_orig_ - chosenRofPhi_;
 
   // Phi coord. of stub relative to centre of nonant.
-  double phiNonantCentre = phiNonantWidth_ * (0.5 + double(iPhiNon)) - M_PI;
+  double phiNonantCentre = phiNonantWidth_ * double(iPhiNon);
+
   phiO_orig_ = reco::deltaPhi(phi_orig_, phiNonantCentre);
 
   //--- Digitize variables used exclusively in GP.
@@ -171,7 +172,9 @@ void DigitalStub::makeHTinput(unsigned int iPhiSec) {
   //--- Shift axes of coords. if required.
 
   // Centre of this sector in phi
-  double phiSectorCentre = phiSectorWidth_ * (0.5 + double(iPhiSec)) - M_PI; 
+  double phiCentreSec0 = -M_PI/float(numPhiNonants_) + M_PI/float(numPhiSectors_);
+  double phiSectorCentre = phiSectorWidth_ * float(iPhiSec) + phiCentreSec0; 
+
   // Point in sector from which stub phiS should be measured.
   double phiSectorRef = phiSectorCentre;
 
@@ -252,18 +255,11 @@ void DigitalStub::makeSForTFinput(string SForTF) {
 
     if (SForTF.find("KF") != string::npos) { 
       // Digitize variables that are exclusive to Kalman filter.
-      if (numPhiNonants_ == 8) {
-	// Data format for nonants redigitizes z to give it same multiplier as r.
-        iDigi_Z_KF_ = std::round(float(iDigi_Z_) * (rtMult_/zMult_));
-        // Determine floating point variable from digitized one, now using r multiplier.
-        z_          = (iDigi_Z_KF_ + 0.5)/rtMult_;
-      } else {
-	// Data format for nonants uses z directly from HT, as its multiplier is exactly a factor 2
-	// smaller than for r, which is easy to fix in VHDL-HLS interface.
-	iDigi_Z_KF_ = iDigi_Z_;
-        // Determine floating point variable from digitized one, using z multiplier.
-        z_          = (iDigi_Z_KF_ + 0.5)/zMult_;
-      }
+      // Data format uses z directly from HT, as its multiplier is exactly a factor 2
+      // smaller than for r, which is easy to fix in VHDL-HLS interface.
+      iDigi_Z_KF_ = iDigi_Z_;
+      // Determine floating point variable from digitized one, using z multiplier.
+      z_          = (iDigi_Z_KF_ + 0.5)/zMult_;
     } else {
       // If not using KF, then restore z value from HT.
       iDigi_Z_KF_ = 0;  // Shoudln't be used in this case.
@@ -302,7 +298,7 @@ void DigitalStub::quickMakeGPinput(int iPhiSec) {
 
   // Phi coord. of stub relative to centre of nonant.
   unsigned int iPhiNon = floor(iPhiSec*numPhiNonants_/numPhiSectors_);
-  double phiNonantCentre = phiNonantWidth_ * (0.5 + double(iPhiNon)) - M_PI;
+  double phiNonantCentre = phiNonantWidth_ * double(iPhiNon);
   phiO_orig_ = reco::deltaPhi(phi_orig_, phiNonantCentre);
 
   //--- Digitize variables used exclusively in GP.
@@ -322,7 +318,9 @@ void DigitalStub::quickMakeHTinput(int iPhiSec) {
   //--- Shift axes of coords. if required.
 
   // Centre of this sector in phi
-  double phiSectorCentre = phiSectorWidth_ * (0.5 + double(iPhiSec)) - M_PI; 
+  double phiCentreSec0 = -M_PI/float(numPhiNonants_) + M_PI/float(numPhiSectors_);
+  double phiSectorCentre = phiSectorWidth_ * float(iPhiSec) + phiCentreSec0; 
+
   // Point in sector from which stub phiS should be measured.
   double phiSectorRef = phiSectorCentre;
 

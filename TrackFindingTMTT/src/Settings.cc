@@ -8,6 +8,7 @@ namespace TMTT {
 
 Settings::Settings() {
   //
+  // TMTT related configuration parameters, including Kalman Filter.
   // Meaning of these parameters explained in TrackFindingTMTT/python/TMTrackProducer_Defaults_cfi.py
   //
   reduceLayerID_=true;
@@ -51,8 +52,9 @@ Settings::Settings() {
   kalmanFillInternalHists_=false;
   kalmanMultiScattTerm_=0.00075;
   kalmanMultiScattFactor_=0.0;
-
+  //
   // Cfg params & constants required only for HYBRID tracking (as taken from DB for TMTT).
+  //
   hybrid_=true;
   psStripPitch_=0.01;
   psNStrips_=960;
@@ -64,7 +66,7 @@ Settings::Settings() {
   zMaxNonTilted_[2] = 24.6; 
   zMaxNonTilted_[3] = 33.9; 
 
-  bField_=3.8112;
+  bField_=3.81120228767395;
 
   if (hybrid_) {
     if (not useApproxB_) {
@@ -114,7 +116,7 @@ Settings::Settings(const edm::ParameterSet& iConfig) :
 
   //=== Cuts applied to stubs before arriving in L1 track finding board.
 
-  bendResReduced_         ( stubCuts_.getParameter<bool>                      ( "BendResReduced"         ) ),
+  degradeBendRes_         ( stubCuts_.getParameter<unsigned int>              ( "DegradeBendRes"         ) ),
   maxStubEta_             ( stubCuts_.getParameter<double>                    ( "MaxStubEta"             ) ),
   killLowPtStubs_         ( stubCuts_.getParameter<bool>                      ( "KillLowPtStubs"         ) ),
   printStubWindows_       ( stubCuts_.getParameter<bool>                      ( "PrintStubWindows"       ) ),

@@ -45,8 +45,9 @@ public:
 
   //=== Cuts applied to stubs before arriving in L1 track finding board.
 
-  // Reduce number of bits used by front-end chips to store stub bend info.
-  bool                 bendResReduced()          const   {return bendResReduced_;}
+  // Reduce number of bits used by front-end chips to store stub bend info?
+  // = 0 (no); = 1 (yes using official recipe); = 2 (yes using TMTT method)
+  unsigned int         degradeBendRes()          const   {return degradeBendRes_;}
   // Don't use stubs with eta beyond this cut, since the tracker geometry makes it impossible to reconstruct tracks with them.
   double               maxStubEta()              const   {return maxStubEta_;}
   // Don't use stubs whose measured Pt from bend info is significantly below HTArraySpec.HoughMinPt, where "significantly" means allowing for resolution in q/Pt derived from stub bend resolution HTFilling.BendResolution
@@ -140,6 +141,7 @@ public:
   bool                 useBendFilter()           const   {return useBendFilter_;} 
   // A filter is used each HT cell, which prevents more than the specified number of stubs being stored in the cell. (Reflecting memory limit of hardware). N.B. If mini-HT is in use, then this cut applies to coarse-HT.   
   unsigned int         maxStubsInCell()          const   {return maxStubsInCell_;}
+  // Similar cut for Mini-HT.
   unsigned int         maxStubsInCellMiniHough() const   {return maxStubsInCellMiniHough_;}
   // If this returns true, and if more than busySectorNumStubs() stubs are assigned to tracks by an r-phi HT array, then 
   // the excess tracks are killed, with lowest Pt ones killed first. This is because hardware has finite readout time.
@@ -396,8 +398,9 @@ public:
 
   double               pitchPS()                 const   {cout<<"ERROR: Use Stub::stripPitch instead of Settings::pitchPS!";exit(1);return 0.;} // pitch of PS modules - OBSOLETE
   double               pitch2S()                 const   {cout<<"ERROR: Use Stub::stripPitch instead of Settings::pitch2S!";exit(1);return 0.;} // pitch of 2S modules - OBSOLETE
-  double               invPtToInvR()             const   {return (this->getBfield())*(2.9979E8/1.0E11);} // B*c/1E11 - converts q/Pt to 1/radius_of_curvature
-  double               invPtToDphi()             const   {return (this->getBfield())*(2.9979E8/2.0E11);} // B*c/2E11 - converts q/Pt to track angle at some radius from beamline.  
+  double               cSpeed()                  const   {return 2.99792458e10;} // Speed of light (cm/s)
+  double               invPtToInvR()             const   {return (this->getBfield())*(this->cSpeed())/1.0E13;} // B*c/1E11 - converts q/Pt to 1/radius_of_curvature
+  double               invPtToDphi()             const   {return (this->getBfield())*(this->cSpeed())/2.0E13;} // B*c/2E11 - converts q/Pt to track angle at some radius from beamline.  
   double               trackerOuterRadius()      const   {return 112.7;}  // max. occuring stub radius.
   double               trackerInnerRadius()      const   {return  21.8;}  // min. occuring stub radius.
   double               trackerHalfLength()       const   {return 270.;}  // half-length of tracker. 
@@ -458,7 +461,7 @@ private:
   unsigned int         genMinStubLayers_;
 
   // Cuts applied to stubs before arriving in L1 track finding board.
-  bool                 bendResReduced_;
+  unsigned int         degradeBendRes_;
   double               maxStubEta_;
   bool                 killLowPtStubs_;
   bool                 printStubWindows_;

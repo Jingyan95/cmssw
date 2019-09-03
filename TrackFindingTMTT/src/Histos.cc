@@ -3057,7 +3057,9 @@ void Histos::endJobAnalysis() {
   if (settings_->hybrid()) {
 
     // Produce plots of tracking efficieny after tracklet pattern reco.
+    this->plotTrackletSeedEfficiency();
     this->plotTrackEfficiency("TRACKLET");
+    this->plotHybridDupRemovalEfficiency();
 
   } else {
 
@@ -3144,7 +3146,9 @@ void Histos::endJobAnalysis() {
 
   if (settings_->hybrid()) {
     //--- Print summary of tracklet pattern reco
+    this->printTrackletSeedFindingPerformance();
     this->printTrackPerformance("TRACKLET");
+    this->printHybridDupRemovalPerformance();
   } else {
     //--- Print summary of track-finding performance after HT
     this->printTrackPerformance("HT");

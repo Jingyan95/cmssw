@@ -2,7 +2,7 @@
  
  
 #include "L1Trigger/TrackFindingTMTT/interface/KF4ParamsComb.h"
-#include "L1Trigger/TrackFindingTMTT/interface/kalmanState.h"
+#include "L1Trigger/TrackFindingTMTT/interface/KalmanState.h"
 #include "L1Trigger/TrackFindingTMTT/interface/StubCluster.h"
 #define CKF_DEBUG
 
@@ -87,7 +87,7 @@ KF4ParamsComb::KF4ParamsComb(const Settings* settings, const uint nPar, const st
 }
 
 
-std::map<std::string, double> KF4ParamsComb::getTrackParams(const kalmanState *state )const{
+std::map<std::string, double> KF4ParamsComb::getTrackParams(const KalmanState *state )const{
 
   std::vector<double> x = state->xa();
   std::map<std::string, double> y;
@@ -168,7 +168,7 @@ TMatrixD KF4ParamsComb::seedP(const L1track3D& l1track3D)const{
 
 /* The forecast matrix
  * (here equals identity matrix) */
-TMatrixD KF4ParamsComb::F(const StubCluster* stubCluster, const kalmanState *state )const{
+TMatrixD KF4ParamsComb::F(const StubCluster* stubCluster, const KalmanState *state )const{
   TMatrixD F(nPar_,nPar_);
   for(unsigned int n = 0; n < nPar_; n++)
     F(n, n) = 1;
@@ -185,7 +185,7 @@ std::vector<double> KF4ParamsComb::d(const StubCluster* stubCluster )const{
 }
 
 // Assumed hit resolution in (phi,z)
-TMatrixD KF4ParamsComb::PddMeas(const StubCluster* stubCluster, const kalmanState *state )const{
+TMatrixD KF4ParamsComb::PddMeas(const StubCluster* stubCluster, const KalmanState *state )const{
 
   double inv2R = (getSettings()->invPtToInvR()) * 0.5 * state->candidate().qOverPt(); // alternatively use state->xa().at(INV2R)
   double inv2R2 = inv2R * inv2R;
@@ -286,7 +286,7 @@ TMatrixD KF4ParamsComb::PddMeas(const StubCluster* stubCluster, const kalmanStat
 }
 
 // State uncertainty due to scattering -- HISTORIC NOT USED 
-TMatrixD KF4ParamsComb::PxxModel( const kalmanState *state, const StubCluster *stubCluster )const
+TMatrixD KF4ParamsComb::PxxModel( const KalmanState *state, const StubCluster *stubCluster )const
 {
 
   TMatrixD p(nPar_,nPar_);
@@ -300,7 +300,7 @@ TMatrixD KF4ParamsComb::PxxModel( const kalmanState *state, const StubCluster *s
 
     unsigned stub_itr = state->nextLayer();
 
-    const kalmanState * last_update_state = state->last_update_state();
+    const KalmanState * last_update_state = state->last_update_state();
     unsigned last_itr(1);
     if( last_update_state ) last_itr = last_update_state->nextLayer();
     dl = ( stub_itr - last_itr ) * dl; 
@@ -317,7 +317,7 @@ TMatrixD KF4ParamsComb::PxxModel( const kalmanState *state, const StubCluster *s
   return p;
 }
 
-bool KF4ParamsComb::isGoodState( const kalmanState &state )const
+bool KF4ParamsComb::isGoodState( const KalmanState &state )const
 {
 
   unsigned nStubLayers = state.nStubLayers();

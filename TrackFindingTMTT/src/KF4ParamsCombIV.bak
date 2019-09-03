@@ -1,7 +1,7 @@
 ///=== This is the Kalman Combinatorial Filter for 4 helix parameters track fit algorithm.
  
 #include "L1Trigger/TrackFindingTMTT/interface/KF4ParamsCombIV.h"
-#include "L1Trigger/TrackFindingTMTT/interface/kalmanState.h"
+#include "L1Trigger/TrackFindingTMTT/interface/KalmanState.h"
 #include "L1Trigger/TrackFindingTMTT/interface/StubCluster.h"
 #define CKF_DEBUG
  
@@ -76,7 +76,7 @@ KF4ParamsCombIV::KF4ParamsCombIV(const Settings* settings, const string &fitterN
     hxaxtmax[3] = +6.e-0;
 }
 
-std::map<std::string, double> KF4ParamsCombIV::getTrackParams(const kalmanState *state )const{
+std::map<std::string, double> KF4ParamsCombIV::getTrackParams(const KalmanState *state )const{
 
     std::map<std::string, double> y;
     if( state->barrel() ){
@@ -206,7 +206,7 @@ TMatrixD KF4ParamsCombIV::seedP(const L1track3D& l1track3D)const{
 
     return p;
 }
-double KF4ParamsCombIV::getZ( const kalmanState *state )const{
+double KF4ParamsCombIV::getZ( const KalmanState *state )const{
 
     double z(0);
     if( state->barrel() ){
@@ -218,7 +218,7 @@ double KF4ParamsCombIV::getZ( const kalmanState *state )const{
     return z;
 }
 
-double KF4ParamsCombIV::getZ0( const kalmanState *state )const{
+double KF4ParamsCombIV::getZ0( const KalmanState *state )const{
 
     double z0(0); 
     if( state->barrel() ){
@@ -231,7 +231,7 @@ double KF4ParamsCombIV::getZ0( const kalmanState *state )const{
     }
     return z0;
 }
-double KF4ParamsCombIV::getZVariance( const kalmanState *state )const{
+double KF4ParamsCombIV::getZVariance( const KalmanState *state )const{
 
     double vz(0); 
     if( state->barrel() ){
@@ -241,7 +241,7 @@ double KF4ParamsCombIV::getZVariance( const kalmanState *state )const{
     return vz;
 }
 
-double KF4ParamsCombIV::getZ0Variance( const kalmanState *state )const{
+double KF4ParamsCombIV::getZ0Variance( const KalmanState *state )const{
 
 
     double vz0(0); 
@@ -282,7 +282,7 @@ void KF4ParamsCombIV::barrelToEndcap( double r, const StubCluster *stubCluster, 
 
 
 /* The forecast matrix */
-TMatrixD KF4ParamsCombIV::F(const StubCluster* stubCluster, const kalmanState *state )const{
+TMatrixD KF4ParamsCombIV::F(const StubCluster* stubCluster, const KalmanState *state )const{
 
     TMatrixD F(4,4);
     for(int n = 0; n < 4; n++)
@@ -341,7 +341,7 @@ std::vector<double> KF4ParamsCombIV::d(const StubCluster* stubCluster )const{
     return meas;
 }
 
-TMatrixD KF4ParamsCombIV::PddMeas(const StubCluster* stubCluster, const kalmanState *state )const{
+TMatrixD KF4ParamsCombIV::PddMeas(const StubCluster* stubCluster, const KalmanState *state )const{
 
 
     double rdphi = stubCluster->r() * stubCluster->dphi();
@@ -353,7 +353,7 @@ TMatrixD KF4ParamsCombIV::PddMeas(const StubCluster* stubCluster, const kalmanSt
 }
 
 /* State uncertainty */
-TMatrixD KF4ParamsCombIV::PxxModel( const kalmanState *state, const StubCluster *stubCluster, unsigned stub_itr )const
+TMatrixD KF4ParamsCombIV::PxxModel( const KalmanState *state, const StubCluster *stubCluster, unsigned stub_itr )const
 {
 
     TMatrixD p(4,4);
@@ -363,7 +363,7 @@ TMatrixD KF4ParamsCombIV::PxxModel( const kalmanState *state, const StubCluster 
 	if( i_eta > 24 ) i_eta = 24;
 	double dl = matx_outer[i_eta] / nlayer_eta[i_eta];
 
-	const kalmanState * last_update_state = state->last_update_state();
+	const KalmanState * last_update_state = state->last_update_state();
 	unsigned last_itr(1);
 	if( last_update_state ) last_itr = last_update_state->nIterations();
 	dl = ( stub_itr - last_itr ) * dl; 
@@ -464,7 +464,7 @@ std::string KF4ParamsCombIV::getParams(){
 
 /* Determine with a stub belongs/does not belong to a candidate
  * Decision based on hit and state uncertainty */
-bool KF4ParamsCombIV::stubBelongs(const StubCluster* stubCluster, kalmanState& state, unsigned itr )const{
+bool KF4ParamsCombIV::stubBelongs(const StubCluster* stubCluster, KalmanState& state, unsigned itr )const{
 
     return true;
 
@@ -517,7 +517,7 @@ double KF4ParamsCombIV::validationGateCutValue( const StubCluster *stubCluster, 
     return max_rchi2;
 }
 
-bool KF4ParamsCombIV::isGoodState( const kalmanState &state )const
+bool KF4ParamsCombIV::isGoodState( const KalmanState &state )const
 {
     unsigned nStubLayers = state.nStubLayers();
     bool goodState( true );

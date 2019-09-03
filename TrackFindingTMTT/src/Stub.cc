@@ -28,13 +28,15 @@ StubKiller Stub::stubKiller_;
 //=== Store useful info about the stub (for use with HYBRID code), with hard-wired constants to allow use outside CMSSW.
 
 Stub::Stub(double phi, double r, double z, double bend, int layerid, bool psModule, bool barrel, unsigned int iphi, double alpha, const Settings* settings, const TrackerTopology* trackerTopology, unsigned int ID) : 
-  phi_(phi), r_(r), z_(z), bend_(bend), iphi_(iphi), alpha_(alpha), psModule_(psModule), layerId_(layerid), barrel_(barrel), 
+  phi_(phi), r_(r), z_(z), bend_(bend), iphi_(iphi), alpha_(alpha), psModule_(psModule), layerId_(layerid), endcapRing_(0), barrel_(barrel), 
   digitalStub_(settings), stubWindowSuggest_(settings)
 { //work in progress on better constructor for new hybrid
   if (psModule && barrel) {
     double zMax[4];
     settings->get_zMaxNonTilted(zMax);
     tiltedBarrel_ = (fabs(z) > zMax[layerid]);
+  } else {
+    tiltedBarrel_ = false;
   }
   if (!psModule) {
     stripPitch_ = settings->ssStripPitch(); nStrips_=settings->ssNStrips(); sigmaPar_=settings->ssStripLength()/std::sqrt(12.0);
@@ -174,8 +176,7 @@ Stub::Stub(const TTStubRef& ttStubRef, unsigned int index_in_vStubs, const Setti
   // Get stub bend that is available in front-end electronics, where bend is displacement between 
   // two hits in stubs in units of strip pitch.
   bendInFrontend_ = ttStubRef->getTriggerBend();
-  bool isEndcap = GeomDetEnumerators::isEndcap( trackerGeometry->idToDetUnit( geoDetId )->subDetector() );
-  if (isEndcap && pos.z() > 0) bendInFrontend_ *= -1;
+  if ((not barrel_) && pos.z() > 0) bendInFrontend_ *= -1;
   // EJC Bend in barrel seems to be flipped in tilted geom.
   if (barrel_) bendInFrontend_ *= -1;
 
@@ -183,11 +184,15 @@ Stub::Stub(const TTStubRef& ttStubRef, unsigned int index_in_vStubs, const Setti
   // bend resolution due to bit encoding by FE chip if required.
   bool rejectStub = false;          // indicates if bend is outside window assumed in DegradeBend.h
   numMergedBend_ = 1;               // Number of bend values merged into single degraded one.
-  if (settings->bendResReduced()) {
+  if (settings->degradeBendRes() == 2) {
     float degradedBend;       // degraded bend
     this->degradeResolution(bendInFrontend_,
           degradedBend, rejectStub, numMergedBend_); // sets value of last 3 arguments.
     bend_ = degradedBend;
+  } else if (settings->degradeBendRes() == 1) {
+    bend_ = ttStubRef->getHardwareBend(); // Degraded bend from official CMS recipe.
+    if ((not barrel_) && pos.z() > 0) bend_ *= -1;
+    if (barrel_) bend_ *= -1;
   } else {
     bend_ = bendInFrontend_;
   }

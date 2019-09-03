@@ -40,8 +40,9 @@ TMTrackProducer_params = cms.PSet(
   #=== Cuts applied to stubs before arriving in L1 track finding board.
 
   StubCuts = cms.PSet(
-     # Reduce number of bits used by front-end chips to store stub bend info. (CMS is considering this option proposed by Seb. Viret).
-     BendResReduced = cms.bool(True),
+     # Reduce number of bits used by front-end chips to store stub bend info? 
+     # = 0 (no); = 1 (yes using official recipe); = 2 (yes using TMTT method)
+     DegradeBendRes = cms.uint32(2),
      # Don't use stubs with eta beyond this cut, since the tracker geometry makes it impossible to reconstruct tracks with them.
      MaxStubEta     = cms.double(2.4),
      # Don't use stubs whose measured Pt from bend info is significantly below HTArraySpec.HoughMinPt, where "significantly" means allowing for resolution in q/Pt derived from stub bend resolution specified below.
@@ -49,11 +50,12 @@ TMTrackProducer_params = cms.PSet(
      # Print stub windows corresponding to KillLowPtStubs, in python cfg format used by CMSSW.
      PrintStubWindows = cms.bool(False),
      # Bend resolution assumed by bend filter in units of strip pitch. Also used when assigning stubs to sectors if EtaPhiSectors.CalcPhiTrkRes=True. And by the bend filter if HTFillingRphi.UseBendFilter=True.
-     # Suggested value: 1.19 if BendResReduced = false, or 1.30 if it is true.
-     BendResolution = cms.double(1.25),
+     # Suggested value: 1.19 if DegradeBendRes = 0, or 1.249 if it is > 0.
+     # N.B. Avoid 1/4-integer values due to rounding error issues.
+     BendResolution = cms.double(1.249),
      # Additional contribution to bend resolution from its encoding into a reduced number of bits.
      # This number is the assumed resolution relative to the naive guess of its value.
-     # It is ignored in BendResReduced = False.
+     # It is ignored in DegradeBendRes = 0.
      BendResolutionExtra = cms.double(0.0),
      # Order stubs by bend in DTC, such that highest Pt stubs are transmitted first.
      OrderStubsByBend = cms.bool(True)
@@ -162,7 +164,7 @@ TMTrackProducer_params = cms.PSet(
      # N.B. If mini-HT is in use, then this cut applies to coarse-HT.
      #MaxStubsInCell       = cms.uint32(99999), # Setting this to anything more than 99 disables this option
      MaxStubsInCell          = cms.uint32(32),    # set it equal to value used in hardware.
-     MaxStubsInCellMiniHough = cms.uint32(16),    # NOT YET ENABLED IN SOFTWARE. Same type of cut for mini-HT (if in use)
+     MaxStubsInCellMiniHough = cms.uint32(16),    # Same type of cut for mini-HT (if in use)
      # If BusySectorKill = True, and more than BusySectorNumStubs stubs are assigned to tracks by an r-phi HT array, then the excess tracks are killed, with lowest Pt ones killed first. This is because HT hardware has finite readout time.
      BusySectorKill       = cms.bool(True),
      BusySectorNumStubs   = cms.uint32(144),

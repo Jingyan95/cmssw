@@ -11,10 +11,10 @@ import os
 
 process = cms.Process("Demo")
 
-process.load('Configuration.Geometry.GeometryExtended2023D17Reco_cff')
-process.load('Configuration.Geometry.GeometryExtended2023D17_cff')
-#process.load('Configuration.Geometry.GeometryExtended2023D21Reco_cff')
-#process.load('Configuration.Geometry.GeometryExtended2023D21_cff')
+#process.load('Configuration.Geometry.GeometryExtended2023D17Reco_cff')
+#process.load('Configuration.Geometry.GeometryExtended2023D17_cff')
+process.load('Configuration.Geometry.GeometryExtended2023D21Reco_cff')
+process.load('Configuration.Geometry.GeometryExtended2023D21_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -25,13 +25,13 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 options = VarParsing.VarParsing ('analysis')
 
 #--- Specify input MC
-
-options.register('inputMC', 'L1Trigger/TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/PU200.txt',
-#options.register('inputMC', 'L1Trigger/TrackFindingTMTT/test/MCsamples/1020/RelVal/TTbar/PU200_D17.txt',
-#options.register('inputMC', 'L1Trigger/TrackFindingTMTT/test/MCsamples/1020/RelVal/TTbar/PU200_D21.txt',
+# D17 geom
+#options.register('inputMC', 'L1Trigger/TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/PU200.txt',
+# D21 geom
+options.register('inputMC', 'L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt',
 
 # Fastest to use a local copy ...
-#options.register('inputMC', 'L1Trigger/TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/localRAL/PU200.txt', 
+#options.register('inputMC', 'L1Trigger/TrackFindingTMTT//test/MCsamples/1040/RelVal/TTbar/localRAL/PU200.txt', 
 
 VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "Files to be processed")
 
@@ -190,11 +190,9 @@ if options.outputDataset == 1:
           dataTier = cms.untracked.string('GEN-SIM')
       )
   )
-  # Include TMTT L1 tracks, optionally excluding the debug ones only reconstructed by HT.
-  process.writeDataset.outputCommands.append('keep  *_TMTrackProducer_TML1Tracks*_*')
-  process.writeDataset.outputCommands.append('drop  *_TMTrackProducer_TML1TracksHT_*')
-  # Include TMTT L1 track to truth associators.
-  process.pd = cms.EndPath(process.writeDataset)
-  process.writeDataset.outputCommands.append('keep  *_TTAssociator*_TML1Tracks*_*')
+  # Include TMTT L1 tracks & associators + stubs.
+  process.writeDataset.outputCommands.append('keep  *TTTrack*_*_*_*')
+  process.writeDataset.outputCommands.append('keep  *TTStub*_*_*_*')
 
+  process.pd = cms.EndPath(process.writeDataset)
   process.schedule = cms.Schedule(process.p, process.pa, process.pd)
