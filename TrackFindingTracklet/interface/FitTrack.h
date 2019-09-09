@@ -1190,7 +1190,7 @@ class FitTrack:public ProcessBase{
 
     std::vector<std::pair<Stub*,L1TStub*>> trackstublist;
     std::vector<std::pair<int,int>> stubidslist;
-    if (nMatchesUniq>=2) {
+    if ((bestTracklet->getISeed()>=8 && nMatchesUniq>=1)||nMatchesUniq>=2) { //For seeds index >=8 (triplet seeds), there are three stubs associated from start.
       countFit++;
       if (fakefit) {
         trackFitFake(bestTracklet);
