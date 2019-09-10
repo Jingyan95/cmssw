@@ -18,7 +18,7 @@ GEOMETRY = "D21"
 # (where HYBRID & HYBRID_DISPLACED both run either Tracklet or Hybrid emulation, 
 #  depending on pragma in Constants.h. ).
 L1TRKALGO = 'HYBRID'
- 
+
 # Write output dataset?
 WRITE_DATA = False
 
@@ -80,7 +80,7 @@ elif GEOMETRY == "D21": # Tilted barrel T6 tracker
   #inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/DisplacedSingleMuPt2to100/PU0.txt')
 
 elif GEOMETRY == "D41":
-    inputMC = ['/store/relval/CMSSW_10_6_0_pre4/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU25ns_106X_upgrade2023_realistic_v2_2023D41PU200-v1/10000/FEA5D564-937A-8D4B-9C9A-696EFC05AB58.root']
+    inputMC = ['/store/mc/PhaseIITDRSpring19DR/TTbar_14TeV_TuneCP5_Pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3_ext1-v3/60000/FFB5D0CA-208F-6040-A9BF-3F5354D0AA59.root']
 
 elif GEOMETRY == "TkOnly":
     inputMC = ['file:/afs/cern.ch/work/s/skinnari/public/L1TK_90X/MuMinus_1to10_TkOnly.root']
@@ -98,7 +98,6 @@ process.source = cms.Source("PoolSource",
                             )
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string('TTbar_PU200_hybrid.root'), closeFileFast = cms.untracked.bool(True))
-
 
 
 ############################################################
@@ -145,7 +144,7 @@ elif (L1TRKALGO == 'HYBRID_FLOAT'):
     L1TRK_PROC.EnableHistos  = cms.bool(False)
 elif (L1TRKALGO == 'TRACKLET_FLOAT'):
     process.load("L1Trigger.TrackFindingTracklet.L1TrackletTracks_cff")
-    L1TRK_PROC  =  process.HybridTrackProducer.TTTracksFromTracklet
+    L1TRK_PROC  =  process.TTTracksFromTracklet
     L1TRK_NAME  = "TTTracksFromTracklet"
     L1TRK_LABEL = "Level1TTTracks"
 else:

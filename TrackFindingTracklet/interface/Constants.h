@@ -25,8 +25,8 @@ static const std::string geomext=hourglassExtended?"hourglassExtended":"hourglas
 
 static const bool geomTDR=true; // false => newest T14 tracker, true => "TDR" (T5/T6 tracker, D21/D11/D17 CMS geometries)
 
-static const double cSpeed=2.99792458e10; // Speed of light (cm/s)
-static double bField=3.81120228767395;    // Assumed B-field
+//static const double cSpeed=2.99792458e10; // Speed of light (cm/s) => these are currently not used, comment out
+//static double bField=3.81120228767395;    // Assumed B-field
 
 static const int TMUX = 6;
 
