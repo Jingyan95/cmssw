@@ -179,6 +179,7 @@ class FitTrack:public ProcessBase{
 
     // Get seed stubs first
     trackstublist.push_back(std::make_pair(tracklet->innerFPGAStub(), tracklet->innerStub()));
+    if(tracklet->getISeed()>=8) trackstublist.push_back(std::make_pair(tracklet->middleFPGAStub(), tracklet->middleStub()));
     trackstublist.push_back(std::make_pair(tracklet->outerFPGAStub(), tracklet->outerStub()));
 
     // Now get ALL matches (can have multiple per layer)
