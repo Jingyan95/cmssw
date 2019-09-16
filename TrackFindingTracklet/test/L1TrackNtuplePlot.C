@@ -524,10 +524,14 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   TH1F* h_tp_phi   = new TH1F("tp_phi",  ";Tracking particle #phi [rad]; Tracking particles / 0.1",       64, -3.2,   3.2);
   TH1F* h_tp_d0    = new TH1F("tp_d0",   ";Tracking particle d_{0} [cm]; Tracking particles / 0.01 cm",50, -maxD0plot, maxD0plot);
   TH1F* h_tp_absd0 = new TH1F("tp_absd0",";Tracking particle |d_{0}| [cm]; Tracking particles / 0.04 cm",50, 0, maxD0plot);
+  TH1F* h_tp_absd0_eta2 = new TH1F("tp_absd0_eta2",";Tracking particle |d_{0}| [cm]; Tracking particles / 0.04 cm",50, 0, maxD0plot);
+  TH1F* h_tp_absd0_eta2_pt3 = new TH1F("tp_absd0_eta2_pt3",";Tracking particle |d_{0}| [cm]; Tracking particles / 0.04 cm",50, 0, maxD0plot);
 
   TH1F* h_match_tp_phi   = new TH1F("match_tp_phi",  ";Tracking particle #phi [rad]; Tracking particles / 0.1",       64, -3.2,   3.2);
   TH1F* h_match_tp_d0    = new TH1F("match_tp_d0",   ";Tracking particle d_{0} [cm]; Tracking particles / 0.01 cm",50, -maxD0plot, maxD0plot);
   TH1F* h_match_tp_absd0 = new TH1F("match_tp_absd0",";Tracking particle d_{0} [cm]; Tracking particles / 0.04 cm",50, 0, maxD0plot);
+  TH1F* h_match_tp_absd0_eta2 = new TH1F("match_tp_absd0_eta2",";Tracking particle d_{0} [cm]; Tracking particles / 0.04 cm",50, 0, maxD0plot);
+  TH1F* h_match_tp_absd0_eta2_pt3 = new TH1F("match_tp_absd0_eta2_pt3",";Tracking particle d_{0} [cm]; Tracking particles / 0.04 cm",50, 0, maxD0plot);
 
   TH1F* h_match_trk_nstub   = new TH1F("match_trk_nstub",   ";Number of stubs; L1 tracks / 1.0", 15, 0, 15);
   TH1F* h_match_trk_nstub_C = new TH1F("match_trk_nstub_C", ";Number of stubs; L1 tracks / 1.0", 15, 0, 15);
@@ -891,6 +895,8 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
 	h_tp_z0->Fill(tp_z0->at(it));
 	h_tp_d0->Fill(tp_d0->at(it));
 	h_tp_absd0->Fill(fabs(tp_d0->at(it)));
+	if (fabs(tp_eta->at(it)) < 2.0) h_tp_absd0_eta2->Fill(fabs(tp_d0->at(it)));
+	if (fabs(tp_eta->at(it)) < 2.0 && tp_pt->at(it)>3.0) h_tp_absd0_eta2_pt3->Fill(fabs(tp_d0->at(it)));
 	
 	if (tp_pt->at(it) < 3.0) h_tp_eta_23->Fill(tp_eta->at(it));
 	else if (tp_pt->at(it) < 5.0) h_tp_eta_35->Fill(tp_eta->at(it));
@@ -1006,6 +1012,8 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
 	h_match_tp_z0->Fill(tp_z0->at(it));
 	h_match_tp_d0->Fill(tp_d0->at(it));
 	h_match_tp_absd0->Fill(fabs(tp_d0->at(it)));
+	if (fabs(tp_eta->at(it)) < 2.0) h_match_tp_absd0_eta2->Fill(fabs(tp_d0->at(it)));
+	if (fabs(tp_eta->at(it)) < 2.0 && tp_pt->at(it) > 3.0) h_match_tp_absd0_eta2_pt3->Fill(fabs(tp_d0->at(it)));
 	
 	if (fabs(tp_eta->at(it)) < 1.0) n_match_eta1p0++;
 	else if (fabs(tp_eta->at(it)) < 1.75) n_match_eta1p75++;
@@ -2352,6 +2360,20 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   h_eff_absd0->GetYaxis()->SetTitle("Efficiency");
   h_eff_absd0->Divide(h_match_tp_absd0, h_tp_absd0, 1.0, 1.0, "B");
 
+  h_match_tp_absd0_eta2->Sumw2();
+  h_tp_absd0_eta2->Sumw2();
+  TH1F* h_eff_absd0_eta2 = (TH1F*) h_match_tp_absd0_eta2->Clone();
+  h_eff_absd0_eta2->SetName("eff_absd0_eta2");
+  h_eff_absd0_eta2->GetYaxis()->SetTitle("Efficiency");
+  h_eff_absd0_eta2->Divide(h_match_tp_absd0_eta2, h_tp_absd0_eta2, 1.0, 1.0, "B");
+
+  h_match_tp_absd0_eta2_pt3->Sumw2();
+  h_tp_absd0_eta2_pt3->Sumw2();
+  TH1F* h_eff_absd0_eta2_pt3 = (TH1F*) h_match_tp_absd0_eta2_pt3->Clone();
+  h_eff_absd0_eta2_pt3->SetName("eff_absd0_eta2_pt3");
+  h_eff_absd0_eta2_pt3->GetYaxis()->SetTitle("Efficiency");
+  h_eff_absd0_eta2_pt3->Divide(h_match_tp_absd0_eta2_pt3, h_tp_absd0_eta2_pt3, 1.0, 1.0, "B");
+
 
   // set the axis range
   h_eff_pt  ->SetAxisRange(0,1.1,"Y");
@@ -2370,6 +2392,8 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   h_eff_z0_H  ->SetAxisRange(0,1.1,"Y");
   h_eff_d0  ->SetAxisRange(0,1.1,"Y");
   h_eff_absd0  ->SetAxisRange(0,1.1,"Y");
+  h_eff_absd0_eta2  ->SetAxisRange(0,1.1,"Y");
+  h_eff_absd0_eta2_pt3  ->SetAxisRange(0,1.1,"Y");
 
 
   gPad->SetGridx();
@@ -2425,21 +2449,22 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   mySmallText(0.45,0.5,1,ctxt);
   c.SaveAs(DIR+type+"_eff_eta_H.pdf");
   
+  h_eff_eta_23->Write();
+  h_eff_eta_35->Write();
+  h_eff_eta_5->Write();
+
   if (doDetailedPlots) {
     h_eff_eta_23->Draw();
-    h_eff_eta_23->Write();
     sprintf(ctxt,"2 < p_{T} < 3 GeV");
     mySmallText(0.45,0.5,1,ctxt);
     c.SaveAs(DIR+type+"_eff_eta_23.pdf");
     
     h_eff_eta_35->Draw();
-    h_eff_eta_35->Write();
     sprintf(ctxt,"3 < p_{T} < 5 GeV");
     mySmallText(0.45,0.5,1,ctxt);
     c.SaveAs(DIR+type+"_eff_eta_35.pdf");
     
     h_eff_eta_5->Draw();
-    h_eff_eta_5->Write();
     sprintf(ctxt,"p_{T} > 5 GeV");
     mySmallText(0.45,0.5,1,ctxt);
     c.SaveAs(DIR+type+"_eff_eta_5.pdf");
@@ -2459,14 +2484,25 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
       h_eff_phi->GetYaxis()->SetRangeUser(0.8,1.01); // zoomed-in plot
       c.SaveAs(DIR+type+"_eff_phi_zoom.pdf");
     }
+  }
+
+  if (doDetailedPlots || TP_maxD0 > 1.0) {
+    h_eff_d0->Write();
+    h_eff_absd0->Write();
+    h_eff_absd0_eta2->Write();
+    h_eff_absd0_eta2_pt3->Write();
 
     h_eff_d0->Draw();
-    h_eff_d0->Write();
     c.SaveAs(DIR+type+"_eff_d0.pdf");
     
     h_eff_absd0->Draw();
-    h_eff_absd0->Write();
     c.SaveAs(DIR+type+"_eff_absd0.pdf");
+
+    h_eff_absd0_eta2->Draw();
+    c.SaveAs(DIR+type+"_eff_absd0_eta2.pdf");
+
+    h_eff_absd0_eta2_pt3->Draw();
+    c.SaveAs(DIR+type+"_eff_absd0_eta2_pt3.pdf");
   }
 
   gPad->SetGridx(0);
