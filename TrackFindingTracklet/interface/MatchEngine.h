@@ -41,7 +41,7 @@ public:
 	double z=0+iz*15;
 	for(unsigned int irinv=0;irinv<32;irinv++){
 	  double rinv=(irinv-15.5)*(1<<(nbitsrinv-5))*krinvpars;
-	  double projbend=bend_tilt_corr_ME(z,layer_,rinv);
+	  double projbend=bendBarrel_ME(z,layer_,rinv);
 	  for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
 	    double stubbend=Stub::benddecode(ibend,layer_<=3);
 	    bool pass=fabs(stubbend-projbend)<bendcutbarrelME;
@@ -343,7 +343,7 @@ public:
   }
 
 
-  double bend_tilt_corr_ME(double z, int layer, double rinv) {
+  double bendBarrel_ME(double z, int layer, double rinv) {
 
     double dr= 0.18 ;
     double CF=1;

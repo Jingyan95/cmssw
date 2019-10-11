@@ -558,8 +558,8 @@ public:
 	      for(int i2=0;i2<2;i2++) {
 		double zouter= zinner*router/rinner;
 		double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
-		double abendinner=bend_tilt_corr_TE(zinner,layer1_,rinv1); 
-		double abendouter=bend_tilt_corr_TE(zouter,layer2_,rinv1);
+		double abendinner=bendBarrel_TE(zinner,layer1_,rinv1); 
+		double abendouter=bendBarrel_TE(zouter,layer2_,rinv1);
 		if (abendinner<bendinnermin) bendinnermin=abendinner;
 		if (abendinner>bendinnermax) bendinnermax=abendinner;
 		if (abendouter<bendoutermin) bendoutermin=abendouter;
@@ -752,7 +752,7 @@ public:
 		  double zouter=zmean[disk2_-1];
 		  double router=zouter*rinner/zinner;
 		  double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
-		  double abendinner=bend_tilt_corr_TE(zinner,layer1_,rinv1);
+		  double abendinner=bendBarrel_TE(zinner,layer1_,rinv1);
 		  double abendouter=bendDisk_TE(router,disk2_,rinv1);
 		  if (abendinner<bendinnermin) bendinnermin=abendinner;
 		  if (abendinner>bendinnermax) bendinnermax=abendinner;
@@ -829,7 +829,7 @@ public:
   }
 
 
-  double bend_tilt_corr_TE(double z, int layer, double rinv) {
+  double bendBarrel_TE(double z, int layer, double rinv) {
 
     double dr= 0.18;
     double CF= 1;

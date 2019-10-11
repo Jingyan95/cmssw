@@ -259,7 +259,7 @@ public:
   }
 
 
-  double bendDisk(double r, int disk, double rinv) {
+  double bendDisk_PR(double r, int disk, double rinv) {
     
     double dr=0.18;
     double z = zmean[disk - 1];
@@ -314,7 +314,7 @@ public:
 	  
 	      double rinv=-phider*(2.0*t);
 
-	      double bendproj=0.5*bendDisk(rproj,disk,rinv);
+	      double bendproj=0.5*bendDisk_PR(rproj,disk,rinv);
 
 	    
 	      int ibendproj=2.0*bendproj+15.5;
