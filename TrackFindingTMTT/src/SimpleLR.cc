@@ -9,6 +9,7 @@
 
 #include "DataFormats/Math/interface/deltaPhi.h"
 #include <vector>
+#include <set>
 #include <algorithm>
 #include <limits>
 
@@ -429,7 +430,8 @@ L1fittedTrack SimpleLR::fit( const L1track3D& l1track3D) {
   
 
   // Create the L1fittedTrack object
-  L1fittedTrack fitTrk(settings_, l1track3D, fitStubs,
+  const unsigned int hitPattern = 0; // FIX: Needs setting
+  L1fittedTrack fitTrk(settings_, l1track3D, fitStubs, hitPattern,
                 qOverPt, 0., phi0, z0, tanLambda,
                 chi2, 4, accepted);
 

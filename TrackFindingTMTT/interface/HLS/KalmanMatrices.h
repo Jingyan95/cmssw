@@ -7,20 +7,20 @@
  * Author: Ian Tomalin
  */
  
-#ifndef __KalmanMatricesHLS__
-#define __KalmanMatricesHLS__
+#ifndef __KalmanMatrices__
+#define __KalmanMatrices__
 
-// Defines StateHLS & KFstateHLS. Also defines finite bit integers & floats.
+// Defines StateHLS & KFstate. Also defines finite bit integers & floats.
 #ifdef CMSSW_GIT_HASH
 #include "L1Trigger/TrackFindingTMTT/interface/HLS/HLSutilities.h"
-#include "L1Trigger/TrackFindingTMTT/interface/HLS/StubHLS.h"
-#include "L1Trigger/TrackFindingTMTT/interface/HLS/KFstateHLS.h"
-#include "L1Trigger/TrackFindingTMTT/interface/HLS/HLSconstants.h"
+#include "L1Trigger/TrackFindingTMTT/interface/HLS/KFstub.h"
+#include "L1Trigger/TrackFindingTMTT/interface/HLS/KFstate.h"
+#include "L1Trigger/TrackFindingTMTT/interface/HLS/KFconstants.h"
 #else
 #include "HLSutilities.h"
-#include "StubHLS.h"
-#include "KFstateHLS.h"
-#include "HLSconstants.h"
+#include "KFstub.h"
+#include "KFstate.h"
+#include "KFconstants.h"
 #endif
  
 #ifdef CMSSW_GIT_HASH
@@ -54,13 +54,14 @@ enum BIT_ADJUST_PLAY {BODGE_V=5, BODGE_CHI2=12};
 template<>
 class BODGE<4> {
 public:
-  enum BIT_ADJUST {V=BODGE_V, S=2+1, R=5-S, IR=10+R+S, DET=15-2*R-2*S, K=23-IR+R, RES=2, CHI2=BODGE_CHI2};
+  //  enum BIT_ADJUST {V=BODGE_V, S=2, R=5-S, IR=10+R+S, DET=13-2*R-2*S, K=23-IR+R, RES=2, CHI2=BODGE_CHI2};
+  enum BIT_ADJUST {V=BODGE_V, S=2, R=5-S, IR=10+R+S, DET=12-2*R-2*S, K=23-IR+R, RES=1, CHI2=BODGE_CHI2};
 };
 
 template<>
 class BODGE<5> {
 public:
-  enum BIT_ADJUST {V=BODGE_V, S=2+2, R=5-S+2, IR=10+R+S-3, DET=15-2*R-2*S+2, K=23-IR+R-2, RES=2, CHI2=BODGE_CHI2};
+  enum BIT_ADJUST {V=BODGE_V, S=2, R=4-S, IR=7+R+S, DET=13-2*R-2*S, K=21-IR+R, RES=1, CHI2=BODGE_CHI2};
 };
 
 // Allow some bits for correlation in helix params between r-phi and r-z planes.
@@ -70,17 +71,17 @@ enum RZ_PHI_CORR {BCORR=1}; // Set this to 1, so this correlation is almost negl
 
 class VectorM {
 public:
-  typedef AP_FIXED(BSP+1,BSP) TMP;
-  typedef AP_FIXED(BSZ1+1,BSZ) TMZ;
+  typedef ap_fixed<1+KFstubN::BPHI,KFstubN::BPHI> TMP;
+  typedef ap_fixed<1+KFstubN::BZ,KFstubN::BZ1> TMZ;
 
-  VectorM(const StubHLS::TP& phiS, const StubHLS::TZ& z) : _0(phiS), _1(z) {
+  VectorM(const KFstubN::TPHI& phiS, const KFstubN::TZ& z) : _0(phiS), _1(z) {
     // Compensate for stubs being rounded down when digitized, by adding extra LSB to coords set to '1'.
     _0[0] = 1;
     _1[0] = 1;
   } 
 public:
-  //  StubHLS::TP _0;
-  //  StubHLS::TZ _1;  
+  //  KFstubN::TPHI _0;
+  //  KFstubN::TZ   _1;  
   TMP _0;
   TMZ _1;  
 };
@@ -92,16 +93,16 @@ public:
   // Use same granularity for resolution as for residuals.
 
   // But with integer range reduced by BODGE_V, as hit resolution much smaller than max. stub coordinate.
-  enum {BVP=BSP-BODGE_V, BVZ=BSZ-BODGE_V, BVPP=2*BVP, BVZZ=2*BVZ};
-  typedef AP_UFIXED(B34,BVPP) TVPP;
-  typedef AP_UFIXED(B34,BVZZ) TVZZ;
-  typedef AP_UFIXED(1,1)       TV0;
+  enum {BVP=KFstubN::BPHI-BODGE_V, BVZ=KFstubN::BZ1-BODGE_V, BVPP=2*BVP, BVZZ=2*BVZ};
+  typedef ap_ufixed<B34,BVPP> TVPP;
+  typedef ap_ufixed<B34,BVZZ> TVZZ;
+  typedef ap_ufixed<1,1>       TV0;
 
   enum {BM=12}; // Used for pitch. May need increasing if larger r or phi multipliers used.
-  typedef AP_UFIXED(B17,BM) TM;
+  typedef ap_ufixed<B17,BM> TM;
 
 public:
-  MatrixV(const StubHLS::TR& r, const StubHLS::TZ& z, const KFstateHLS<5>::TR& inv2R, const KFstateHLS<5>::TT& tanL, const AP_INT(BHT_M)& mBin);
+  MatrixV(const KFstubN::TR& r, const KFstubN::TZ& z, const KFstateN::TR& inv2R, const KFstateN::TT& tanL, const KFstateN::TM& mBin);
 
 public:
   TVPP _00;
@@ -118,9 +119,9 @@ public:
 class PitchOverR_2 {
 public:
   enum {BRED = 4}; // To save ROM resources, reduce granularity in r by this number of bits. 
-  enum {MAXN = 1 << (BSR - BRED)}; // pow(2,BSR) // Max. value of [r / pow(2,BRED)].
+  enum {MAXN = 1 << (KFstubN::BR - BRED)}; // pow(2,BR) // Max. value of [r / pow(2,BRED)].
   // Number of bits chosen based on CalcCheck job summary.
-  typedef AP_UFIXED(12,5)   TPOR;
+  typedef ap_ufixed<12,5>   TPOR;
 public:
 
   PitchOverR_2(const MatrixV::TM& pitch) {
@@ -137,14 +138,14 @@ public:
 
 class InvPt2 {
 public:
-  InvPt2(const AP_UINT(1)& iOpt = 0, float scaleFactor = 1.) {
+  InvPt2(const ap_uint<1>& iOpt = 0, float scaleFactor = 1.) {
     float theConst;
     if (iOpt == 0) {
       // Used to estimate increase in phi stub error due to scattering.
       theConst = kalmanMultScatTerm*phiMult;
     } else {
       // Used to estimate increase in phi stub error due to conversion from (r,phi) to (z,phi) in endcap.
-      theConst = 0.5*invPtToInvR*scaleFactor*inv2R_Mult;
+      theConst = invPtToInv2R*scaleFactor*inv2R_Mult;
     }
     for (int m = minPtBin; m <= maxPtBin; m++) { 
       // Estimate Pt from Hough m-bin cell.
@@ -153,7 +154,7 @@ public:
     }
   }
 
-  const MatrixV::TVPP& getIt(const AP_INT(BHT_M)& m) const {return this->get[m - minPtBin];} 
+  const MatrixV::TVPP& getIt(const KFstateN::TM& m) const {return this->get[m - minPtBin];} 
 
 public:
   MatrixV::TVPP get[numPtBins];
@@ -167,7 +168,7 @@ public:
   enum {BDET=9}; // Number of significant bits used to calculate 1/determinant. Keep small to save resources.
   enum {MINN = (1 << (BDET - 1)), MAXN = (1 << BDET)}; // pow(2,BSR) // Min & max. value of r
   enum {BOI=2-BDET}; // Large enough to contain reciprocal.
-  typedef SW_UFIXED(BDET,BOI)   TOI;
+  typedef ap_ufixed<BDET,BOI>   TOI;
 public:
   OneOverInt() {
     for (unsigned int n = MINN; n < MAXN; n++) { // Don't bother initializing first two, as would overflow bit range.
@@ -175,7 +176,7 @@ public:
     }
   }
 
-  const TOI& getIt(const AP_UINT(BDET)& i) const {return get[i - MINN];}
+  const TOI& getIt(const ap_uint<BDET>& i) const {return get[i - MINN];}
 
 private:
   TOI get[MAXN - MINN + 1];
@@ -191,14 +192,14 @@ public:
   enum {BIR00=B34 - MatrixR<NPAR>::BR00 - BODGE<NPAR>::IR,
         BIR11=B34 - MatrixR<NPAR>::BR11 - BODGE<NPAR>::IR,
         BIR01=0};   // correlation between r-phi & r-z planes not used.
-  typedef SW_UFIXED(B34,   BIR00)  TRI00;
-  typedef SW_UFIXED(B34,   BIR11)  TRI11;
-  typedef SW_UFIXED(BCORR, BIR01)  TRI01;
+  typedef ap_ufixed<B34,   BIR00>  TRI00;
+  typedef ap_ufixed<B34,   BIR11>  TRI11;
+  typedef ap_ufixed<BCORR, BIR01>  TRI01;
 
   // Additional types used to cast this matrix to a lower precision one for use in chi2 calculation.
-  typedef SW_UFIXED(B26,   BIR00) TRI00_short;
-  typedef SW_UFIXED(B26,   BIR11) TRI11_short;
-  typedef SW_UFIXED(BCORR, BIR01) TRI01_short;
+  typedef ap_ufixed<B26,   BIR00> TRI00_short;
+  typedef ap_ufixed<B26,   BIR11> TRI11_short;
+  typedef ap_ufixed<BCORR, BIR01> TRI01_short;
 
   enum {BDET=OneOverInt::BDET}; // Number of significant bits used to calculate 1/determinant. Keep small to save resources.
 
@@ -214,7 +215,7 @@ public:
 };
 
 // Since chi2 can be large, use more bits for internal calculation than for external number.
-typedef AP_UFIXED(B17+BODGE_CHI2,BCHI+BODGE_CHI2) TCHI_INT;
+typedef ap_ufixed<B17+BODGE_CHI2,KFstateN::BCHI+BODGE_CHI2> TCHI_INT;
 
 #ifdef CMSSW_GIT_HASH
 }

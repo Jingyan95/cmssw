@@ -40,9 +40,8 @@ TMTrackProducer_params = cms.PSet(
   #=== Cuts applied to stubs before arriving in L1 track finding board.
 
   StubCuts = cms.PSet(
-     # Reduce number of bits used by front-end chips to store stub bend info? 
-     # = 0 (no); = 1 (yes using official recipe); = 2 (yes using TMTT method)
-     DegradeBendRes = cms.uint32(2),
+     # Reduce number of bits used by front-end chips to store stub bend info. (CMS is considering this option proposed by Seb. Viret).
+     BendResReduced = cms.bool(True),
      # Don't use stubs with eta beyond this cut, since the tracker geometry makes it impossible to reconstruct tracks with them.
      MaxStubEta     = cms.double(2.4),
      # Don't use stubs whose measured Pt from bend info is significantly below HTArraySpec.HoughMinPt, where "significantly" means allowing for resolution in q/Pt derived from stub bend resolution specified below.
@@ -50,12 +49,12 @@ TMTrackProducer_params = cms.PSet(
      # Print stub windows corresponding to KillLowPtStubs, in python cfg format used by CMSSW.
      PrintStubWindows = cms.bool(False),
      # Bend resolution assumed by bend filter in units of strip pitch. Also used when assigning stubs to sectors if EtaPhiSectors.CalcPhiTrkRes=True. And by the bend filter if HTFillingRphi.UseBendFilter=True.
-     # Suggested value: 1.19 if DegradeBendRes = 0, or 1.249 if it is > 0.
+     # Suggested value: 1.19 if BendResReduced = false, or 1.249 if it is true.
      # N.B. Avoid 1/4-integer values due to rounding error issues.
      BendResolution = cms.double(1.249),
      # Additional contribution to bend resolution from its encoding into a reduced number of bits.
      # This number is the assumed resolution relative to the naive guess of its value.
-     # It is ignored in DegradeBendRes = 0.
+     # It is ignored in BendResReduced = False.
      BendResolutionExtra = cms.double(0.0),
      # Order stubs by bend in DTC, such that highest Pt stubs are transmitted first.
      OrderStubsByBend = cms.bool(True)
@@ -65,7 +64,6 @@ TMTrackProducer_params = cms.PSet(
 
   StubDigitize = cms.PSet(
      EnableDigitize  = cms.bool(True),  # Digitize stub coords? If not, use floating point coords.
-     FirmwareType    = cms.uint32(1),    # 0 = Old Thomas 2-cbin data format, 1 = new Thomas data format used for daisy chain, 2-98 = reserved for demonstrator daisy chain use, 99 = Systolic array data format.
      #
      #--- Parameters available in MP board.
      #
@@ -73,19 +71,14 @@ TMTrackProducer_params = cms.PSet(
      PhiSBits        = cms.uint32(14),   # Bits used to store phiS coord. (13 enough?)
      PhiSRange       = cms.double(0.698131700),  # Range phiS coord. covers in radians.
      RtBits          = cms.uint32(12),   # Bits used to store Rt coord.
-     RtRange         = cms.double(103.1103), # Range Rt coord. covers in units of cm.
+      RtRange        = cms.double(91.652837), # Range Rt coord. covers in units of cm.
      ZBits           = cms.uint32(14),   # Bits used to store z coord.
-     ZRange          = cms.double(824.883), # Range z coord. covers in units of cm.
-     # The following four parameters do not need to be specified if FirmwareType = 1 (i.e., daisy-chain firmware) 
-     DPhiBits        = cms.untracked.uint32(8),    # Bits used to store Delta(phi) track angle.
-     DPhiRange       = cms.untracked.double(1.),   # Range Delta(phi) covers in radians.
-     RhoBits         = cms.untracked.uint32(6),    # Bits used to store rho parameter.
-     RhoRange        = cms.untracked.double(0.25), # Range rho parameter covers.
+      ZRange          = cms.double(733.2227), # Range z coord. covers in units of cm.
      #
      #--- Parameters available in GP board (excluding any in common with MP specified above).
      #
      PhiOBits        = cms.uint32(15),      # Bits used to store PhiO parameter.
-     PhiORange       = cms.double(1.396263400), # Range PhiO parameter covers.
+     PhiORange      = cms.double(1.3962634), # Range PhiO parameter covers.
      BendBits        = cms.uint32(6)        # Bits used to store stub bend.
   ),
 
@@ -104,7 +97,7 @@ TMTrackProducer_params = cms.PSet(
   PhiSectors = cms.PSet(
      NumPhiNonants      = cms.uint32(9),    # Divisions of Tracker at DTC
      NumPhiSectors      = cms.uint32(18),   # Divisions of Tracker at GP.
-     ChosenRofPhi       = cms.double(61.273), # Use phi of track at this radius for assignment of stubs to phi sectors & also for one of the axes of the r-phi HT. If ChosenRofPhi=0, then use track phi0. - Should be an integer multiple of the stub r digitisation granularity.
+     ChosenRofPhi       = cms.double(67.240), # Use phi of track at this radius for assignment of stubs to phi sectors & also for one of the axes of the r-phi HT. If ChosenRofPhi=0, then use track phi0. - Should be an integer multiple of the stub r digitisation granularity.
      #--- You can set one or both the following parameters to True.
      UseStubPhi         = cms.bool(True),  # Require stub phi to be consistent with track of Pt > HTArraySpec.HoughMinPt that crosses HT phi axis?
      UseStubPhiTrk      = cms.bool(True),  # Require stub phi0 (or phi65 etc.) as estimated from stub bend, to lie within HT phi axis, allowing tolerance(s) specified below?
@@ -116,8 +109,10 @@ TMTrackProducer_params = cms.PSet(
   #=== Division of Tracker into eta sectors
 
   EtaSectors = cms.PSet(
-     EtaRegions = cms.vdouble(-2.4,-2.16,-1.95,-1.7,-1.43,-1.16,-0.89,-0.61,-0.31,0.0,0.31,0.61,0.89,1.16,1.43,1.7,1.95,2.16,2.4), # Eta boundaries.
-     #EtaRegions = cms.vdouble(-2.40, -2.03, -1.66, -1.31, -1.01, -0.77, -0.57, -0.38, -0.19, 0.0, 0.19, 0.38, 0.57, 0.77, 1.01, 1.31, 1.66, 2.03, 2.40), # Alternative, that reduces GP output truncation, at cost of 10% increase in HT output tracks.
+# Eta boundaries for 18 eta regions
+#     EtaRegions = cms.vdouble(-2.4,-2.16,-1.95,-1.7,-1.43,-1.16,-0.89,-0.61,-0.31,0.0,0.31,0.61,0.89,1.16,1.43,1.7,1.95,2.16,2.4), 
+# Eta boundaries for 16 eta regions
+     EtaRegions = cms.vdouble(-2.4,-2.08,-1.68,-1.26,-0.90,-0.62,-0.41,-0.20,0.0,0.20,0.41,0.62,0.90,1.26,1.68,2.08,2.4), 
      ChosenRofZ  = cms.double(50.),        # Use z of track at this radius for assignment of tracks to eta sectors & also for one of the axes of the r-z HT. Do not set to zero!
      BeamWindowZ = cms.double(15),         # Half-width of window assumed to contain beam-spot in z.
      HandleStripsEtaSec = cms.bool(False), # If True, adjust algorithm to allow for uncertainty in stub (r,z) coordinate caused by length of 2S module strips when assigning stubs to eta sectors.
@@ -128,10 +123,10 @@ TMTrackProducer_params = cms.PSet(
 
   HTArraySpecRphi = cms.PSet(
      HoughMinPt      = cms.double(3.0), # Min track Pt that Hough Transform must find. Also used by StubCuts.KillLowPtStubs and by EtaPhiSectors.UseStubPhi.
-     #HoughNbinsPt    = cms.uint32(18),  # HT array dimension in track q/Pt. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
+     #HoughNbinsPt    = cms.uint32(16),  # HT array dimension in track q/Pt. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
      #HoughNbinsPhi   = cms.uint32(32),  # HT array dimension in track phi0 (or phi65 or any other track phi angle. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
      # If using Mini-HT, increase these to:
-     HoughNbinsPt    = cms.uint32(36),  # HT array dimension in track q/Pt. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
+     HoughNbinsPt    = cms.uint32(32),  # HT array dimension in track q/Pt. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
      HoughNbinsPhi   = cms.uint32(64),  # HT array dimension in track phi0 (or phi65 or any other track phi angle. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
      HoughNcellsRphi = cms.int32(-1),   # If > 0, then parameters HoughNbinsPt and HoughNbinsPhi will be calculated from the constraints that their product should equal HoughNcellsRphi and their ratio should make the maximum |gradient|" of stub lines in the HT array equal to 1. If <= 0, then HoughNbinsPt and HoughNbinsPhi will be taken from the values configured above.
      EnableMerge2x2  = cms.bool(False), # Groups of neighbouring 2x2 cells in HT will be treated as if they are a single large cell? N.B. You can only enable this option if your HT array has even numbers of bins in both dimensions. And this cfg param ignored if MiniHTstage = True.  HISTORIC OPTION. SUGGEST NOT USING!
@@ -167,34 +162,27 @@ TMTrackProducer_params = cms.PSet(
      MaxStubsInCellMiniHough = cms.uint32(16),    # Same type of cut for mini-HT (if in use)
      # If BusySectorKill = True, and more than BusySectorNumStubs stubs are assigned to tracks by an r-phi HT array, then the excess tracks are killed, with lowest Pt ones killed first. This is because HT hardware has finite readout time.
      BusySectorKill       = cms.bool(True),
-     BusySectorNumStubs   = cms.uint32(144),
+     BusySectorNumStubs   = cms.uint32(162), # Or 144 if only 320 MHz FW.
      # If BusySectorMbinRanges is not empty, then the BusySectorNumStubs cut is instead applied to the subset of tracks appearing in the following m bin (q/Pt) ranges of the HT array. The sum of the entries in the vector should equal the number of m bins in the HT. (N.B. If EnableMerge2x2 or MiniHTstage = True, then the m bin ranges here correspond to the bins before merging. Also in these cases, the odd m-bin numbers don't correspond to HT outputs, so should be all grouped together on a single imaginary link).
      # If BusySectorMbinOrder is not empty, then the m-bins are grouped in the specified order, instead of sequentially.
      # (Histos NumStubsPerLink, NumStubsVsLink & MeanStubsPerLink useful for optimising this option).
      #
-     # Choice for 18x32 coarse HT array with 3 GeV Pt threshold, and no Mini-HT.
-     #BusySectorMbinRanges = cms.vuint32(2,2,2,2,2,2,2,2,2),
-     #BusySectorMbinOrder  = cms.vuint32(0,9, 1,10, 2,11, 3,12, 4,13, 5,14, 6,15, 7,16, 8,17),
-     # Choice for 27x32 coarse HT array with 2 GeV Pt threshold, and no Mini-HT
-     #BusySectorMbinRanges = cms.vuint32(2,2,2,2,2,2,2,2,2,2,2,2,2,1),   
-     #BusySectorMbinOrder  = cms.vuint32(0,14, 1,15, 2,16, 3,17, 4,18, 5,19, 6,20, 7,21, 8,22, 9,23, 10,24, 11,25, 12,26, 13),
-     # Choice for 18x32 coarse HT array followed by 2x2 mini-HT array with 3 GeV Pt threshold.
-     BusySectorMbinRanges  = cms.vuint32(2,2,2,2,2,2,2,2,2, 18),   
-     BusySectorMbinOrder   = cms.vuint32(0,18, 2,20, 4,22, 6,24, 8,26, 10,28, 12,30, 14,32, 16,34, 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35),
-     # Choice for 18x32 coarse HT array followed by 2x2 mini-HT array with 2 GeV Pt threshold.
-     #BusySectorMbinRanges = cms.vuint32(2,2,2,2,2,2,2,2,2,2,2,2,2,1, 27),   
-     #BusySectorMbinOrder  = cms.vuint32(0,28, 2,30, 4,32, 6,34, 8,36, 10,38, 12,40, 14,42, 16,44, 18,46, 20,48, 22,50, 24,52, 26, 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47,49,51,53),
+     # Choice for 16x32 coarse HT array followed by 2x2 mini-HT array with 3 GeV Pt threshold.
+     BusySectorMbinRanges  = cms.vuint32(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 16),   
+     BusySectorMbinOrder   = cms.vuint32(0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30, 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31),
+     # Choice for 24x32 coarse HT array followed by 2x2 mini-HT array with 2 GeV Pt threshold.
+     #BusySectorMbinRanges = cms.vuint32(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 24),   
+     #BusySectorMbinOrder  = cms.vuint32(0,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46, 1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,37,39,41,43,45,47),
      #
      # If BusyInputSectorKill = True, and more than BusyInputSectorNumStubs are input to the HT array from the GP, then
      # the excess stubs are killed. This is because HT hardware has finite readin time.
      # Results unreliable as depend on assumed order of stubs.
      BusyInputSectorKill  = cms.bool(True),
-     BusyInputSectorNumStubs   = cms.uint32(175),  # Naive value is 210.
-     #BusyInputSectorNumStubs   = cms.uint32(120), # Alternative proposal from Tom James for ultra compact firmware.
+     BusyInputSectorNumStubs  = cms.uint32(162),  #  Or 144 if only 320 MHz FW
      # Multiplex the outputs from several HTs onto a single pair of output optical links?
      # Options: 0 = disable Mux; 1 = Dec. 2016 Mux; 2 = Mar 2018 Mux (for transverse HT readout by m-bin). 
-     # (The mux algorithm is hard-wired in class MuxHToutputs, and currently only works if option BusySectorMbinRanges is being used).
-     MuxOutputsHT = cms.uint32(2),
+     # (The mux algorithm is hard-wired in class MuxHToutputs, and currently only works if option BusySectorMbinRanges is being used); 3 = Sept 2019 Mux (transerse HT readout by m-bin), with single m bin in entire nonant going to each link.
+     MuxOutputsHT = cms.uint32(3),
      # If this is non-empty, then only the specified eta sectors are enabled, to study them individually.
      EtaRegWhitelist = cms.vuint32()
   ),
@@ -452,13 +440,13 @@ TMTrackProducer_params = cms.PSet(
     #====== Kalman Filter Digi parameters ========
     KF_skipTrackDigi = cms.bool( False ), # Optionally skip track digitisation if done internally inside fitting code.
     KF_oneOver2rBits = cms.uint32(18),
-    KF_oneOver2rRange = cms.double(0.013541449),
-    KF_d0Bits = cms.uint32(12), # Made up by Ian as never yet discussed.
-    KF_d0Range  = cms.double(10.),
+    KF_oneOver2rRange = cms.double(0.015234263), # q/Pt > 1/1.3 GeV
+    KF_d0Bits = cms.uint32(12),
+    KF_d0Range  = cms.double(31.992876),
     KF_phi0Bits = cms.uint32(18),
     KF_phi0Range = cms.double(1.3962634),  # phi0 is actually only digitised relative to centre of sector.
     KF_z0Bits = cms.uint32(18),
-    KF_z0Range  = cms.double(51.55517),
+    KF_z0Range  = cms.double(45.826419),
     KF_tanlambdaBits = cms.uint32(18),
     KF_tanlambdaRange = cms.double(32.),
     KF_chisquaredBits = cms.uint32(17),

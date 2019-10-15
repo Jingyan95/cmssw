@@ -45,9 +45,8 @@ public:
 
   //=== Cuts applied to stubs before arriving in L1 track finding board.
 
-  // Reduce number of bits used by front-end chips to store stub bend info?
-  // = 0 (no); = 1 (yes using official recipe); = 2 (yes using TMTT method)
-  unsigned int         degradeBendRes()          const   {return degradeBendRes_;}
+  // Reduce number of bits used by front-end chips to store stub bend info.
+  bool                 bendResReduced()          const   {return bendResReduced_;}
   // Don't use stubs with eta beyond this cut, since the tracker geometry makes it impossible to reconstruct tracks with them.
   double               maxStubEta()              const   {return maxStubEta_;}
   // Don't use stubs whose measured Pt from bend info is significantly below HTArraySpec.HoughMinPt, where "significantly" means allowing for resolution in q/Pt derived from stub bend resolution HTFilling.BendResolution
@@ -66,7 +65,6 @@ public:
   //=== Optional stub digitization configuration
 
   bool                 enableDigitize()          const   {return enableDigitize_;}
-  unsigned int         firmwareType()            const   {return firmwareType_;}
   //--- Parameters available in MP board.
   unsigned int         phiSectorBits()           const   {return phiSectorBits_;}
   unsigned int         phiSBits()                const   {return phiSBits_;}
@@ -157,7 +155,8 @@ public:
   bool                 busyInputSectorKill()     const   {return busyInputSectorKill_;}
   unsigned int         busyInputSectorNumStubs() const   {return busyInputSectorNumStubs_;}
   // Multiplex the outputs from several HTs onto a single pair of output optical links?
-  // Options: 0 = disable Mux; 1 = Dec. 2016 Mux; 2 = Mar 2018 Mux (transverse HT readout by m-bin). 
+  // Options: 0 = disable Mux; 1 = Dec. 2016 Mux; 2 = Mar 2018 Mux (transverse HT readout by m-bin); 
+  // 3 = Sept 2019 Mux (transverse HT readout by m-bin) 
   unsigned int         muxOutputsHT()            const   {return muxOutputsHT_;}
   // Is specified eta sector enabled?
   bool                 isHTRPhiEtaRegWhitelisted(unsigned const iEtaReg) const;
@@ -461,7 +460,7 @@ private:
   unsigned int         genMinStubLayers_;
 
   // Cuts applied to stubs before arriving in L1 track finding board.
-  unsigned int         degradeBendRes_;
+  bool                 bendResReduced_;
   double               maxStubEta_;
   bool                 killLowPtStubs_;
   bool                 printStubWindows_;
@@ -471,7 +470,6 @@ private:
 
   // Optional stub digitization.
   bool                 enableDigitize_;
-  unsigned int         firmwareType_;
   unsigned int         phiSectorBits_;
   unsigned int         phiSBits_;
   double               phiSRange_;
@@ -479,10 +477,6 @@ private:
   double               rtRange_;
   unsigned int         zBits_;
   double               zRange_;
-  unsigned int         dPhiBits_;
-  double               dPhiRange_;
-  unsigned int         rhoBits_;
-  double               rhoRange_;
   unsigned int         phiOBits_;
   double               phiORange_;
   unsigned int         bendBits_;

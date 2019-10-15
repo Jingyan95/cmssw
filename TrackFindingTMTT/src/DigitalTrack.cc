@@ -86,6 +86,7 @@ void DigitalTrack::getDigiCfg(const string& fitterName) {
 
 void DigitalTrack::init(const string& fitterName, unsigned int nHelixParams,
 			unsigned int iPhiSec, unsigned int iEtaReg, int mbin, int cbin, int mBinhelix, int cBinhelix, 
+		        unsigned int hitPattern,
 			float qOverPt_orig, float d0_orig, float phi0_orig, float tanLambda_orig, float z0_orig, float chisquared_orig, 
 			float qOverPt_bcon_orig, float phi0_bcon_orig, float chisquared_bcon_orig, // beam-spot constrained values. 
 			unsigned int nLayers, bool consistent, bool accepted, 
@@ -95,6 +96,7 @@ void DigitalTrack::init(const string& fitterName, unsigned int nHelixParams,
   ranInit_ = true; // Note we ran init().
 
   fitterName_     = fitterName;
+  nHelixParams_   = nHelixParams;
 
   // Get digitisation parameters for this particular track fitter.
   this->getDigiCfg(fitterName);
@@ -118,27 +120,28 @@ void DigitalTrack::init(const string& fitterName, unsigned int nHelixParams,
   phi0rel_bcon_orig_   = reco::deltaPhi(phi0_bcon_orig_, phiSectorCentre_);
   chisquared_bcon_orig_= chisquared_bcon_orig;
 
-  nlayers_        = nLayers;
-  iPhiSec_        = iPhiSec;
-  iEtaReg_        = iEtaReg;
-  mBin_           = mbin;
-  cBin_           = cbin;
-  mBinhelix_      = mBinhelix;
-  cBinhelix_      = cBinhelix;
+  nlayers_         = nLayers;
+  iPhiSec_         = iPhiSec;
+  iEtaReg_         = iEtaReg;
+  mBin_            = mbin;
+  cBin_            = cbin;
+  mBinhelix_       = mBinhelix;
+  cBinhelix_       = cBinhelix;
+  hitPattern_      = hitPattern;
 
-  consistent_     = consistent;
-  accepted_       = accepted;
-  tp_tanLambda_   = tp_tanLambda;
-  tp_qoverpt_     = tp_qOverPt;
-  tp_pt_          = 1./(1.0e-6 + fabs(tp_qOverPt));
-  tp_d0_          = tp_d0;
-  tp_eta_         = tp_eta;
-  tp_phi0_        = tp_phi0;
-  tp_z0_          = tp_z0;
-  tp_index_       = tp_index;
-  tp_useForAlgEff_= tp_useForAlgEff;
-  tp_useForEff_   = tp_useForEff;
-  tp_pdgId_       = tp_pdgId;
+  consistent_      = consistent;
+  accepted_        = accepted;
+  tp_tanLambda_    = tp_tanLambda;
+  tp_qoverpt_      = tp_qOverPt;
+  tp_pt_           = 1./(1.0e-6 + fabs(tp_qOverPt));
+  tp_d0_           = tp_d0;
+  tp_eta_          = tp_eta;
+  tp_phi0_         = tp_phi0;
+  tp_z0_           = tp_z0;
+  tp_index_        = tp_index;
+  tp_useForAlgEff_ = tp_useForAlgEff;
+  tp_useForEff_    = tp_useForEff;
+  tp_pdgId_        = tp_pdgId;
 }
 
 //=== Digitize track
@@ -209,7 +212,11 @@ void DigitalTrack::makeDigitalTrack() {
 
     oneOver2r_    = (iDigi_oneOver2r_ + 0.5)/oneOver2rMult_;
     qOverPt_      = oneOver2r_/invPtToDPhi_;
-    d0_           = (iDigi_d0_ + 0.5)/d0Mult_;
+    if (nHelixParams_ == 5) {
+      d0_         = (iDigi_d0_ + 0.5)/d0Mult_;
+    } else {
+      d0_         = 0.;
+    }
     phi0rel_      = (iDigi_phi0rel_ + 0.5)/phi0Mult_;
     phi0_         = reco::deltaPhi(phi0rel_, -phiSectorCentre_);
     tanLambda_    = (iDigi_tanLambda_ + 0.5)/tanLambdaMult_;
@@ -217,11 +224,19 @@ void DigitalTrack::makeDigitalTrack() {
     chisquared_   = (iDigi_chisquared_ + 0.5)/chisquaredMult_;
 
     // Same again with beam-spot constraint.
-    oneOver2r_bcon_    = (iDigi_oneOver2r_bcon_ + 0.5)/oneOver2rMult_;
-    qOverPt_bcon_      = oneOver2r_bcon_/invPtToDPhi_;
-    phi0rel_bcon_      = (iDigi_phi0rel_bcon_ + 0.5)/phi0Mult_;
-    phi0_bcon_         = reco::deltaPhi(phi0rel_bcon_, -phiSectorCentre_);
-    chisquared_bcon_   = (iDigi_chisquared_bcon_ + 0.5)/chisquaredMult_;
+    if (nHelixParams_ == 5) {
+      oneOver2r_bcon_    = (iDigi_oneOver2r_bcon_ + 0.5)/oneOver2rMult_;
+      qOverPt_bcon_      = oneOver2r_bcon_/invPtToDPhi_;
+      phi0rel_bcon_      = (iDigi_phi0rel_bcon_ + 0.5)/phi0Mult_;
+      phi0_bcon_         = reco::deltaPhi(phi0rel_bcon_, -phiSectorCentre_);
+      chisquared_bcon_   = (iDigi_chisquared_bcon_ + 0.5)/chisquaredMult_;
+    } else {
+      oneOver2r_bcon_    = oneOver2r_;
+      qOverPt_bcon_      = qOverPt_;
+      phi0rel_bcon_      = phi0rel_;
+      phi0_bcon_         = phi0_;
+      chisquared_bcon_   = chisquared_;
+    }
 
     // Check that track coords. are within assumed digitization range.
     this->checkInRange();

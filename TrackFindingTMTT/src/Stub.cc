@@ -20,7 +20,7 @@ namespace TMTT {
 
 // Static variables
 
-string Stub::trackerGeometryVersion_ = "UNKNOWN";
+thread_local string Stub::trackerGeometryVersion_ = "UNKNOWN";
 
 bool       Stub::stubKillerInit_ = false;
 StubKiller Stub::stubKiller_;
@@ -176,7 +176,8 @@ Stub::Stub(const TTStubRef& ttStubRef, unsigned int index_in_vStubs, const Setti
   // Get stub bend that is available in front-end electronics, where bend is displacement between 
   // two hits in stubs in units of strip pitch.
   bendInFrontend_ = ttStubRef->getTriggerBend();
-  if ((not barrel_) && pos.z() > 0) bendInFrontend_ *= -1;
+  bool isEndcap = GeomDetEnumerators::isEndcap( trackerGeometry->idToDetUnit( geoDetId )->subDetector() );
+  if (isEndcap && pos.z() > 0) bendInFrontend_ *= -1;
   // EJC Bend in barrel seems to be flipped in tilted geom.
   if (barrel_) bendInFrontend_ *= -1;
 
@@ -184,15 +185,11 @@ Stub::Stub(const TTStubRef& ttStubRef, unsigned int index_in_vStubs, const Setti
   // bend resolution due to bit encoding by FE chip if required.
   bool rejectStub = false;          // indicates if bend is outside window assumed in DegradeBend.h
   numMergedBend_ = 1;               // Number of bend values merged into single degraded one.
-  if (settings->degradeBendRes() == 2) {
+  if (settings->bendResReduced()) {
     float degradedBend;       // degraded bend
     this->degradeResolution(bendInFrontend_,
           degradedBend, rejectStub, numMergedBend_); // sets value of last 3 arguments.
     bend_ = degradedBend;
-  } else if (settings->degradeBendRes() == 1) {
-    bend_ = ttStubRef->getHardwareBend(); // Degraded bend from official CMS recipe.
-    if ((not barrel_) && pos.z() > 0) bend_ *= -1;
-    if (barrel_) bend_ *= -1;
   } else {
     bend_ = bendInFrontend_;
   }
