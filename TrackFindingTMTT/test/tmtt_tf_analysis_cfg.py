@@ -11,10 +11,18 @@ import os
 
 process = cms.Process("Demo")
 
-#process.load('Configuration.Geometry.GeometryExtended2023D17Reco_cff')
-#process.load('Configuration.Geometry.GeometryExtended2023D17_cff')
-process.load('Configuration.Geometry.GeometryExtended2023D21Reco_cff')
-process.load('Configuration.Geometry.GeometryExtended2023D21_cff')
+GEOMETRY = "D21"
+
+if GEOMETRY == "D17":
+  process.load('Configuration.Geometry.GeometryExtended2023D17Reco_cff')
+  process.load('Configuration.Geometry.GeometryExtended2023D17_cff')
+elif GEOMETRY == "D21":
+  process.load('Configuration.Geometry.GeometryExtended2023D21Reco_cff')
+  process.load('Configuration.Geometry.GeometryExtended2023D21_cff')
+elif GEOMETRY == "D41":
+  process.load('Configuration.Geometry.GeometryExtended2023D41Reco_cff')
+  process.load('Configuration.Geometry.GeometryExtended2023D41_cff')
+
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 from Configuration.AlCa.GlobalTag import GlobalTag
@@ -24,16 +32,21 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
 options = VarParsing.VarParsing ('analysis')
 
+def getTxtFile(txtFileName): 
+  return os.environ['CMSSW_BASE']+'/src/L1Trigger/TrackFindingTMTT/test/'+txtFileName
+
 #--- Specify input MC
-# D17 geom
-#options.register('inputMC', 'L1Trigger/TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/PU200.txt',
-# D21 geom
-options.register('inputMC', 'L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt',
+if GEOMETRY == "D17":
+  inputMCtxt = getTxtFile('MCsamples/937/RelVal/TTbar/PU200.txt')
+elif GEOMETRY == "D21":
+  inputMCtxt = getTxtFile('MCsamples/1040/RelVal/TTbar/PU200.txt')
+elif GEOMETRY == "D41":
+  inputMCtxt = getTxtFile('MCsamples/1060/RelVal/TTbar/PU200.txt')
 
 # Fastest to use a local copy ...
-#options.register('inputMC', 'L1Trigger/TrackFindingTMTT//test/MCsamples/1040/RelVal/TTbar/localRAL/PU200.txt', 
+#inputMCtxt = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/localRAL/PU200.txt') 
 
-VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "Files to be processed")
+options.register('inputMC', inputMCtxt, VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.string, "Files to be processed")
 
 #--- Specify number of events to process.
 options.register('Events',100,VarParsing.VarParsing.multiplicity.singleton, VarParsing.VarParsing.varType.int,"Number of Events to analyze")
@@ -52,15 +65,12 @@ options.parseArguments()
 
 #--- input and output
 
-def getTxtFile(txtFileName): 
-  return FileUtils.loadListFromFile(os.environ['CMSSW_BASE']+'/src/'+txtFileName)
-
-list = getTxtFile(options.inputMC)
+list = FileUtils.loadListFromFile(options.inputMC)
 readFiles = cms.untracked.vstring(*list)
 secFiles = cms.untracked.vstring()
 
 # Override input dataset.
-#readFiles = cms.untracked.vstring('/store/user/ejclemen/L1TT/RelVal_932/WithTruthAssociation/TTbar/PU200/output_0.root')
+#readFiles = cms.untracked.vstring('/store/user/abhijith/DisplacedMuPlus.root')
 
 outputHistFile = options.histFile
 
@@ -86,10 +96,10 @@ process.source = cms.Source ("PoolSource",
 process.Timing = cms.Service("Timing", summaryOnly = cms.untracked.bool(True))
 
 #--- Load code that produces our L1 tracks and makes corresponding histograms.
-process.load('L1Trigger.TrackFindingTMTT.TMTrackProducer_cff')
+#process.load('L1Trigger.TrackFindingTMTT.TMTrackProducer_cff')
 
 #--- Alternative cfg including improvements not yet in the firmware. Aimed at L1 trigger studies.
-#process.load('L1Trigger.TrackFindingTMTT.TMTrackProducer_Ultimate_cff')
+process.load('L1Trigger.TrackFindingTMTT.TMTrackProducer_Ultimate_cff')
 #
 #--- Optionally override default configuration parameters here (example given of how).
 

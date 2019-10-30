@@ -43,10 +43,9 @@ void makeResidualIntervalPlot( TString type, TString dir, TString variable, TH1F
 // Main script
 // ----------------------------------------------------------------------------------------------------------------
 
-
 void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0, int TP_select_pdgid=0, int TP_select_eventid=0, 
 		       bool useTightCuts=false, bool useDeadRegion=false, 
-		       float TP_minPt=2.0, float TP_maxPt=100.0, float TP_maxEta=2.4, float TP_maxDxy=1.0, float TP_maxD0=1.0) {
+		       float TP_minPt=2.0, float TP_maxPt=100.0, float TP_maxEta=2.4, float TP_maxDxy=1.0, float TP_maxD0=1.0, bool doDetailedPlots=true) {
 
   // type:              this is the input file you want to process (minus ".root" extension)
   // TP_select_pdgid:   if non-zero, only select TPs with a given PDG ID
@@ -54,8 +53,12 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   // TP_minPt:          only look at TPs with pt > X GeV
   // TP_maxPt:          only look at TPs with pt < X GeV
   // TP_maxEta:         only look at TPs with |eta| < X
+  // doDetailedPlots:   includes extra plots, such as  performance vs d0.
 
   // TP_select_injet: only look at TPs that are within a jet with pt > 30 GeV (==1) or within a jet with pt > 100 GeV (==2), >200 GeV (==3) or all TPs (==0)
+
+  //--  N.B. For standard displaced tracking plots, set TP_minPt=3.0, TP_maxEta=2.0, TP_maxDxy=10.0,
+  //--  TO_maxD0=10.0, doDetailedPlots=true. (Efficiency plots vs eta also usually made for d0 < 5).
  
 
   gROOT->SetBatch();
@@ -83,7 +86,6 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
     L1Tk_maxChi2dof = L1Tk_TIGHT_maxChi2dof;
   }
   
-  bool doDetailedPlots = false; //turn on to make full set of plots
   bool doGausFit = false;       //do gaussian fit for resolution vs eta/pt plots
   bool doLooseMatch = false;    //looser MC truth matching
 
@@ -2943,7 +2945,7 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   if (fabs(N)>0) cout << "efficiency for 1.75 < |eta| < "<<std::min(TP_maxEta, 2.5f)<<" = " << k/N*100.0 << " +- " << 1.0/N*sqrt(k*(1.0 - k/N))*100.0 << endl;
   N = (float) n_all_eta1p0 + n_all_eta1p75 + n_all_eta2p5;
   k = (float) n_match_eta1p0 + n_match_eta1p75 + n_match_eta2p5;
-  if (fabs(N)>0) cout << "combined efficiency for |eta| < "<<std::min(TP_maxEta, 2.5f)<<" = " << k/N*100.0 << " +- " << 1.0/N*sqrt(k*(1.0 - k/N))*100.0 << endl << endl;
+  if (fabs(N)>0) cout << "combined efficiency for |eta| < "<<std::min(TP_maxEta, 2.5f)<<" = " << k/N*100.0 << " +- " << 1.0/N*sqrt(k*(1.0 - k/N))*100.0 << " = " << k << "/" << N << endl << endl;
 
   k = (float)n_match_ptg2;
   N = (float)n_all_ptg2;

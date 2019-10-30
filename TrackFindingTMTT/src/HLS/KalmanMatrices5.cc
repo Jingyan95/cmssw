@@ -6,9 +6,9 @@
 ///=== Written by: Ian Tomalin
 
 #ifdef CMSSW_GIT_HASH
-#include "L1Trigger/TrackFindingTMTT/interface/HLS/KalmanMatricesHLS5.h"
+#include "L1Trigger/TrackFindingTMTT/interface/HLS/KalmanMatrices5.h"
 #else
-#include "KalmanMatricesHLS5.h"
+#include "KalmanMatrices5.h"
 #endif
 
 #ifdef PRINT_SUMMARY
@@ -23,7 +23,7 @@ namespace KalmanHLS {
 
 // Calculate matrix of derivatives of predicted stub coords w.r.t. helix params.
 
-MatrixH<5>::THD MatrixH<5>::setH04(const StubHLS::TR& r) {
+MatrixH<5>::THD MatrixH<5>::setH04(const KFstubN::TR& r) {
   static const MinusOneOverR calcMinusOneOverR; // Get -1/r   
   THD h04 = calcMinusOneOverR.get[r.to_uint() >> MinusOneOverR::BRED];
   return h04;
@@ -90,7 +90,6 @@ MatrixR<5>::MatrixR(const MatrixV& V, const MatrixH<5>& H, const MatrixS_transpo
 // Kalman gain matrix K = S*R(inverse).
 
 MatrixK<5>::MatrixK(const MatrixS_transpose<5>& St, const MatrixInverseR<5>& RmatInv) {
-#ifdef USE_FIXED
   _00 =  St._00 * RmatInv._00 + St._01 * RmatInv._10;
   _10 =  St._10 * RmatInv._00 + St._11 * RmatInv._10;
   _20 =  St._20 * RmatInv._00 + St._21 * RmatInv._10;
@@ -101,18 +100,6 @@ MatrixK<5>::MatrixK(const MatrixS_transpose<5>& St, const MatrixInverseR<5>& Rma
   _21 =  St._20 * RmatInv._01 + St._21 * RmatInv._11;
   _31 =  St._30 * RmatInv._01 + St._31 * RmatInv._11;
   _41 =  St._30 * RmatInv._01 + St._41 * RmatInv._11;
-#else
-  _00 =  SW_FLOAT(St._00) * RmatInv._00 + SW_FLOAT(St._01) * RmatInv._10;
-  _10 =  SW_FLOAT(St._10) * RmatInv._00 + SW_FLOAT(St._11) * RmatInv._10;
-  _20 =  SW_FLOAT(St._20) * RmatInv._00 + SW_FLOAT(St._21) * RmatInv._10;
-  _30 =  SW_FLOAT(St._30) * RmatInv._00 + SW_FLOAT(St._31) * RmatInv._10;
-  _40 =  SW_FLOAT(St._40) * RmatInv._00 + SW_FLOAT(St._41) * RmatInv._10;
-  _01 =  SW_FLOAT(St._00) * RmatInv._01 + SW_FLOAT(St._01) * RmatInv._11;
-  _11 =  SW_FLOAT(St._10) * RmatInv._01 + SW_FLOAT(St._11) * RmatInv._11;
-  _21 =  SW_FLOAT(St._20) * RmatInv._01 + SW_FLOAT(St._21) * RmatInv._11;
-  _31 =  SW_FLOAT(St._30) * RmatInv._01 + SW_FLOAT(St._31) * RmatInv._11;
-  _41 =  SW_FLOAT(St._40) * RmatInv._01 + SW_FLOAT(St._41) * RmatInv._11;
-#endif
 
 #ifdef PRINT_SUMMARY
   double k00 =  double(St._00) * double(RmatInv._00) + double(St._01) * double(RmatInv._10);
@@ -158,25 +145,17 @@ VectorRes<5>::VectorRes(const VectorM& m, const MatrixH<5>& H, const VectorX<5>&
 // Calculate output helix params: x' = x + K*res
 
 VectorX<5>::VectorX(const VectorX<5>& x, const MatrixK<5>& K, const VectorRes<5>& res) {
-#ifdef USE_FIXED
   typedef MatrixK<5>::TK00_short TK00_short;
   typedef MatrixK<5>::TK10_short TK10_short;
   typedef MatrixK<5>::TK21_short TK21_short;
   typedef MatrixK<5>::TK31_short TK31_short;
   typedef MatrixK<5>::TK40_short TK40_short;
   typedef MatrixK<5>::T0         T0;
-  _0 = x._0 + KFstateHLS<5>::TR(TK00_short(K._00) * res._0 + T0        (K._01) * res._1);
-  _1 = x._1 + KFstateHLS<5>::TP(TK10_short(K._10) * res._0 + T0        (K._11) * res._1);
-  _2 = x._2 + KFstateHLS<5>::TT(T0        (K._20) * res._0 + TK21_short(K._21) * res._1);
-  _3 = x._3 + KFstateHLS<5>::TZ(T0        (K._30) * res._0 + TK31_short(K._31) * res._1);
-  _4 = x._4 + KFstateHLS<5>::TD(TK40_short(K._40) * res._0 + T0        (K._41) * res._1);
-#else
-  _0 = x._0 + KFstateHLS<5>::TR(K._00 * SW_FLOAT(res._0) + K._01 * SW_FLOAT(res._1)); 
-  _1 = x._1 + KFstateHLS<5>::TP(K._10 * SW_FLOAT(res._0) + K._11 * SW_FLOAT(res._1)); 
-  _2 = x._2 + KFstateHLS<5>::TT(K._20 * SW_FLOAT(res._0) + K._21 * SW_FLOAT(res._1)); 
-  _3 = x._3 + KFstateHLS<5>::TZ(K._30 * SW_FLOAT(res._0) + K._31 * SW_FLOAT(res._1)); 
-  _4 = x._4 + KFstateHLS<5>::TD(K._40 * SW_FLOAT(res._0) + K._41 * SW_FLOAT(res._1)); 
-#endif
+  _0 = x._0 + KFstateN::TR(TK00_short(K._00) * res._0 + T0        (K._01) * res._1);
+  _1 = x._1 + KFstateN::TP(TK10_short(K._10) * res._0 + T0        (K._11) * res._1);
+  _2 = x._2 + KFstateN::TT(T0        (K._20) * res._0 + TK21_short(K._21) * res._1);
+  _3 = x._3 + KFstateN::TZ(T0        (K._30) * res._0 + TK31_short(K._31) * res._1);
+  _4 = x._4 + KFstateN::TD(TK40_short(K._40) * res._0 + T0        (K._41) * res._1);
 }
 
 
@@ -187,27 +166,15 @@ MatrixC<5>::MatrixC(const MatrixC<5>& C, const MatrixK<5>& K, const MatrixS<5>& 
   _10(_01), _32(_23), _40(_04), _41(_14), _20(_02), _30(_03), _21(_12), _31(_13), _24(_42), _34(_43)
 {
   // Covariance matrix is symmetric & some elements can be neglected.
-#ifdef USE_FIXED
-  _00 =  C._00 - KFstateHLS<5>::TC00(K._00 * S._00 + K._01 * S._10);
-  _11 =  C._11 - KFstateHLS<5>::TC11(K._10 * S._01 + K._11 * S._11);
-  _22 =  C._22 - KFstateHLS<5>::TC22(K._20 * S._02 + K._21 * S._12);
-  _33 =  C._33 - KFstateHLS<5>::TC33(K._30 * S._03 + K._31 * S._13);
-  _44 =  C._44 - KFstateHLS<5>::TC44(K._40 * S._04 + K._41 * S._14);
-  _01 =  C._01 - KFstateHLS<5>::TC01(K._00 * S._01 + K._01 * S._11);
-  _23 =  C._23 - KFstateHLS<5>::TC23(K._20 * S._03 + K._21 * S._13);
-  _04 =  C._04 - KFstateHLS<5>::TC04(K._00 * S._04 + K._01 * S._14);
-  _14 =  C._14 - KFstateHLS<5>::TC14(K._10 * S._04 + K._11 * S._14);
-#else
-  _00 =  C._00 - KFstateHLS<5>::TC00(K._00 * SW_FLOAT(S._00) + K._01 * SW_FLOAT(S._10));
-  _11 =  C._11 - KFstateHLS<5>::TC11(K._10 * SW_FLOAT(S._01) + K._11 * SW_FLOAT(S._11));
-  _22 =  C._22 - KFstateHLS<5>::TC22(K._20 * SW_FLOAT(S._02) + K._21 * SW_FLOAT(S._12));
-  _33 =  C._33 - KFstateHLS<5>::TC33(K._30 * SW_FLOAT(S._03) + K._31 * SW_FLOAT(S._13));
-  _44 =  C._44 - KFstateHLS<5>::TC44(K._40 * SW_FLOAT(S._04) + K._41 * SW_FLOAT(S._14));
-  _01 =  C._01 - KFstateHLS<5>::TC01(K._00 * SW_FLOAT(S._01) + K._01 * SW_FLOAT(S._11));
-  _23 =  C._23 - KFstateHLS<5>::TC23(K._20 * SW_FLOAT(S._03) + K._21 * SW_FLOAT(S._13));
-  _04 =  C._04 - KFstateHLS<5>::TC04(K._00 * SW_FLOAT(S._04) + K._01 * SW_FLOAT(S._14));
-  _14 =  C._14 - KFstateHLS<5>::TC14(K._10 * SW_FLOAT(S._04) + K._11 * SW_FLOAT(S._14));
-#endif
+  _00 =  C._00 - KFstateN::TC00EX(K._00 * S._00 + K._01 * S._10);
+  _11 =  C._11 - KFstateN::TC11EX(K._10 * S._01 + K._11 * S._11);
+  _22 =  C._22 - KFstateN::TC22EX(K._20 * S._02 + K._21 * S._12);
+  _33 =  C._33 - KFstateN::TC33EX(K._30 * S._03 + K._31 * S._13);
+  _44 =  C._44 - KFstateN::TC44EX(K._40 * S._04 + K._41 * S._14);
+  _01 =  C._01 - KFstateN::TC01EX(K._00 * S._01 + K._01 * S._11);
+  _23 =  C._23 - KFstateN::TC23EX(K._20 * S._03 + K._21 * S._13);
+  _04 =  C._04 - KFstateN::TC04EX(K._00 * S._04 + K._01 * S._14);
+  _14 =  C._14 - KFstateN::TC14EX(K._10 * S._04 + K._11 * S._14);
 
 #ifdef PRINT_SUMMARY
   double c00new = double(C._00) - (double(K._00) * double(S._00) + double(K._01) * double(S._10));
@@ -219,15 +186,15 @@ MatrixC<5>::MatrixC(const MatrixC<5>& C, const MatrixK<5>& K, const MatrixS<5>& 
   double c23new = double(C._23) - (double(K._20) * double(S._03) + double(K._21) * double(S._13));
   double c04new = double(C._04) - (double(K._00) * double(S._04) + double(K._01) * double(S._14));
   double c14new = double(C._14) - (double(K._10) * double(S._04) + double(K._11) * double(S._14));
-  CHECK_AP::checkCalc("C00_new", _00, c00new, 0.01);
-  CHECK_AP::checkCalc("C11_new", _11, c11new, 0.01);
-  CHECK_AP::checkCalc("C22_new", _22, c22new, 0.01);
-  CHECK_AP::checkCalc("C33_new", _33, c33new, 0.01);
-  CHECK_AP::checkCalc("C44_new", _44, c44new, 0.01);
-  CHECK_AP::checkCalc("C01_new", _01, c01new, 0.01);
-  CHECK_AP::checkCalc("C23_new", _23, c23new, 0.01);
-  CHECK_AP::checkCalc("C04_new", _04, c04new, 0.01);
-  CHECK_AP::checkCalc("C14_new", _14, c14new, 0.01);
+  CHECK_AP::checkCalc("C00_new", _00, c00new, 0.03);
+  CHECK_AP::checkCalc("C11_new", _11, c11new, 0.03);
+  CHECK_AP::checkCalc("C22_new", _22, c22new, 0.03);
+  CHECK_AP::checkCalc("C33_new", _33, c33new, 0.03);
+  CHECK_AP::checkCalc("C44_new", _44, c44new, 0.03);
+  CHECK_AP::checkCalc("C01_new", _01, c01new, 0.03);
+  CHECK_AP::checkCalc("C23_new", _23, c23new, 0.03);
+  CHECK_AP::checkCalc("C04_new", _04, c04new, 0.03);
+  CHECK_AP::checkCalc("C14_new", _14, c14new, 0.03);
   CHECK_AP::checkDet("C_new(rphi)",_00,_11,_44, _01, _04, _14);
   CHECK_AP::checkDet("C_new(rz)"  ,_22,_33,_23);
 #endif

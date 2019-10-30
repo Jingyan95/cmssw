@@ -28,6 +28,10 @@ KalmanState::KalmanState( const L1track3D& candidate, unsigned n_skipped, unsign
     stubCluster_ = stubCluster;
     chi2_ = chi2;
 
+    hitPattern_ = 0;
+    if (last_state != nullptr) hitPattern_ = last_state->hitPattern(); // Bit encoded list of hit layers
+    if (stubCluster != nullptr) hitPattern_ |= (1 << (stubCluster->layerKF()));
+
     // EJC CLANG complains about this line, 
     // const KalmanState *state = this;
 
@@ -143,6 +147,7 @@ std::vector<const Stub *> KalmanState::stubs()const
 	}
 	state = state->last_state();
     }
+    std::reverse(all_stubs.begin(), all_stubs.end()); // Put innermost stub first.
     return all_stubs;
 }
 
