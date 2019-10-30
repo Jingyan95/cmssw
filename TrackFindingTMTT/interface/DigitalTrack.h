@@ -4,6 +4,7 @@
 #include "FWCore/Utilities/interface/Exception.h"
 #include "L1Trigger/TrackFindingTMTT/interface/TP.h"
 #include <string>
+#include <set>
 
 using namespace std;
 
@@ -34,6 +35,7 @@ public:
   /// Initialize track with original, floating point coords
   void init(const string& fitterName, unsigned int nHelixParams,
 	    unsigned int iPhiSec, unsigned int iEtaReg, int mbin, int cbin, int mBinhelix, int cBinhelix, 
+	    unsigned int hitPattern,
 	    float qOverPt_orig, float d0_orig, float phi0_orig, float tanLambda_orig, float z0_orig, float chisquared_orig, 
 	    float qOverPt_bcon_orig, float phi0_bcon_orig, float chisquared_bcon_orig, // beam-spot constrained values. 
 	    unsigned int nLayers, bool consistent, bool accepted, 
@@ -81,10 +83,10 @@ public:
   int          mBinhelix()                const {this->okin(); return mBinhelix_;}
   int          cBinhelix()                const {this->okin(); return cBinhelix_;}
   unsigned int nlayers()                  const {this->okin(); return nlayers_;}
-  bool         consistent()               const {this->okin(); return consistent_;}
   int          mBinHT()                   const {this->okin(); return mBin_;}
   int          cBinHT()                   const {this->okin(); return cBin_;}
   bool         accepted()                 const {this->okin(); return accepted_;}
+  unsigned int hitPattern()               const {this->okin(); return hitPattern_;}
 
   //--- The functions below give access to the original variables prior to digitization.
   //%%% Those common to GP & HT input.
@@ -112,6 +114,8 @@ public:
   //--- Utility: return phi nonant number corresponding to given phi sector number.
   unsigned int iGetNonant(unsigned int iPhiSec) const {return floor(iPhiSec*numPhiNonants_/numPhiSectors_);}
 
+  bool         available()     const {return ranMake_;}
+
 private:
 
   // Check DigitalTrack correctly initialized;
@@ -137,6 +141,7 @@ private:
   const Settings* settings_;
 
   string          fitterName_; 
+  unsigned int    nHelixParams_;
 
   // Integer data after digitization (which doesn't degrade its resolution, but can recast it in a different form).
   unsigned int        nlayers_;
@@ -194,6 +199,8 @@ private:
   float                invPtToDPhi_;
 
   //--- Original floating point stub coords before digitization.
+
+  unsigned int         hitPattern_;
 
   float                qOverPt_orig_;
   float                oneOver2r_orig_;
