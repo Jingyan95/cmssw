@@ -366,7 +366,7 @@ public:
       }
       if ((layer==1 && barrelSpacingCut[0]<=z && z<=barrelSpacingCut[5]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[5]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
 	
-	CF = 0.886454*(z/r) + 0.504148;
+	CF = cosModuleTilt*(z/r) + sinModuleTilt;
 
       }
   

@@ -577,7 +577,7 @@ public:
 	    if (layer1_>=4) nbins1=16;
 	    for(int ibend=0;ibend<nbins1;ibend++) {
 	      double bend=Stub::benddecode(ibend,layer1_<=3); 
-	      bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;	    
+	      bool passinner=bend-bendinnermin>-bendcutbarrelTE&&bend-bendinnermax<bendcutbarrelTE;	    
 	      if (passinner) vmbendinner[ibend]=true;
 	      pttableinner_.push_back(passinner);
 	    
@@ -587,7 +587,7 @@ public:
 	    if (layer2_>=4) nbins2=16;
 	    for(int ibend=0;ibend<nbins2;ibend++) {
 	      double bend=Stub::benddecode(ibend,layer2_<=3); 
-	      bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	      bool passouter=bend-bendoutermin>-bendcutbarrelTE&&bend-bendoutermax<bendcutbarrelTE;
 	      if (passouter) vmbendouter[ibend]=true;
 	      pttableouter_.push_back(passouter);
 	    
@@ -676,7 +676,7 @@ public:
 	    for(int ibend=0;ibend<8;ibend++) {
 	      double bend=Stub::benddecode(ibend,true); 
 	      
-	      bool passinner=bend-bendinnermin>-bendcutdisk&&bend-bendinnermax<bendcutdisk;	    
+	      bool passinner=bend-bendinnermin>-bendcutdiskTE&&bend-bendinnermax<bendcutdiskTE;	    
 	      if (passinner) vmbendinner[ibend]=true;
 	      pttableinner_.push_back(passinner);
 	      
@@ -685,7 +685,7 @@ public:
 	    for(int ibend=0;ibend<8;ibend++) {
 	      double bend=Stub::benddecode(ibend,true); 
 	      
-	      bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	      bool passouter=bend-bendoutermin>-bendcutdiskTE&&bend-bendoutermax<bendcutdiskTE;
 	      if (passouter) vmbendouter[ibend]=true;
 	      pttableouter_.push_back(passouter);
 	    
@@ -770,7 +770,7 @@ public:
 	  
 	    for(int ibend=0;ibend<8;ibend++) {
 	      double bend=Stub::benddecode(ibend,true); 
-	      bool passinner=(izinner!=0)?bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut:false;
+	      bool passinner=(izinner!=0)?bend-bendinnermin>-bendcutbarrelTE&&bend-bendinnermax<bendcutbarrelTE:false;
 	    
 	      if (passinner) vmbendinner[ibend]=true;
 	      pttableinner_.push_back(passinner);
@@ -780,7 +780,7 @@ public:
 	    for(int ibend=0;ibend<8;ibend++) {
 	      double bend=Stub::benddecode(ibend,true); 
 	    
-	      bool passouter=(izinner!=0)?bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut:false;
+	      bool passouter=(izinner!=0)?bend-bendoutermin>-bendcutdiskTE&&bend-bendoutermax<bendcutdiskTE:false;
 	      if (passouter) vmbendouter[ibend]=true;
 	      pttableouter_.push_back(passouter);
 	    
@@ -847,7 +847,7 @@ public:
       dr = 0.16; 
     }
     if ((layer==1 && barrelSpacingCut[0]<=z && z<=barrelSpacingCut[5]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[5]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
-      CF = 0.886454*(z/r) + 0.504148;
+      CF = cosModuleTilt*(z/r) + sinModuleTilt;
 
     }
 
