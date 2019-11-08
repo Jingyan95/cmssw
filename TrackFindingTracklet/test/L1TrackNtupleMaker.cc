@@ -809,7 +809,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
         	if (my_tp.isNull() == false) {
         	  int tmp_eventid = my_tp->eventId().event();
 
-        	  if (tmp_eventid > 0) continue; // this means stub from pileup track
+		  // if (tmp_eventid > 0) continue; // this means stub from pileup track
 
         	  myTP_pdgid = my_tp->pdgId();
         	  myTP_pt = my_tp->p4().pt();
