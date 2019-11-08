@@ -349,7 +349,7 @@ public:
     double CF=1;
     double r=rmean[layer-1];
 
-    if ((layer==1 && z<=barrelSpacingCut[2]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[4]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
+    if ((layer==1 && z<=barrelSpacingCut[3]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[4]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
       
       dr = 0.26; 
     
