@@ -170,7 +170,7 @@ class FitTrack:public ProcessBase{
 
 
 
-  void trackFitNew(Tracklet* tracklet, std::vector<std::pair<Stub*,L1TStub*>> &trackstublist, std::vector<std::pair<int,int>> &stubidslist){
+  void trackFitNew(Tracklet* tracklet, std::vector<std::pair<Stub*,L1TStub*>> &, std::vector<std::pair<int,int>> &){
 
 #ifdef USEHYBRID
    if (doKF) {
@@ -1022,6 +1022,15 @@ class FitTrack:public ProcessBase{
 
    std::vector<unsigned int> indexArray;
    for (unsigned int i=0;i<fullmatch.size();i++) {
+
+     //checks that we have correct order
+     if (fullmatch[i]->nMatches()>1) {
+       for (unsigned int j=0;j<fullmatch[i]->nMatches()-1;j++){
+	 assert(fullmatch[i]->getFPGATracklet(j)->TCID()<=fullmatch[i]->getFPGATracklet(j+1)->TCID());
+       }
+     }
+     
+     
     if(debug1 && fullmatch[i]->nMatches()!=0) cout<<"orderedMatches: "<<fullmatch[i]->getName()<<" "<< fullmatch[i]->nMatches()<<"\n";
 
     indexArray.push_back(0);

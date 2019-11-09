@@ -90,8 +90,6 @@ public:
     findr(r2,z1,rmind2,rmaxd2);
     findr(r2,z2,rmind2,rmaxd2);
 
-    //cout << "rmind2 rmaxd2 "<<rmind2<<" "<<rmaxd2<<endl;
-    
     assert(rmind2<rmaxd2);
 
     if (rmind2>rmaxdiskvm) return -1;
@@ -114,6 +112,16 @@ public:
     
     // first pack rbinmin and deltar for second disk
 
+    // This is a 9 bit word:
+    // xxx|yy|z|rrr
+    // xxx is the delta r window
+    // yy is the r bin
+    // z is flag to look in next bin
+    // rrr fine r bin
+    // NOTE : this encoding is not efficient z is one if xxx+rrr is greater than 8
+    //        and xxx is only 1,2, or 3
+    //        should also reject xxx=0 as this means projection is outside range
+    
     int rbinmin=NBINS*(rmind2-rmindiskvm)/(rmaxdiskvm-rmindiskvm);
     int rbinmax=NBINS*(rmaxd2-rmindiskvm)/(rmaxdiskvm-rmindiskvm);
 

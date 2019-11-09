@@ -158,10 +158,6 @@ public:
 	    output=="vmstuboutPHIs"+s+"n"+ns||
 	    output=="vmstuboutPHIt"+s+"n"+ns
 	  ){
-	  //cout << "memory name : "<<memory->getName()<<" "
-	  //     <<memory->getName().substr(3,2)<<" "
-	  //     <<memory->getName().substr(11,1)
-	  //     <<endl;
 
 	  if (memory->getName().substr(3,2)=="TE") {
 	    VMStubsTEMemory* tmp=dynamic_cast<VMStubsTEMemory*>(memory);
@@ -404,7 +400,8 @@ public:
 	    }
 	      
 	  } else {
-
+	    // disk-disk seeding
+	    
 	    int binlookup=-1;
 
 	    if (!overlap) {
@@ -783,16 +780,18 @@ public:
     static TETableInnerDisk innerTableD3;
     static bool first=true;
 
+    int nrbits=8;
+    
     if (first) {
-      innerTableD1.init(1,2,-1,7,3);
-      innerTableD1_extended.init(1,2,2,7,3);
-      innerTableD3.init(3,4,-1,7,3);
+      innerTableD1.init(1,2,-1,nrbits,3);
+      innerTableD1_extended.init(1,2,2,nrbits,3);
+      innerTableD3.init(3,4,-1,nrbits,3);
       first=false;
     }
     
     FPGAWord r=stub->r();
     FPGAWord z=stub->z();
-    int rbin=(r.value())>>(r.nbits()-7);
+    int rbin=(r.value())>>(r.nbits()-nrbits);
     int zbin=(z.value()+(1<<(z.nbits()-1)))>>(z.nbits()-3);
     bool negdisk=stub->disk().value()<0;
     if (negdisk) zbin=7-zbin; //Should this be separate table?

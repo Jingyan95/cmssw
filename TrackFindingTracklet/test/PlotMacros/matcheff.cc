@@ -56,10 +56,9 @@ void matcheff(){
   
   //TString parttype="All Tracks";
   //TString parttype="Electron";
-  //TString parttype="Pion";
+  TString parttype="Pion";
   //TString parttype="Kaon";
   //TString parttype="Proton";
-  TString parttype="Muon";
 
   int itype=-1;
 

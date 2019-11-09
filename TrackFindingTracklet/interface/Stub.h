@@ -267,9 +267,8 @@ public:
 
 
   //Returns a number from 0 to 31
-  int iphivmRaw() const {
-    int iphivm=(phicorr_.value()>>(phicorr_.nbits()-5));
-    assert(iphivm>=0);
+  unsigned int iphivmRaw() const {
+    unsigned int iphivm=(phicorr_.value()>>(phicorr_.nbits()-5));
     assert(iphivm<32);
     return iphivm;
     
@@ -278,7 +277,7 @@ public:
   //VMbits is the number of bits for the fine bins. E.g. 32 bins would use VMbits=5
   //finebits is the number of bits within the VM 
   
-  int iphivmFineBins(int VMbits, int finebits) const {
+  unsigned int iphivmFineBins(int VMbits, int finebits) const {
 
     return (phicorr_.value()>>(phicorr_.nbits()-VMbits-finebits))&((1<<finebits)-1);
 
@@ -490,27 +489,7 @@ public:
 
   void setPhiCorr(int phiCorr){
 
-    /*    
-    int layer=layer_.value()+1;
-    
-    double Delta=stubr_-rmean[layer-1];
-    double dphi=Delta*0.5*(bend_.value()-15.0)*0.009/0.18/rmean[layer-1];
-
-    int idphi=0;
-
-    if (layer<=3) {
-      idphi=dphi/kphi;
-    } else {
-        idphi=dphi/kphi1;
-    }
-    */
-     
-    //cout << "iphi idphi "<<phi_.value()<<" "<<idphi<<endl;
-    
-    //int iphicorr=phi_.value()+idphi;
     int iphicorr=phi_.value()-phiCorr;
-
-    //cout << "phiCorr: layer bend old, new : "<<layer<<" "<<bend_.value()<<" "<<idphi<<" "<<phiCorr<<endl;
     
     if (iphicorr<0) iphicorr=0;
     if (iphicorr>=(1<<phi_.nbits())) iphicorr=(1<<phi_.nbits())-1;

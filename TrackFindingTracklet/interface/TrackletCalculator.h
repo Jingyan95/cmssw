@@ -878,6 +878,10 @@ public:
     izproj[2]   = ITC->zL_2_final.get_ival();
     izproj[3]   = ITC->zL_3_final.get_ival();
 
+    if (writeTC) {
+      cout << "TC "<<layer_<<" "<<innerFPGAStub->iphivmRaw()<<" "<<outerFPGAStub->iphivmRaw();
+    }
+    
     for(int i=0; i<4; ++i){
       iphider[i] = ITC->der_phiL_final.get_ival();
       izder[i]   = ITC->der_zL_final.get_ival();
@@ -890,6 +894,12 @@ public:
       if (iphiproj[i]>=(1<<nbitsphistubL456)-1) {
 	iphiproj[i]=(1<<nbitsphistubL456)-2; //-2 not to hit atExtreme
 	validproj[i] = false;
+      }
+
+      if (writeTC) {
+	if (validproj[i]) {
+	  cout <<" ["<<i<<"] "<<(iphiproj[i]>>15);
+	}
       }
       
       if (rproj_[i]<60.0) {
@@ -915,6 +925,10 @@ public:
       }
     }
 
+    if (writeTC) {
+      cout << endl;
+    }
+      
     iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
     iphiprojdisk[1] = ITC->phiD_1_final.get_ival();
     iphiprojdisk[2] = ITC->phiD_2_final.get_ival();
@@ -1388,12 +1402,14 @@ public:
 
     bool success = true;
     if(!ITC->rinv_final.local_passes()){
-      if (debug1) 
-	cout << "TrackletCalculator::DiskSeeding irinv too large: "<<ITC->rinv_final.get_fval()<<endl;
+     if (debug1) 
+	cout << "TrackletCalculator::DiskSeeding irinv too large: "<<ITC->rinv_final.get_fval()
+	     << " disk = "<<disk_<<" r1="<<r1<<endl;
       success = false;
     }
     if (!ITC->z0_final.local_passes()) {
-      if (debug1) cout << "Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" in layer 1"<<endl;
+      if (debug1)
+	cout << "Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" in disk "<<disk_<<endl;
       success = false;
     }
     success = success && ITC->valid_trackpar.passes();
@@ -1798,12 +1814,12 @@ public:
     if(!ITC->rinv_final.local_passes()){
       if (debug1) {
 	cout << "TrackletCalculator::OverlapSeeding irinv too large: "<<ITC->rinv_final.get_fval()<<endl;
-      }
+       }
       success = false;
     }
     if (!ITC->z0_final.local_passes()) {
       if (debug1) {
-	cout << "Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" in layer 1"<<endl;
+	cout << "TrackletCalculator::OverlapSeeding Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" r1="<<r1<<" "<<layer_<<endl;
       }
       success = false;
     }

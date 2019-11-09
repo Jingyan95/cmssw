@@ -69,10 +69,10 @@ static const bool writeTrackProjOcc=false;
 static const bool writeME=false;
 static const bool writeMatchCalculator=false;
 static const bool writeResiduals=false;
-static const bool writeProjectionTransceiver=false;
-static const bool writeMatchTransceiver=false;
 static const bool writeFitTrack=false;
 static const bool writeChiSq=false;
+
+static const bool writeTC=false; //if true write out which memories track projetions will fill
 
 static const bool writeNMatches=false;
 static const bool writeHitEff=false;
@@ -284,11 +284,13 @@ static const double two_pi=2*M_PI;
 
 static const double ptcut=1.91; //Minimum pt
 static const double rinvcut=0.01*0.3*3.8/ptcut; //0.01 to convert to cm-1
-static const double ptcutte=1.6; //Minimum pt in TE
+static const double ptcutte=1.8; //Minimum pt in TE
 static const double rinvcutte=0.01*0.3*3.8/ptcutte; //0.01 to convert to cm-1 in TE
-static const double bendcut=1.5;
-static const double bendcutdisk=2.0;
+static const double bendcut=1.25;
+static const double bendcutdisk=1.25;
 static const double z0cut=15.0;
+static const double mecut=2.0;
+static const double mecutdisk=1.5;
 
 
 static const unsigned int NSector=9; 
@@ -333,7 +335,7 @@ static const double rinnerdisk=22.0;
 //static const int NMAXstub  = 250;
 //static const int NMAXroute = 250;
 
-static const unsigned int MAXOFFSET=10000; //set to 0 to enable regular truncation or 10000 to disable it.
+static const unsigned int MAXOFFSET=0; //set to 0 to enable regular truncation or 10000 to disable it.
 
 static const unsigned int MAXSTUBSLINK = 108 + MAXOFFSET; //Max stubs per link
 static const unsigned int MAXLAYERROUTER = 108 + MAXOFFSET; //Max stubs handled by layer router
@@ -382,11 +384,11 @@ static const int nbitszprojderL456=7+2;
 static const int nfinephibarrelinner=2;
 static const int nfinephibarrelouter=3;
 
-static const int nfinephidiskinner=1;
-static const int nfinephidiskouter=2;
+static const int nfinephidiskinner=2; //too small!
+static const int nfinephidiskouter=3;
 
-static const int nfinephioverlapinner=1;
-static const int nfinephioverlapouter=2;
+static const int nfinephioverlapinner=2;
+static const int nfinephioverlapouter=3;
 
 
 //Bits used to store track parameter in tracklet

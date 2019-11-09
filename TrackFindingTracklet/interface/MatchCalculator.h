@@ -602,6 +602,10 @@ public:
 	      <<"   "<<ideltaz*fact_*kz<<" "<<dz<<" "<<zmatchcut_[seedindex]*kz<<endl;	  
 	}
 
+
+	//cout << "Layer "<<layer_<<" phimatch "<<(fabs(ideltaphi)<=phimatchcut_[seedindex])<<" "<<dphi*rmean[layer_-1]*10
+	//     <<"mm zmatch "<<(fabs(ideltaz*fact_)<=zmatchcut_[seedindex])<<endl;
+	
 	bool imatch=(fabs(ideltaphi)<=phimatchcut_[seedindex])&&(fabs(ideltaz*fact_)<=zmatchcut_[seedindex]);
 
 	//if (!imatch) {

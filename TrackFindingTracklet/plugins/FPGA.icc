@@ -142,7 +142,7 @@
 	static std::map<string,vector<int> > dtclayerdisk;
 
 	if (dtclayerdisk.size()==0) {
-	  ifstream in("dtclinklayerdisk.dat");
+	  ifstream in("../data/dtclinklayerdisk.dat");
 	  string dtc;
 	  in >> dtc;
 	  while (in.good()){
@@ -167,7 +167,7 @@
                dtcbase=dtc.substr(0,4)+dtc.substr(6,dtc.size()-6);
 	     }     
 
-	     string fname="MemPrints/InputStubs/Link_";
+	     string fname="../data/MemPrints/InputStubs/Link_";
 	     fname+=dtcbase;
 	     if (dtcstubs.find(dtcbase+"A")!=dtcstubs.end()) continue;
 	     fname+="_A.dat";
@@ -175,7 +175,7 @@
 	     out->open(fname.c_str());
 	     dtcstubs[dtcbase+"A"]=out;
 
-	     fname="MemPrints/InputStubs/Link_";
+	     fname="../data/MemPrints/InputStubs/Link_";
 	     fname+=dtcbase;
 	     if (dtcstubs.find(dtcbase+"B")!=dtcstubs.end()) continue;
 	     fname+="_B.dat";
@@ -363,6 +363,9 @@ if (writeHitEff) {
 
     TCTimer.start();
     for (unsigned int k=0;k<NSector;k++) {
+      if (writeTC) {
+	cout << "TCSector" << endl;
+      }
       sectors[k]->executeTC();	 
       if(writemem&&k==writememsect){
         sectors[k]->writeTPAR(first);

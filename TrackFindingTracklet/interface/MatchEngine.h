@@ -42,7 +42,7 @@ public:
 	double projbend=bend(rmean[layer_-1],rinv);
 	for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
 	  double stubbend=Stub::benddecode(ibend,layer_<=3);
-	  bool pass=fabs(stubbend-projbend)<2.0;
+	  bool pass=fabs(stubbend-projbend)<mecut;
 	  table_.push_back(pass);
 	}
       }
@@ -73,12 +73,12 @@ public:
 	double projbend=0.5*(iprojbend-15.0);
 	for(unsigned int ibend=0;ibend<8;ibend++){
 	  double stubbend=Stub::benddecode(ibend,true);
-	  bool pass=fabs(stubbend-projbend)<1.5;
+	  bool pass=fabs(stubbend-projbend)<mecutdisk;
 	  tablePS_.push_back(pass);
 	}
 	for(unsigned int ibend=0;ibend<16;ibend++){
 	  double stubbend=Stub::benddecode(ibend,false);
-	  bool pass=fabs(stubbend-projbend)<1.5;
+	  bool pass=fabs(stubbend-projbend)<mecutdisk;
 	  table2S_.push_back(pass);
 	}
       }
@@ -146,6 +146,11 @@ public:
     int nproj=vmprojs_->nTracklets();
     bool moreproj=iproj<nproj;
 
+    bool highocc=nproj>10;
+    if (highocc) {
+      cout << "nproj "<<nproj<<endl;
+    }
+    
     //Projection that is read from the buffer and compared to stubs  
     int rzbin=0;
     int projfinerz=0;
@@ -245,6 +250,9 @@ public:
 	  Tracklet* proj=vmprojs_->getFPGATracklet(projindex);
 
 	  nstubs=vmstubs_->nStubsBin(rzbin);
+	  if (highocc) {
+	    cout <<" nstubs "<<nstubs<<endl;
+	  }
 	  projfinerz = barrel?proj->finezvm(layer_):proj->finervm(disk_);
 
 	  projrinv=barrel?(16+(proj->fpgarinv().value()>>(proj->fpgarinv().nbits()-5))):proj->getBendIndex(disk_).value();
@@ -322,6 +330,10 @@ public:
       
     }
 
+    if (highocc) {
+      cout << " countall countpass : "<<countall<<" "<<countpass<<endl;
+    }
+    
     if (writeME) {
       static ofstream out("matchengine.txt");
       out << getName()<<" "<<countall<<" "<<countpass<<endl;

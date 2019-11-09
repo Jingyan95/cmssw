@@ -40,30 +40,19 @@ public:
     }
     if (name[3]=='D') {
       disk1_=name[4]-'0';
-      //r1_=name[12]-'0';
     }
     if (name[11]=='L') {
       layer2_=name[12]-'0';
-      //z2_=name[23]-'0';
     }
     if (name[11]=='D') {
       disk2_=name[12]-'0';
-      //r2_=name[23]-'0';
     }
     if (name[12]=='L') {
       layer2_=name[13]-'0';
-      //z2_=name[23]-'0';
     }
     if (name[12]=='D') {
       disk2_=name[13]-'0';
-      //r2_=name[23]-'0';
     }
-    
-    //phi1_=name[10]-'0';
-    //phi2_=name[21]-'0';
-
-    //dct1_=name[6]-'0';
-    //dct2_=name[17]-'0';
     
     innerphibits_=-1;
     outerphibits_=-1;
@@ -162,10 +151,7 @@ public:
 
 	int start=(bin>>1);
 	int last=start+(bin&1);
-	if (last==8) {
-	  cout << "Warning last==8 start="<<start<<endl;
-	  last=start;
-	}
+
 	for(int ibin=start;ibin<=last;ibin++) {
 	  if (debug1) cout << getName() << " looking for matching stub in bin "<<ibin
 			   <<" with "<<outervmstubs_->nStubsBinned(ibin)<<" stubs"<<endl;
@@ -183,6 +169,9 @@ public:
 	      continue;
 	    }
 
+	    int ir=((start&3)<<3)+rbinfirst;
+	    //cout << "start rbinfirst ir : "<<start<<" "<<rbinfirst<<" "<<ir<<" "<<innerstub.second->z()/innerstub.second->r()<<endl;
+	    
 	    assert(innerphibits_!=-1);
 	    assert(outerphibits_!=-1);
 	    
@@ -190,14 +179,12 @@ public:
 	    unsigned int nvmouter=nallstubsoverlapdisks[disk2_-1]*nvmteoverlapdisks[disk2_-1];
 	    unsigned int nvmbitsinner=nbits(nvminner);
 	    unsigned int nvmbitsouter=nbits(nvmouter);
-	    int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
-	    int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
-	      
-	      
-	    int index = (iphiinnerbin<<outerphibits_)+iphiouterbin;
+	    unsigned int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
+	    unsigned int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
+
+	    unsigned int index = (((iphiinnerbin<<outerphibits_)+iphiouterbin)<<5)+ir;
 	    
-	    assert(index<(int)phitable_.size());		
-	    
+	    assert(index<phitable_.size());
 	      
 	    if (!phitable_[index]) {
 	      if (debug1) {
@@ -376,6 +363,8 @@ public:
 	  int bin=newbin/8;
 	  
 	  int rbinfirst=newbin&7;
+
+	  //cout << "rbinfirst+rdiffmax next "<<rdiffmax<<" "<<rbinfirst+rdiffmax<<" "<<(bin&1)<<endl;
 	  
 	  int start=(bin>>1);
 	  if (negdisk) start+=4;
@@ -637,6 +626,7 @@ public:
 	    double bendoutermin=20.0;
 	    double bendoutermax=-20.0;
 	    double rinvmin=1.0; 
+	    double rinvmax=-1.0; 
 	    for(int i1=0;i1<2;i1++) {
 	      for(int i2=0;i2<2;i2++) {
 		for(int i3=0;i3<2;i3++) {
@@ -651,9 +641,16 @@ public:
 		  if (fabs(rinv1)<rinvmin) {
 		    rinvmin=fabs(rinv1);
 		  }
+		  if (fabs(rinv1)>rinvmax) {
+		    rinvmax=fabs(rinv1);
+		  }
 		}
 	      }
 	    }
+
+	    //if (disk1_==1 && rinvmax>0.013 && rinvmin<0.0057){
+	    //  cout << "router rinvmax rinvmin :"<<router[0]<<" "<<rinvmax<<" "<<rinvmin<<endl;
+	    //}
 	    
 	    phitable_.push_back(rinvmin<rinvcutte);
 
@@ -670,7 +667,7 @@ public:
 	    for(int ibend=0;ibend<8;ibend++) {
 	      double bend=Stub::benddecode(ibend,true); 
 	      
-	      bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	      bool passouter=bend-bendoutermin>-bendcutdisk&&bend-bendoutermax<bendcutdisk;
 	      if (passouter) vmbendouter[ibend]=true;
 	      pttableouter_.push_back(passouter);
 	    
@@ -689,7 +686,8 @@ public:
 
       innerphibits_=nfinephioverlapinner;
       outerphibits_=nfinephioverlapouter;
-
+      unsigned int nrbits=5;
+      
       int innerphibins=(1<<innerphibits_);
       int outerphibins=(1<<outerphibits_);
 
@@ -712,60 +710,61 @@ public:
 	vmbendouter.push_back(false);
       }
       
+      double dr=(rmaxdiskvm-rmindiskvm)/(1<<nrbits);
 
-      router[0]=rmean[layer1_-1]+5; //Approximate but probably good enough for LUT
-      router[1]=rmean[layer1_]+10; //Approximate but probably good enough for LUT
       for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
 	phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
 	phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
 	for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
 	  phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
 	  phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
-	  
-	  double bendinnermin=20.0;
-	  double bendinnermax=-20.0;
-	  double bendoutermin=20.0;
-	  double bendoutermax=-20.0;
-	  double rinvmin=1.0; 
-	  for(int i1=0;i1<2;i1++) {
-	    for(int i2=0;i2<2;i2++) {
-	      for(int i3=0;i3<2;i3++) {
-		double rinner=rmean[layer1_-1];
-		double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router[i3]);
-		double abendinner=bend(rinner,rinv1);
-		double abendouter=bend(router[i3],rinv1);
-		if (abendinner<bendinnermin) bendinnermin=abendinner;
-		if (abendinner>bendinnermax) bendinnermax=abendinner;
-		if (abendouter<bendoutermin) bendoutermin=abendouter;
-		if (abendouter>bendoutermax) bendoutermax=abendouter;
-		if (fabs(rinv1)<rinvmin) {
-		  rinvmin=fabs(rinv1);
+	  for (int irbin=0;irbin<(1<<nrbits);irbin++){
+	    router[0]=rmindiskvm+dr*irbin;
+	    router[1]=router[0]+dr; 
+	    double bendinnermin=20.0;
+	    double bendinnermax=-20.0;
+	    double bendoutermin=20.0;
+	    double bendoutermax=-20.0;
+	    double rinvmin=1.0; 
+	    for(int i1=0;i1<2;i1++) {
+	      for(int i2=0;i2<2;i2++) {
+		for(int i3=0;i3<2;i3++) {
+		  double rinner=rmean[layer1_-1];
+		  double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router[i3]);
+		  double abendinner=bend(rinner,rinv1);
+		  double abendouter=bend(router[i3],rinv1);
+		  if (abendinner<bendinnermin) bendinnermin=abendinner;
+		  if (abendinner>bendinnermax) bendinnermax=abendinner;
+		  if (abendouter<bendoutermin) bendoutermin=abendouter;
+		  if (abendouter>bendoutermax) bendoutermax=abendouter;
+		  if (fabs(rinv1)<rinvmin) {
+		    rinvmin=fabs(rinv1);
+		  }
 		}
 	      }
 	    }
-	  }
 	    
-	  phitable_.push_back(rinvmin<rinvcutte);
+	    phitable_.push_back(rinvmin<rinvcutte);
 
 	  
-	  for(int ibend=0;ibend<8;ibend++) {
-	    double bend=Stub::benddecode(ibend,true); 
+	    for(int ibend=0;ibend<8;ibend++) {
+	      double bend=Stub::benddecode(ibend,true); 
 	    
-	    bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;	    
-	    if (passinner) vmbendinner[ibend]=true;
-	    pttableinner_.push_back(passinner);
-	    
-	  }
+	      bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;	    
+	      if (passinner) vmbendinner[ibend]=true;
+	      pttableinner_.push_back(passinner);
+	      
+	    }
 
-	  for(int ibend=0;ibend<8;ibend++) {
-	    double bend=Stub::benddecode(ibend,true); 
+	    for(int ibend=0;ibend<8;ibend++) {
+	      double bend=Stub::benddecode(ibend,true); 
+	      
+	      bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	      if (passouter) vmbendouter[ibend]=true;
+	      pttableouter_.push_back(passouter);
 	    
-	    bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
-	    if (passouter) vmbendouter[ibend]=true;
-	    pttableouter_.push_back(passouter);
-	    
+	    }
 	  }
-
 	}
       }
     
@@ -782,6 +781,10 @@ public:
 
   double rinv(double phi1, double phi2,double r1, double r2){
 
+    if (r2<r1) { //can not form tracklet
+      return 20.0; 
+    }
+    
     assert(r2>r1);
 
     double dphi=phi2-phi1;
