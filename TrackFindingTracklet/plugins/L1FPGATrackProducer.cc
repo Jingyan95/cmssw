@@ -179,6 +179,9 @@ private:
   edm::FileInPath DTCLinkFile;
   edm::FileInPath moduleCablingFile;
 
+  edm::FileInPath DTCLinkLayerDiskFile;
+
+  
   int failscenario_;
   StubKiller* my_stubkiller;
 
@@ -193,6 +196,8 @@ private:
 
   Sector** sectors;
   Cabling cabling;
+
+  std::map<string,vector<int> > dtclayerdisk;
 
   edm::ESHandle<TrackerTopology> tTopoHandle;
   edm::ESHandle<TrackerGeometry> tGeomHandle;
@@ -263,7 +268,11 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
   wiresFile = iConfig.getParameter<edm::FileInPath> ("wiresFile");
 
   DTCLinkFile = iConfig.getParameter<edm::FileInPath> ("DTCLinkFile");
-  moduleCablingFile = iConfig.getParameter<edm::FileInPath> ("moduleCablingFile");
+  moduleCablingFile = iConfig.getParameter<edm::FileInPath> ("moduleCablingFile"
+
+  DTCLinkLayerDiskFile = iConfig.getParameter<edm::FileInPath> ("DTCLinkLayerDiskFile");
+
+);
 
 
   // --------------------------------------------------------------------------------
@@ -319,9 +328,26 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
   if (debug1) {
     cout << "cabling DTC links :     "<<DTCLinkFile.fullPath()<<endl;
     cout << "module cabling :     "<<moduleCablingFile.fullPath()<<endl;
+    cout << "DTC link layer disk :     "<<DTCLinkLayerDiskFile.fullPath()<<endl;
   }
 
   cabling.init(DTCLinkFile.fullPath().c_str(),moduleCablingFile.fullPath().c_str());
+
+  ifstream in(DTCLinkLayerDiskFile.fullPath().c_str());
+  string dtc;
+  in >> dtc;
+  while (in.good()){
+    vector<int> tmp;
+    dtclayerdisk[dtc]=tmp;
+    int layerdisk;
+    in >> layerdisk;
+    while (layerdisk>0) {
+      dtclayerdisk[dtc].push_back(layerdisk);
+      in >> layerdisk;
+    }
+    in >> dtc;
+  }
+  
 
   for (unsigned int i=0;i<NSector;i++) {
     sectors[i]=new Sector(i);

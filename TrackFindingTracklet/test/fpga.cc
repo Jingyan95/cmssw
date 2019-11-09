@@ -229,9 +229,26 @@ int main(const int argc, const char** argv)
       sectors[i]->addWire(mem,procin,procout);
     }
   
-
   }
 
+  std::map<string,vector<int> > dtclayerdisk;
+
+  ifstream indtc("../data/dtclinklayerdisk.dat");
+  assert(indtc.good());
+  string dtc;
+  indtc >> dtc;
+  while (indtc.good()){
+    vector<int> tmp;
+    dtclayerdisk[dtc]=tmp;
+    int layerdisk;
+    indtc >> layerdisk;
+    while (layerdisk>0) {
+      dtclayerdisk[dtc].push_back(layerdisk);
+      indtc >> layerdisk;
+    }
+    indtc >> dtc;
+  }
+  
   ofstream skimout;
   if (skimfile!="") skimout.open(skimfile.c_str());
 
@@ -258,7 +275,7 @@ int main(const int argc, const char** argv)
 
   bool first=true;
 
-  for (int i=0;i<nevents&&!in->eof();i++){
+  for (int eventnum=0;eventnum<nevents&&!in->eof();eventnum++){
     
     readTimer.start();
     SLHCEvent ev(*in);
@@ -281,7 +298,7 @@ int main(const int argc, const char** argv)
 // -----------------------------------------------------------------
 #ifdef USEROOT
     fpgaEvent->reset();
-    fpgaEvent->nevt = i;
+    fpgaEvent->nevt = eventnum;
     for(int nst=0; nst<ev.nsimtracks(); nst++) {
       simtrk = ev.simtrack(nst);
       FPGAEventMCTrack *mcTrack = new FPGAEventMCTrack(simtrk.type(),simtrk.pt(),simtrk.eta(),simtrk.phi(),simtrk.vx(),simtrk.vy(),simtrk.vz());
@@ -295,7 +312,7 @@ int main(const int argc, const char** argv)
 
       //skip if no simtracks - new (180424) ascii files only print out simtrack info if we have clusters
       if (ev.nsimtracks()==0) {
-      	i--;
+      	eventnum--;
 	//cout <<"Skip event"<<endl;
 	continue;
       }
@@ -332,7 +349,7 @@ int main(const int argc, const char** argv)
 
 
       if (!good) {
-	i--;
+	eventnum--;
 	//cout <<"Skip event"<<endl;
 	continue;
       }
@@ -343,7 +360,7 @@ int main(const int argc, const char** argv)
 
     if (writeSeeds) {
       ofstream fout("seeds.txt", ofstream::app);
-      fout << "======== Event " << i << " ========" << endl;
+      fout << "======== Event " << eventnum << " ========" << endl;
       for(unsigned nst=0; nst<ev.nsimtracks(); nst++) {
         const L1SimTrack &simtrk = ev.simtrack(nst);
         fout << "SimTrk " << simtrk.pt() << " " << simtrk.eta() << " " << simtrk.phi() << " " << simtrk.d0() << " ";
@@ -399,15 +416,9 @@ int main(const int argc, const char** argv)
       StubVariance variance(ev);
     }
 
-
-    
-    //ev.write(out);
-
-    cout <<"Process event: "<<i<<" with "<<ev.nstubs()<<" stubs and "<<ev.nsimtracks()<<" simtracks"<<endl;
+    cout <<"Process event: "<<eventnum<<" with "<<ev.nstubs()<<" stubs and "<<ev.nsimtracks()<<" simtracks"<<endl;
 
     std::vector<Track*> tracks;
-
-    //cout << "tracks.size() "<<tracks.size()<<endl;
 
     int nlayershit=0;
 
@@ -508,7 +519,7 @@ int main(const int argc, const char** argv)
 
 	//cout << "dpt dphi deta dz0 "<<dpt<<" "<<dphi<<" "<<deta<<" "<<dz0<<endl;
 	
-        out <<i<<" "<<simeventid<<" "<<simtrackid<<" "<<simtrack.type()<<" "
+        out <<eventnum<<" "<<simeventid<<" "<<simtrackid<<" "<<simtrack.type()<<" "
             <<simtrack.pt()<<" "<<simtrack.eta()<<" "<<simtrack.phi()<<" "
             <<simtrack.vx()<<" "<<simtrack.vy()<<" "<<simtrack.vz()<<" "
 	    <<eff<<" "<<effloose<<" "

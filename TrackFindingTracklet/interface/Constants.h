@@ -117,7 +117,7 @@ static const bool writetrace=false; //Print out details about startup
 static const bool debug1=false; //Print detailed debug information about tracking
 static const bool writeoutReal = false; 
 static const bool writememLinks = false; //Write files for dtc links
-static const bool writemem=false; //Note that for 'full' detector this will open
+static const bool writemem = false; //Note that for 'full' detector this will open
                             //a LOT of files, and the program will run excruciatingly slow
 static const unsigned int writememsect=3;  //writemem only for this sector
 

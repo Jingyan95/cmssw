@@ -31,11 +31,13 @@ clean:
 	@rm -f fpga
 	@rm -f *~
 	@rm -f ../data/MemPrints/InputStubs/InputStubs*.dat
+	@rm -f ../data/MemPrints/InputStubs/Link_*.dat
 	@rm -f ../data/MemPrints/Stubs/AllStubs_AS_*.dat
 	@rm -f ../data/MemPrints/Stubs/LayerStubs_SL*.dat
 	@rm -f ../data/MemPrints/VMStubsTE/VMStubs_VMS*.dat
 	@rm -f ../data/MemPrints/VMStubsME/VMStubs_VMS*.dat
 	@rm -f ../data/MemPrints/FitTrack/TrackFit_TF_*.dat
+	@rm -f ../data/MemPrints/CleanTrack/CleanTrack_CT_*.dat
 	@rm -f ../data/MemPrints/Stubs/DiskStubs_SD*.dat
 	@rm -f ../data/MemPrints/StubPairs/StubPairs_SP_*.dat
 	@rm -f InvTable_TC_*.dat
