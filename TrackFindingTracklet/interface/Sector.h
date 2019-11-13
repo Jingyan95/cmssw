@@ -24,6 +24,7 @@
 #include "TrackletEngineDisplaced.h"
 #include "TripletEngine.h"
 #include "TrackletCalculator.h"
+#include "TrackletProcessor.h"
 #include "TrackletCalculatorDisplaced.h"
 #include "ProjectionRouter.h"
 #include "MatchEngine.h"
@@ -175,6 +176,9 @@ public:
 	       procType=="TrackletDiskCalculator:") {
       TC_.push_back(new TrackletCalculator(procName,isector_));
       Processes_[procName]=TC_.back();
+    } else if (procType=="TrackletProcessor:") {
+      TP_.push_back(new TrackletProcessor(procName,isector_));
+      Processes_[procName]=TP_.back();
     } else if (procType=="TrackletCalculatorDisplaced:") {
       TCD_.push_back(new TrackletCalculatorDisplaced(procName,isector_));
       Processes_[procName]=TCD_.back();
@@ -401,6 +405,12 @@ public:
     }
   }
 
+  void executeTP(){
+    for (unsigned int i=0;i<TP_.size();i++){
+      TP_[i]->execute();
+    }
+  }
+
   void executeTC(){
     for (unsigned int i=0;i<TC_.size();i++){
       TC_[i]->execute();
@@ -525,6 +535,7 @@ private:
   std::vector<TrackletEngine*> TE_;
   std::vector<TrackletEngineDisplaced*> TED_;
   std::vector<TripletEngine*> TRE_;
+  std::vector<TrackletProcessor*> TP_;
   std::vector<TrackletCalculator*> TC_;
   std::vector<TrackletCalculatorDisplaced*> TCD_;
   std::vector<ProjectionRouter*> PR_;

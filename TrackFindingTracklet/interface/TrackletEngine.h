@@ -868,8 +868,6 @@ private:
   bool extra_;
   
   vector<bool> phitable_;
-  //vector<double> bendtableinner_;
-  //vector<double> bendtableouter_;
   vector<bool> pttableinner_;
   vector<bool> pttableouter_;
   

@@ -72,7 +72,7 @@ void matcheff(){
     cout << "Need to correctly specify parttype:"<<parttype<<endl;
   }
   
-  double effmin=0.7;
+  double effmin=0.0;
   int nbin=32;
   double maxpt=20.0;
   

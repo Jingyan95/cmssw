@@ -328,6 +328,8 @@ for proc in processingmodules :
         fp.write("TripletEngine: "+proc+"\n")
     if "TC_" in proc:
         fp.write("TrackletCalculator: "+proc+"\n")
+    if "TP_" in proc:
+        fp.write("TrackletProcessor: "+proc+"\n")
     if "TCD_" in proc:
         fp.write("TrackletCalculatorDisplaced: "+proc+"\n")
     if "PR_" in proc:
@@ -639,189 +641,191 @@ for m in inputmemcount :
         for line in lines:
             substr = line.split(">")
             proc=substr[1].strip()
-            if mem in substr[0].split() :
-                c+=1
-                if (count>1) :
-                    if c!=i :
-                        continue
-                fp.write(proc)
-                if "IL" in mem  and not "PHIL" in mem:
-                    fp.write(".stubin")
-                if "SL" in mem:
-                    if "SL1_" in mem :
-                        fp.write(".stubinLink1")
-                    if "SL2_" in mem :
-                        fp.write(".stubinLink2")
-                    if "SL3_" in mem :
-                        fp.write(".stubinLink3")
-                if "SD" in mem:
-                    if "SD1_" in mem :
-                        fp.write(".stubinLink1")
-                    if "SD2_" in mem :
-                        fp.write(".stubinLink2")
-                    if "SD3_" in mem :
-                        fp.write(".stubinLink3")
-                if "VMSTE_" in mem:
-                    if "hourglass" in sys.argv[1]:
-                        if "TE_" in proc:
-                            if ( ("_D1" in mem and not ("TE_L1" in proc or "TE_L2" in proc)) or ("_L2" in mem and not "TE_L1" in proc) or "_L1" in mem or ("_L3" in mem and not "TE_L2" in proc) or "_L5" in mem or "_D3" in mem ) :
+            #print "Split:",substr[0].split()
+            for inputmem in substr[0].split():
+                if mem in inputmem :
+                    c+=1
+                    if (count>1) :
+                        if c!=i :
+                            continue
+                    fp.write(proc)
+                    if "IL" in mem  and not "PHIL" in mem:
+                        fp.write(".stubin")
+                    if "SL" in mem:
+                        if "SL1_" in mem :
+                            fp.write(".stubinLink1")
+                        if "SL2_" in mem :
+                            fp.write(".stubinLink2")
+                        if "SL3_" in mem :
+                            fp.write(".stubinLink3")
+                    if "SD" in mem:
+                        if "SD1_" in mem :
+                            fp.write(".stubinLink1")
+                        if "SD2_" in mem :
+                            fp.write(".stubinLink2")
+                        if "SD3_" in mem :
+                            fp.write(".stubinLink3")
+                    if "VMSTE_" in mem:
+                        if "hourglass" in sys.argv[1]:
+                            if "TE_" in proc or "TP_" in proc:
+                                if ( ("_D1" in mem and not ("TE_L1" in proc or "TE_L2" in proc or "TP_L1" in proc or "TP_L2" in proc)) or ("_L2" in mem and not ("TE_L1" in proc or "TP_L1" in proc)) or "_L1" in mem or ("_L3" in mem and not ("TE_L2" in proc or "TP_L2" in proc)) or "_L5" in mem or "_D3" in mem ) :
+                                    fp.write(".innervmstubin")
+                                else :
+                                    fp.write(".outervmstubin")
+                            elif "TED_" in proc:
+                                if ("_L3" in mem and not "TED_L2" in proc) or ("_L5" in mem) or ("_L2" in mem) or ("_D1" in mem):
+                                    fp.write(".firstvmstubin")
+                                else:
+                                    fp.write(".secondvmstubin")
+                            elif "TRE_" in proc:
+                                fp.write(".thirdvmstubin")
+                            else:
+                                print "UNKNOWN CONSUMER OF VMSTE! ", line
+                        else :
+                            if ( ("_L1" in mem and not "TE_D1" in proc and not "TE_B1" in proc) or "_L3" in mem or "_L5" in mem or "_D1" in mem or "_D3" in mem or "_B1" in mem or "_B3" in mem ) :
                                 fp.write(".innervmstubin")
                             else :
-                                fp.write(".outervmstubin")
-                        elif "TED_" in proc:
-                            if ("_L3" in mem and not "TED_L2" in proc) or ("_L5" in mem) or ("_L2" in mem) or ("_D1" in mem):
-                                fp.write(".firstvmstubin")
-                            else:
-                                fp.write(".secondvmstubin")
-                        elif "TRE_" in proc:
-                            fp.write(".thirdvmstubin")
-                        else:
-                            print "UNKNOWN CONSUMER OF VMSTE! ", line
-                    else :
-                        if ( ("_L1" in mem and not "TE_D1" in proc and not "TE_B1" in proc) or "_L3" in mem or "_L5" in mem or "_D1" in mem or "_D3" in mem or "_B1" in mem or "_B3" in mem ) :
-                            fp.write(".innervmstubin")
+                                fp.write(".outervmstubin")                        
+                    if "VMSME_" in mem:
+                        fp.write(".vmstubin")
+                    if "AS_" in mem:
+                        if ("MC_" in proc or "MP_" in proc) :
+                            fp.write(".allstubin")
                         else :
-                            fp.write(".outervmstubin")                        
-                if "VMSME_" in mem:
-                    fp.write(".vmstubin")
-                if "AS_" in mem:
-                    if ("MC_" in proc or "MP_" in proc) :
-                        fp.write(".allstubin")
-                    else :
-                        if "TC_" in proc:
-                            if ( "_L1" in mem or "_L3" in mem or "_L5" in mem or "_F1" in mem or "_F3" in mem ) :  
-                                fp.write(".innerallstubin")
-                            else :
-                                fp.write(".outerallstubin")
-                        elif "TCD_L3" in proc:
-                            if "_L3" in mem:
-                                fp.write(".firstallstubin")
-                            elif "_L4" in mem:
-                                fp.write(".secondallstubin")
+                            if "TC_" in proc or "TP_" in proc:
+                                if ( "_L1" in mem or "_L3" in mem or "_L5" in mem or "_F1" in mem or "_F3" in mem ) :  
+                                    fp.write(".innerallstubin")
+                                else :
+                                    fp.write(".outerallstubin")
+                            elif "TCD_L3" in proc:
+                                if "_L3" in mem:
+                                    fp.write(".firstallstubin")
+                                elif "_L4" in mem:
+                                    fp.write(".secondallstubin")
+                                else:
+                                    fp.write(".thirdallstubin")
+                            elif "TCD_L5" in proc:
+                                if "_L4" in mem:
+                                    fp.write(".thirdallstubin")
+                                elif "_L5" in mem:
+                                    fp.write(".firstallstubin")
+                                else:
+                                    fp.write(".secondallstubin")
+                            elif "TCD_L2" in proc:
+                                if "_D1" in mem:
+                                    fp.write(".thirdallstubin")
+                                elif "_L2" in mem:
+                                    fp.write(".firstallstubin")
+                                else:
+                                    fp.write(".secondallstubin")
+                            elif "TCD_D1" in proc:
+                                if "_L2" in mem:
+                                    fp.write(".thirdallstubin")
+                                elif "_D1" in mem:
+                                    fp.write(".firstallstubin")
+                                else:
+                                    fp.write(".secondallstubin")
                             else:
-                                fp.write(".thirdallstubin")
-                        elif "TCD_L5" in proc:
-                            if "_L4" in mem:
-                                fp.write(".thirdallstubin")
-                            elif "_L5" in mem:
-                                fp.write(".firstallstubin")
-                            else:
-                                fp.write(".secondallstubin")
-                        elif "TCD_L2" in proc:
-                            if "_D1" in mem:
-                                fp.write(".thirdallstubin")
-                            elif "_L2" in mem:
-                                fp.write(".firstallstubin")
-                            else:
-                                fp.write(".secondallstubin")
-                        elif "TCD_D1" in proc:
-                            if "_L2" in mem:
-                                fp.write(".thirdallstubin")
-                            elif "_D1" in mem:
-                                fp.write(".firstallstubin")
-                            else:
-                                fp.write(".secondallstubin")
+                                print "UNKNOWN CONSUMER OF AS_ ",line                            
+                    if "SP_" in mem:
+                        ii=0
+                        for f in tcin :
+                            if f[0]==proc :
+                                f[1]+=1
+                                ii=f[1]
+                        if ii==0:
+                            tcin.append([proc,1])
+                            ii=1
+                        fp.write(".stubpair"+str(ii)+"in")
+                    if "SPD_" in mem:
+                        ii=0
+                        for f in trein :
+                            if f[0]==proc :
+                                f[1]+=1
+                                ii=f[1]
+                        if ii==0:
+                            trein.append([proc,1])
+                            ii=1
+                        fp.write(".stubpair"+str(ii)+"in")
+                    if "ST_" in mem:
+                        ii1=0
+                        for f in tcdin :
+                            if f[0]==proc :
+                                f[1]+=1
+                                ii1=f[1]
+                        if ii1==0:
+                            tcdin.append([proc,1])
+                            ii1=1
+                        fp.write(".stubtriplet"+str(ii1)+"in")
+                    if "TPROJ_" in mem:
+                        if ("PT_" in proc or "MP_" in proc) :
+                            fp.write(".projin")
                         else:
-                            print "UNKNOWN CONSUMER OF AS_ ",line                            
-                if "SP_" in mem:
-                    ii=0
-                    for f in tcin :
-                        if f[0]==proc :
-                            f[1]+=1
-                            ii=f[1]
-                    if ii==0:
-                        tcin.append([proc,1])
-                        ii=1
-                    fp.write(".stubpair"+str(ii)+"in")
-                if "SPD_" in mem:
-                    ii=0
-                    for f in trein :
-                        if f[0]==proc :
-                            f[1]+=1
-                            ii=f[1]
-                    if ii==0:
-                        trein.append([proc,1])
-                        ii=1
-                    fp.write(".stubpair"+str(ii)+"in")
-                if "ST_" in mem:
-                    ii1=0
-                    for f in tcdin :
-                        if f[0]==proc :
-                            f[1]+=1
-                            ii1=f[1]
-                    if ii1==0:
-                        tcdin.append([proc,1])
-                        ii1=1
-                    fp.write(".stubtriplet"+str(ii1)+"in")
-                if "TPROJ_" in mem:
-                    if ("PT_" in proc or "MP_" in proc) :
-                        fp.write(".projin")
-                    else:
+                            ii=0
+                            for f in prin :
+                                if f[0]==proc :
+                                    f[1]+=1
+                                    ii=f[1]
+                            if ii==0:
+                                prin.append([proc,1])
+                                ii=1
+                            fp.write(".proj"+str(ii)+"in")
+                    if "VMPROJ_" in mem:
+                        fp.write(".vmprojin")
+                    if "AP_" in mem:
+                        fp.write(".allprojin")
+                    if "CM_" in mem:
                         ii=0
-                        for f in prin :
+                        for f in cmin :
                             if f[0]==proc :
                                 f[1]+=1
                                 ii=f[1]
                         if ii==0:
-                            prin.append([proc,1])
+                            cmin.append([proc,1])
                             ii=1
-                        fp.write(".proj"+str(ii)+"in")
-                if "VMPROJ_" in mem:
-                    fp.write(".vmprojin")
-                if "AP_" in mem:
-                    fp.write(".allprojin")
-                if "CM_" in mem:
-                    ii=0
-                    for f in cmin :
-                        if f[0]==proc :
-                            f[1]+=1
-                            ii=f[1]
-                    if ii==0:
-                        cmin.append([proc,1])
-                        ii=1
-                    fp.write(".match"+str(ii)+"in")
-                if "TF_" in mem:
-                    ii=0
-                    for f in tfin :
-                        if f[0]==proc :
-                            f[1]+=1
-                            ii=f[1]
-                    if ii==0:
-                        tfin.append([proc,1])
-                        ii=1
-                    fp.write(".trackin"+str(ii))
-                if "FM_" in mem:
-                    if "MT_" in proc :
+                        fp.write(".match"+str(ii)+"in")
+                    if "TF_" in mem:
                         ii=0
-                        for f in fmin2 :
+                        for f in tfin :
                             if f[0]==proc :
                                 f[1]+=1
                                 ii=f[1]
                         if ii==0:
-                            fmin2.append([proc,1])
+                            tfin.append([proc,1])
                             ii=1
-                        fp.write(".proj"+str(ii)+"in")
-                    else:
-                        num=matchin(proc,mem)
+                        fp.write(".trackin"+str(ii))
+                    if "FM_" in mem:
+                        if "MT_" in proc :
+                            ii=0
+                            for f in fmin2 :
+                                if f[0]==proc :
+                                    f[1]+=1
+                                    ii=f[1]
+                            if ii==0:
+                                fmin2.append([proc,1])
+                                ii=1
+                            fp.write(".proj"+str(ii)+"in")
+                        else:
+                            num=matchin(proc,mem)
+                            ii=0
+                            for f in fmin2 :
+                                if f[0]==proc+num :
+                                    f[1]+=1
+                                    ii=f[1]
+                            if ii==0:
+                                fmin2.append([proc+num,1])
+                                ii=1
+                            fp.write(".fullmatch"+num+"in"+str(ii))
+                    if "TPAR_" in mem:
                         ii=0
-                        for f in fmin2 :
-                            if f[0]==proc+num :
+                        for f in ftin :
+                            if f[0]==proc :
                                 f[1]+=1
                                 ii=f[1]
                         if ii==0:
-                            fmin2.append([proc+num,1])
+                            ftin.append([proc,1])
                             ii=1
-                        fp.write(".fullmatch"+num+"in"+str(ii))
-                if "TPAR_" in mem:
-                    ii=0
-                    for f in ftin :
-                        if f[0]==proc :
-                            f[1]+=1
-                            ii=f[1]
-                    if ii==0:
-                        ftin.append([proc,1])
-                        ii=1
-                    fp.write(".tpar"+str(ii)+"in")
+                        fp.write(".tpar"+str(ii)+"in")
                     
 
         fp.write("\n")

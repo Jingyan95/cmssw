@@ -60,6 +60,7 @@ static const bool writeSeeds=false;
 static const bool writeTE=false;
 static const bool writeTED=false;
 static const bool writeTRE=false;
+static const bool writeTrackletProcessor=false;
 static const bool writeTrackletCalculator=false;
 static const bool writeTrackletCalculatorDisplaced=false;
 static const bool writeTrackletPars=false;
@@ -94,7 +95,7 @@ static const bool writeVariance=false; //write out residuals for variand matrix 
 static const bool writeResEff=false; //write files for making resolution & efficiency plots for standable code version
 static const bool writePars=false; //write files for making plots of track parameters
 
-static const bool writeMatchEff=false; //write files for making plots with truth matched efficiency
+static const bool writeMatchEff=true; //write files for making plots with truth matched efficiency
 
 
 
@@ -133,15 +134,15 @@ static const bool warnNoMem=false;  //If true will print out warnings about miss
 //Program flow (should be true for normal operation)
 //enables the stub finding in these layer/disk combinations
 static const bool doL1L2=true;
-static const bool doL2L3=true;
-static const bool doL3L4=true;
-static const bool doL5L6=true;
+static const bool doL2L3=false;
+static const bool doL3L4=false;
+static const bool doL5L6=false;
 
-static const bool doD1D2=true; 
-static const bool doD3D4=true;
+static const bool doD1D2=false; 
+static const bool doD3D4=false;
 
-static const bool doL1D1=true;
-static const bool doL2D1=true;
+static const bool doL1D1=false;
+static const bool doL2D1=false;
 
 static const bool doL3L4L2=true; // only run if hourglassExtended is true
 static const bool doL5L6L4=true; // only run if hourglassExtended is true
@@ -335,7 +336,7 @@ static const double rinnerdisk=22.0;
 //static const int NMAXstub  = 250;
 //static const int NMAXroute = 250;
 
-static const unsigned int MAXOFFSET=0; //set to 0 to enable regular truncation or 10000 to disable it.
+static const unsigned int MAXOFFSET=10000; //set to 0 to enable regular truncation or 10000 to disable it.
 
 static const unsigned int MAXSTUBSLINK = 108 + MAXOFFSET; //Max stubs per link
 static const unsigned int MAXLAYERROUTER = 108 + MAXOFFSET; //Max stubs handled by layer router

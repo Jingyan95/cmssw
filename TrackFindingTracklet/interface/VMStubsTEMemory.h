@@ -85,7 +85,9 @@ public:
     if (subname[1]!='n') {
       phibin_=10*phibin_+(subname[1]-'0');
     }
-
+    cout << "Phibin: "<<name<<" "<<phibin_<<endl;
+    
+    
     unsigned int nbins=8;
     if (layer_>=4) nbins=16;
     if (disk_==1 && extended_ && overlap_) nbins = 16;

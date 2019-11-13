@@ -337,6 +337,13 @@ if (writeHitEff) {
     }
     TRETimer.stop();
 
+    for (unsigned int k=0;k<NSector;k++) {
+      sectors[k]->executeTP();	 
+      if(writemem&&k==writememsect){
+        sectors[k]->writeTPAR(first);
+        //sectors[k]->writeTPROJ(first);
+      } 
+    }
 
     TCTimer.start();
     for (unsigned int k=0;k<NSector;k++) {
