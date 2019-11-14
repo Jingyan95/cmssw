@@ -1082,9 +1082,9 @@ public:
 	  }
 	  
 	  bool foundmem=false;
+	  int layer=tracklet->layer();
+	  int disk=abs(tracklet->disk());
 	  for (unsigned int l=0;l<fullmatches_.size();l++){
-	    int layer=tracklet->layer();
-	    int disk=abs(tracklet->disk());
 	    if (!hourglassExtended) {
 	      if ((layer==1&&disk==0&&fullmatches_[l]->getName().substr(3,4)=="L1L2")||
 		  (layer==3&&disk==0&&fullmatches_[l]->getName().substr(3,4)=="L3L4")||
@@ -1135,7 +1135,10 @@ public:
 	      }
 	    }
 	  }
-	  //assert(foundmem);
+	  if (!foundmem) {
+	    cout << getName()<<" layer:"<<layer<<" disk="<<disk<<endl;
+	  }
+	  assert(foundmem);
 	}
       }
       //if (countall>=MAXMC) break;
