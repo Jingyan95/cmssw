@@ -1054,7 +1054,7 @@ public:
 		
 	  
 	if (imatch) {
-	  
+
 	  std::pair<Stub*,L1TStub*> tmp(fpgastub,stub);
 	    
 	  countsel++;
@@ -1081,6 +1081,7 @@ public:
 		 << " "<<iSector_<<endl;	   
 	  }
 	  
+	  bool foundmem=false;
 	  for (unsigned int l=0;l<fullmatches_.size();l++){
 	    int layer=tracklet->layer();
 	    int disk=abs(tracklet->disk());
@@ -1102,8 +1103,9 @@ public:
 		  fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << tracklet->getISeed() << endl;
 		  fout.close();
 		}
+		foundmem=true;
 		fullmatches_[l]->addMatch(tracklet,tmp);
-	      }
+	      } 
 	    }
 	    else {
 	      int iSeed = tracklet->getISeed ();
@@ -1128,10 +1130,12 @@ public:
 		  fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << tracklet->getISeed() << endl;
 		  fout.close();
 		}
+		foundmem=true;
 		fullmatches_[l]->addMatch(tracklet,tmp);
 	      }
 	    }
 	  }
+	  //assert(foundmem);
 	}
       }
       //if (countall>=MAXMC) break;

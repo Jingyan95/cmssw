@@ -146,11 +146,6 @@ public:
     int nproj=vmprojs_->nTracklets();
     bool moreproj=iproj<nproj;
 
-    bool highocc=nproj>10;
-    if (highocc) {
-      cout << "nproj "<<nproj<<endl;
-    }
-    
     //Projection that is read from the buffer and compared to stubs  
     int rzbin=0;
     int projfinerz=0;
@@ -250,9 +245,7 @@ public:
 	  Tracklet* proj=vmprojs_->getFPGATracklet(projindex);
 
 	  nstubs=vmstubs_->nStubsBin(rzbin);
-	  if (highocc) {
-	    cout <<" nstubs "<<nstubs<<endl;
-	  }
+
 	  projfinerz = barrel?proj->finezvm(layer_):proj->finervm(disk_);
 
 	  projrinv=barrel?(16+(proj->fpgarinv().value()>>(proj->fpgarinv().nbits()-5))):proj->getBendIndex(disk_).value();
@@ -330,10 +323,6 @@ public:
       
     }
 
-    if (highocc) {
-      cout << " countall countpass : "<<countall<<" "<<countpass<<endl;
-    }
-    
     if (writeME) {
       static ofstream out("matchengine.txt");
       out << getName()<<" "<<countall<<" "<<countpass<<endl;

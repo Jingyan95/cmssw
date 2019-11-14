@@ -13,10 +13,10 @@ tdisk=2.4
 tLLD =1.7
 
 #If true it will use a MatchProcessor to replace PRs, MEs, MC
-combinedMP=True
+combinedMP=False
 
 #If true it will use a TrackletProcessor to replace TEs, TCs
-combinedTP=True
+combinedTP=False
 
 # if true use L2L3 seeding
 extraseeding=True
@@ -2416,6 +2416,10 @@ if combinedMP :
             fp.write(" > MP_L"+str(ilayer)+"PHI"+letter(iallprojmem)+" > ")
             fm_name="FM_L1L2_L"+str(ilayer)+"PHI"+letter(iallprojmem)
             if ilayer!=1 and ilayer!=2 :
+                fp.write(fm_name+" ")
+                FM_list.append(fm_name)
+            fm_name="FM_L2L3_L"+str(ilayer)+"PHI"+letter(iallprojmem)
+            if ilayer!=2 and ilayer!=3 and ilayer!=6:  #do not allow L2L3 projections to L6
                 fp.write(fm_name+" ")
                 FM_list.append(fm_name)
             fm_name="FM_L3L4_L"+str(ilayer)+"PHI"+letter(iallprojmem)

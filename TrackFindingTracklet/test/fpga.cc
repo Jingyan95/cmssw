@@ -189,9 +189,9 @@ int main(const int argc, const char** argv)
     string procType, procName;
     inproc >>procType>>procName;
     if (!inproc.good()) continue;
-    //if (writetrace) {
+    if (writetrace) {
       cout << "Read process: "<<procType<<" "<<procName<<endl;
-      //}
+    }
     for (unsigned int i=0;i<NSector;i++) {
       sectors[i]->addProc(procType,procName);
     }

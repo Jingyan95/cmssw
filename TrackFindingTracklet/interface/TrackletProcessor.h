@@ -234,10 +234,6 @@ public:
 	   << " to input "<<input<<endl;
     }
 
-    if (getName()=="TP_L1L2A" && iSector_==1) {
-      cout << "In "<<name_<<" adding input from "<<memory->getName()<<endl;      
-    }
-    
     if (input=="innervmstubin"){
       VMStubsTEMemory* tmp=dynamic_cast<VMStubsTEMemory*>(memory);
       assert(tmp!=0);
@@ -488,8 +484,6 @@ public:
 
     StubPairsMemory stubpairs("tmp",iSector_,0.0,1.0); //dummy arguments for now
 
-    cout << "TrackletProcessor execute "<<getName()<<" "<<innervmstubs_.size()<<endl;
-
     bool print=false;
     
     assert(innervmstubs_.size()==outervmstubs_.size());
@@ -677,7 +671,6 @@ public:
 		unsigned int nvminner=nallstubslayers[layer_-1]*nvmtelayers[layer_-1];
 		unsigned int nvmouter=nallstubslayers[layer_]*nvmtelayers[layer_];
 		if (extra_){
-		  assert(0);
 		  nvminner=nallstubslayers[layer_-1]*nvmteextralayers[layer_-1];
 		  nvmouter=nallstubslayers[layer_]*nvmteextralayers[layer_];
 		}
@@ -823,10 +816,7 @@ public:
       }
     }
     
-    
-
-    //cout << "stubpairs:"<<getName()<<" "<<stubpairs.nStubPairs()<<endl;
-    
+        
     for(unsigned int i=0;i<stubpairs.nStubPairs();i++){
 
       if (trackletpars_->nTracklets()>=maxtracklet_) {
@@ -990,7 +980,7 @@ public:
   }
 
   bool barrelSeeding(Stub* innerFPGAStub, L1TStub* innerStub, Stub* outerFPGAStub, L1TStub* outerStub){
-	  
+
     if (debug1) {
       cout << "TrackletProcessor "<<getName()<<" "<<layer_<<" trying stub pair in layer (inner outer): "
 	   <<innerFPGAStub->layer().value()<<" "<<outerFPGAStub->layer().value()<<endl;
@@ -1345,7 +1335,7 @@ public:
       success = false;
     }
     success = success && ITC->valid_trackpar.passes();
-    
+
     if (!success) return false;
 
     double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
@@ -1372,7 +1362,8 @@ public:
 	  <<"   "<<z0<<" "<<z0approx<<" "<<ITC->z0_final.get_fval()
 	  <<endl;
     }	        
-        
+
+    
     Tracklet* tracklet=new Tracklet(innerStub,NULL,outerStub,
 					    innerFPGAStub,NULL,outerFPGAStub,
 					    iSector_,
@@ -1470,8 +1461,8 @@ public:
     int sign=1;
     if (innerFPGAStub->disk().value()<0) sign=-1;
     
-    disk_=innerFPGAStub->disk().value();
-    assert(abs(disk_)==1||abs(disk_)==3);
+    int disk=innerFPGAStub->disk().value();
+    assert(abs(disk)==1||abs(disk)==3);
     
     
     assert(innerStub->isPSmodule());
@@ -1522,9 +1513,9 @@ public:
       phiderdiskapprox[3],rderdiskapprox[3];
 	    
     IMATH_TrackletCalculatorDisk *ITC;
-    if(disk_==1)       ITC = &ITC_F1F2;
-    else if(disk_==3)  ITC = &ITC_F3F4;
-    else if(disk_==-1) ITC = &ITC_B1B2;
+    if(disk==1)       ITC = &ITC_F1F2;
+    else if(disk==3)  ITC = &ITC_F3F4;
+    else if(disk==-1) ITC = &ITC_B1B2;
     else               ITC = &ITC_B3B4;
     
     ITC->r1.set_fval(r1);
@@ -1863,7 +1854,7 @@ public:
     
     assert(innerFPGAStub->isDisk());
     
-    disk_=innerFPGAStub->disk().value();
+    int disk=innerFPGAStub->disk().value();
     
     if (debug1) {
       cout << "trying to make overlap tracklet disk_ = "<<disk_<<" "<<getName()<<endl;
@@ -1921,10 +1912,10 @@ public:
 
     IMATH_TrackletCalculatorOverlap *ITC;
     int ll = outerFPGAStub->layer().value()+1;
-    if     (ll==1 && disk_==1)  ITC = &ITC_L1F1;
-    else if(ll==2 && disk_==1)  ITC = &ITC_L2F1;
-    else if(ll==1 && disk_==-1) ITC = &ITC_L1B1;
-    else if(ll==2 && disk_==-1) ITC = &ITC_L2B1;
+    if     (ll==1 && disk==1)  ITC = &ITC_L1F1;
+    else if(ll==2 && disk==1)  ITC = &ITC_L2F1;
+    else if(ll==1 && disk==-1) ITC = &ITC_L1B1;
+    else if(ll==2 && disk==-1) ITC = &ITC_L2B1;
     else assert(0);
     
     ITC->r1.set_fval(r2-rmean[ll-1]);

@@ -72,7 +72,7 @@ public:
   }
 
   void execute(std::vector<Track*>& outputtracks_) {
-
+    
     inputtracklets_.clear();
     inputtracks_.clear();
 
@@ -381,7 +381,7 @@ public:
         //}
         //cout << endl;
       }
-      
+
       for(unsigned int itrk=0; itrk<numTrk-1; itrk++) { // numTrk-1 since last track has no other to compare to
 	
         // If primary track is a duplicate, it cannot veto any...move on
@@ -442,13 +442,14 @@ public:
         } // end tag duplicates
 
       } // end loop over primary track
+
     } // end ichi + nstub removal
 
     //Add tracks to output
     if(RemovalType!="merge") {
       for(unsigned int i=0;i<inputtrackfits_.size();i++) {
         for(unsigned int j=0;j<inputtrackfits_[i]->nTracks();j++) {
-          if(inputtrackfits_[i]->getTrack(j)->getTrack()->duplicate()==0) {
+	  if(inputtrackfits_[i]->getTrack(j)->getTrack()->duplicate()==0) {
             if (writeSeeds) {
               ofstream fout("seeds.txt", ofstream::app);
               fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << inputtrackfits_[i]->getTrack(j)->getISeed() << endl;
@@ -462,7 +463,6 @@ public:
       }
     }
 
-    
   }
 
 

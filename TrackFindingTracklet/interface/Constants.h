@@ -134,15 +134,15 @@ static const bool warnNoMem=false;  //If true will print out warnings about miss
 //Program flow (should be true for normal operation)
 //enables the stub finding in these layer/disk combinations
 static const bool doL1L2=true;
-static const bool doL2L3=false;
-static const bool doL3L4=false;
-static const bool doL5L6=false;
+static const bool doL2L3=true;
+static const bool doL3L4=true;
+static const bool doL5L6=true;
 
-static const bool doD1D2=false; 
-static const bool doD3D4=false;
+static const bool doD1D2=true; 
+static const bool doD3D4=true;
 
-static const bool doL1D1=false;
-static const bool doL2D1=false;
+static const bool doL1D1=true;
+static const bool doL2D1=true;
 
 static const bool doL3L4L2=true; // only run if hourglassExtended is true
 static const bool doL5L6L4=true; // only run if hourglassExtended is true

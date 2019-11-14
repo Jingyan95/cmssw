@@ -996,9 +996,12 @@ class FitTrack:public ProcessBase{
 
    double phicrit=phi0fit-asin(0.5*rcrit*rinvfit);
    bool keep=(phicrit>phicritmin)&&(phicrit<phicritmax);
-   
-   if (!keep) return;
 
+   
+   if (!keep) {
+     return;
+   }
+     
    tracklet->setFitPars(rinvfit,phi0fit,tfit,z0fit,chisqfit,
      rinvfitexact,phi0fitexact,tfitexact,
      z0fitexact,chisqfitexact,
@@ -1079,13 +1082,12 @@ class FitTrack:public ProcessBase{
 
   void execute() {
 
-
    // merge
    std::vector<Tracklet*> matches1=orderedMatches(fullmatch1_);
    std::vector<Tracklet*> matches2=orderedMatches(fullmatch2_);
    std::vector<Tracklet*> matches3=orderedMatches(fullmatch3_);
    std::vector<Tracklet*> matches4=orderedMatches(fullmatch4_);
-
+   
    if (debug1&&(matches1.size()+matches2.size()+matches3.size()+matches4.size())>0) {
     for (unsigned int i=0;i<fullmatch1_.size();i++) {
      cout << fullmatch1_[i]->getName()<<" "<<fullmatch1_[i]->nMatches()<<endl;
