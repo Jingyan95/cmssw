@@ -314,8 +314,8 @@ public:
   unsigned int         kalmanMaxStubsPerLayer()         const { return kalmanMaxStubsPerLayer_;}
   // Multiple scattering term - inflate hit phi errors by this divided by Pt
   double               kalmanMultiScattTerm()           const { return kalmanMultiScattTerm_;}
-  // Multiple scattering factor -- buggy so don't use!
-  double               kalmanMultiScattFactor()         const { return kalmanMultiScattFactor_;}
+  // Scale down chi2 in r-phi plane by this factor to improve electron performance.
+  unsigned int         kalmanChi2RphiScale()            const { return kalmanChi2RphiScale_;}
   //--- Enable Higher order corrections
   // Treat z uncertainty in tilted barrel modules correctly.
   bool                kalmanHOtilted()                  const {return kalmanHOtilted_;}
@@ -376,6 +376,7 @@ public:
   double              kf_tanlambdaRange()        const {return kf_tanlambdaRange_;}
   unsigned int        kf_chisquaredBits()        const {return kf_chisquaredBits_;}
   double              kf_chisquaredRange()       const {return kf_chisquaredRange_;}
+  vector<double>      kf_chisquaredBinEdges()    const {return kf_chisquaredBinEdges_;}
   // Skip track digitisation when fitted is not SimpleLR or KF?
   bool                other_skipTrackDigi()      const {return other_skipTrackDigi_;}
 
@@ -616,7 +617,7 @@ private:
   unsigned int         kalmanMaxStubsEasy_;
   unsigned int         kalmanMaxStubsPerLayer_;
   double               kalmanMultiScattTerm_; 
-  double               kalmanMultiScattFactor_; 
+  unsigned int         kalmanChi2RphiScale_;
   bool                 kalmanHOtilted_;
   bool                 kalmanHOhelixExp_;
   unsigned int         kalmanHOalpha_;
@@ -659,6 +660,7 @@ private:
   double               kf_tanlambdaRange_;
   unsigned int         kf_chisquaredBits_;
   double               kf_chisquaredRange_;
+  vector<double>       kf_chisquaredBinEdges_;
   //
   bool                 other_skipTrackDigi_;
 
