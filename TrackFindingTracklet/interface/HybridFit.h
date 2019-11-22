@@ -147,14 +147,19 @@ class HybridFit{
       if (printDebugKF) cout << "Done with Kalman fit. Pars: pt = " << trk.pt() << ", 1/2R = " << 3.8*3*trk.qOverPt()/2000 << ", phi0 = " << trk.phi0() << ", eta = " << trk.eta() << ", z0 = " << trk.z0() << ", chi2 = "<<trk.chi2()  << ", accepted = "<< trk.accepted() << endl;
 
       // Tracklet wants phi0 with respect to lower edge of sector, not global phi0.
-      double tracklet_phi0=trk.phi0()-iSector_*2*M_PI/NSector+0.5*dphisectorHG;
+      double phi0fit=trk.phi0()-iSector_*2*M_PI/NSector+0.5*dphisectorHG;
 
-      if (tracklet_phi0>M_PI) tracklet_phi0-=2*M_PI;
-      if (tracklet_phi0<-M_PI) tracklet_phi0+=2*M_PI;
+      if (phi0fit>M_PI) phi0fit-=2*M_PI;
+      if (phi0fit<-M_PI) phi0fit+=2*M_PI;
 
       double rinvfit=0.01*0.3*settings->getBfield()*trk.qOverPt();
 
-      int id0fit   = trk.d0()  / kd0;
+      int irinvfit = rinvfit   / krinvpars;
+      int iphi0fit = trk.phi0() / kphi0pars;
+      int itanlfit = trk.tanLambda() / ktpars;
+      int iz0fit   = trk.z0() / kz0pars;
+      int id0fit   = trk.d0()  / kd0pars;
+      int ichi2fit = trk.chi2() / 8;  // CHECK THIS
 
       if(trk.accepted()){
 
@@ -168,11 +173,12 @@ class HybridFit{
 
         if (printDebugKF) cout<<"#stubs before/after KF fit = "<<TMTTstubs.size()<<"/"<<l1stubsFromFit.size()<<endl;
 
-       tracklet->setFitPars(rinvfit,tracklet_phi0,trk.d0(),sinh(trk.eta()),trk.z0(),
-         trk.chi2(),rinvfit,tracklet_phi0, trk.d0(), sinh(trk.eta()),
-         trk.z0(),trk.chi2(),rinvfit/krinvpars,
-         tracklet_phi0/kphi0pars,id0fit,
-         sinh(trk.eta())/ktpars,trk.z0()/kz0pars,trk.chi2(),l1stubsFromFit);
+	// TO DO: update setFitPars() args, adding trk.getHitPattern() 
+	// & replacing trk.chi2() by trk.chi2rphi() & trk.chi2rz().
+
+	tracklet->setFitPars(rinvfit,phi0fit,trk.d0(),trk.tanLambda(),trk.z0(),trk.chi2(),
+			     rinvfit,phi0fit,trk.d0(),trk.tanLambda(),trk.z0(),trk.chi2(),
+			     irinvfit,iphi0fit,id0fit,itanlfit,iz0fit,ichi2fit,l1stubsFromFit);
        //cout<<" KF fit d0 is "<<trk.d0()<<"\n";
       } else {
        if (printDebugKF) cout << "FitTrack:KF rejected track"<<endl;
