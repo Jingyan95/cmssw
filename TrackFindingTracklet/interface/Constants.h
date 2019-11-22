@@ -497,6 +497,7 @@ static const int chisqzfactbits=14;
 //Duplicate Removal
 static const int minIndStubs=3; // not used with merge removal
 //"ichi" (pairwise, keep track with best ichisq), "nstub" (pairwise, keep track with more stubs), "grid" (TMTT-like removal), "" (no removal), "merge" (hybrid dup removal)
+
 #ifdef USEHYBRID
 static const std::string RemovalType="merge";
 // "CompareBest" (recommended) Compares only the best stub in each track for each region (best = smallest phi residual) and will merge the two tracks if stubs are shared in three or more regions
@@ -507,7 +508,7 @@ static const std::string RemovalType="ichi";
 #endif
 //static const std::string RemovalType=""; // Run without duplicate removal
 
-static const bool fakefit=false; //if true, run a dummy fit, producing TTracks directly from output of tracklet pattern reco stage.
+static const bool fakefit=false; //if true, run a dummy fit, producing TTracks directly from output of tracklet pattern reco stage. (Not working for Hybrid)
 
 #endif
 
