@@ -154,11 +154,11 @@ class HybridFit{
 
       double rinvfit=0.01*0.3*settings->getBfield()*trk.qOverPt();
 
-      int irinvfit = rinvfit   / krinvpars;
-      int iphi0fit = trk.phi0() / kphi0pars;
+      int irinvfit = rinvfit / krinvpars;
+      int iphi0fit = phi0fit / kphi0pars;
       int itanlfit = trk.tanLambda() / ktpars;
       int iz0fit   = trk.z0() / kz0pars;
-      int id0fit   = trk.d0()  / kd0pars;
+      int id0fit   = trk.d0() / kd0pars;
       int ichi2fit = trk.chi2() / 8;  // CHECK THIS
 
       if(trk.accepted()){
