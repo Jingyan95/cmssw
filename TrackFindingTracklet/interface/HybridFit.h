@@ -159,7 +159,7 @@ class HybridFit{
       int itanlfit = trk.tanLambda() / ktpars;
       int iz0fit   = trk.z0() / kz0pars;
       int id0fit   = trk.d0() / kd0pars;
-      int ichi2fit = trk.chi2() / 8;  // CHECK THIS
+      int ichi2fit = trk.chi2() / 16;  // CHECK THIS (but not used to make TTTrack)
 
       if(trk.accepted()){
 
