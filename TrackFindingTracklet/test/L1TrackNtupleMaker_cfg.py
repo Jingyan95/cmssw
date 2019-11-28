@@ -64,7 +64,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:upgradePLS3', '')
 # input and output
 ############################################################
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
 
 # Get list of MC datasets from repo, or specify yourself.
 
@@ -75,7 +75,8 @@ if GEOMETRY == "D17": # Tilted barrel T5 tracker
   inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/PU200.txt')
 
 elif GEOMETRY == "D21": # Tilted barrel T6 tracker
-  inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt')
+  inputMC = ['file:/eos/cms/store/user/skinnari/TTbar_PU200_D21.root']
+ #inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt')
   #inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/SingleMuPt2to100/PU0.txt')
   #inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/DisplacedSingleMuPt2to100/PU0.txt')
 
