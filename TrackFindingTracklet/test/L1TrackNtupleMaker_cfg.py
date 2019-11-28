@@ -75,8 +75,7 @@ if GEOMETRY == "D17": # Tilted barrel T5 tracker
   inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/937/RelVal/TTbar/PU200.txt')
 
 elif GEOMETRY == "D21": # Tilted barrel T6 tracker
-  inputMC = ['file:/eos/cms/store/user/skinnari/TTbar_PU200_D21.root']
- #inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt')
+  inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/TTbar/PU200.txt')
   #inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/SingleMuPt2to100/PU0.txt')
   #inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/DisplacedSingleMuPt2to100/PU0.txt')
 
