@@ -111,6 +111,7 @@ public:
 
   void execute() {
 
+    cout << "In TrackletEngine"<<endl;
     
     if (!((doL1L2&&(layer1_==1)&&(layer2_==2))||
 	  (doL2L3&&(layer1_==2)&&(layer2_==3))||

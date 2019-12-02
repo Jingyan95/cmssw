@@ -4,6 +4,7 @@
 
 #include "L1TStub.h"
 #include "Stub.h"
+#include "VMStubTE.h"
 #include "MemoryBase.h"
 
 using namespace std;
@@ -11,10 +12,10 @@ using namespace std;
 class VMStubsTEMemory:public MemoryBase{
 
 public:
-
-  VMStubsTEMemory(string name, unsigned int iSector, 
-	      double phimin, double phimax):
-    MemoryBase(name,iSector){
+  
+ VMStubsTEMemory(string name, unsigned int iSector, 
+		 double phimin, double phimax):
+  MemoryBase(name,iSector){
     phimin_=phimin;
     phimax_=phimax;
     string subname=name.substr(6,2);
@@ -61,7 +62,7 @@ public:
     if (subname=="K") extra_=true;
     if (subname=="L") extra_=true;
     
-
+    
     extended_ = false;
     if (subname=="a") extended_=true;
     if (subname=="b") extended_=true;
@@ -79,7 +80,7 @@ public:
     if (subname=="r") extended_=true;
     if (subname=="s") extended_=true;
     if (subname=="t") extended_=true;
-        
+    
     subname=name.substr(12,2);
     phibin_=subname[0]-'0';
     if (subname[1]!='n') {
@@ -98,7 +99,7 @@ public:
     if (overlap_ and layer_==2) isinner_ = true;
     if (overlap_ and layer_==3) isinner_ = false;
     if (overlap_ and disk_==1) isinner_ = false; 
-
+    
     if (extra_ and layer_==2) isinner_ = true;
     if (extra_ and layer_==3) isinner_ = false;
     // more special cases for triplets
@@ -109,6 +110,105 @@ public:
     
   }
   
+  bool addVMStub(VMStubTE vmstub) {
+
+    std::pair<Stub*,L1TStub*> stub=vmstub.stub();
+
+    int mask=-1;
+    if (layer_==1 || layer_==3 || layer_==5 || (extended_ && layer_==2))
+      mask=1023;
+
+    int binlookup= -1;
+    if(!extended_){
+      binlookup=stub.first->getVMBits().value()&mask;
+      if (overlap_) {
+	binlookup=stub.first->getVMBitsOverlap().value();
+      }
+    } else{
+      binlookup=stub.first->getVMBitsExtended().value()&mask;
+      if (overlap_) {
+	binlookup=stub.first->getVMBitsOverlapExtended().value()&mask;
+      }
+    }
+    if (extra_) {
+      binlookup=stub.first->getVMBitsExtra().value();
+    }
+    if (binlookup<0) {
+      cout << getName() << " binlookup = "<<binlookup<<endl;
+    }
+
+    assert(binlookup==(int)vmstub.vmbits());
+    //cout << getName() << " binlookup:"<<binlookup<<" "<<vmstub.vmbits()<<endl;
+    binlookup=(int)vmstub.vmbits();
+    
+    assert(binlookup>=0);
+    int bin=(binlookup/8);
+
+    bool pass=passbend(stub.first->bend().value());
+
+    if (!pass) {
+      if (debug1) cout << getName() << " Stub failed bend cut. bend = "<<Stub::benddecode(stub.first->bend().value(),stub.first->isPSmodule())<<endl;
+      return false;
+    }
+
+    if(!extended_){
+      if (overlap_) {
+	if (disk_==1) {
+	  bool negdisk=stub.first->disk().value()<0.0;
+	  assert(bin<4);
+	  if (negdisk) bin+=4;
+	  stubsbinnedvm_[bin].push_back(vmstub);
+	  if (debug1) cout << getName()<<" Stub with lookup = "<<binlookup
+			   <<" in disk = "<<disk_<<"  in bin = "<<bin<<endl;
+	}
+      } else {
+        if (stub.first->isBarrel()){
+          if (!isinner_) {
+	    stubsbinnedvm_[bin].push_back(vmstub);
+          }
+	
+	} else {
+
+	  bool negdisk=stub.first->disk().value()<0.0;
+
+	  if (disk_%2==0) {
+	    assert(bin<4);
+	    if (negdisk) bin+=4;
+	    stubsbinnedvm_[bin].push_back(vmstub);
+	  }
+		  
+	}
+      }
+    }
+    else {
+      if(!isinner_){
+	if(layer_>0){
+	  stubsbinnedvm_[bin].push_back(vmstub);
+	}
+	else{
+	  if(overlap_){
+	    assert(disk_==1); // D1 from L2L3D1
+
+	    //bin 0 is PS, 1 through 3 is 2S
+	    
+	    bin = stub.first->ir(); // 0 to 9
+	    bin = bin >> 2; // 0 to 2
+	    bin += 1;
+	    if(stub.first->isPSmodule())
+	      bin = 0;
+	  }
+	  assert(bin<4);
+	  bool negdisk=stub.first->disk().value()<0.0;
+	  if (negdisk) bin+=4;
+	  stubsbinnedvm_[bin].push_back(vmstub);	  
+	}
+      }
+    }
+    if (debug1) cout << "Adding stubs to "<<getName()<<endl;
+    stubsvm_.push_back(vmstub);
+    return true;
+  }
+    
   bool addStub(std::pair<Stub*,L1TStub*> stub) {
     int mask=-1;
     if (layer_==1 || layer_==3 || layer_==5 || (extended_ && layer_==2))
@@ -200,6 +300,13 @@ public:
     return true;
   }
 
+  unsigned int nVMStubs() const {return stubsvm_.size();}
+  unsigned int nVMStubsBinned(unsigned int bin) const {return stubsbinnedvm_[bin].size();}
+  VMStubTE getVMStubTE(unsigned int i) const {return stubsvm_[i];}
+  VMStubTE getVMStubTEBinned(unsigned int bin, unsigned int i) const {return stubsbinnedvm_[bin][i];}
+
+
+  //Next 8 methods should be eliminated as obsolete
   unsigned int nStubs() const {return stubs_.size();}
   unsigned int nStubsBinned(unsigned int bin) const {return stubsbinned_[bin].size();}
 
@@ -217,6 +324,10 @@ public:
     stubs_.clear();
     for (unsigned int i=0;i<NLONGVMBINS;i++){
       stubsbinned_[i].clear();
+    }
+    stubsvm_.clear();
+    for (unsigned int i=0;i<NLONGVMBINS;i++){
+      stubsbinnedvm_[i].clear();
     }
   }
 
@@ -444,6 +555,9 @@ private:
   std::vector<std::pair<Stub*,L1TStub*> > stubs_;
   std::vector<std::pair<Stub*,L1TStub*> > stubsbinned_[NLONGVMBINS];
 
+  std::vector<VMStubTE> stubsvm_;
+  std::vector<VMStubTE> stubsbinnedvm_[NLONGVMBINS];
+  
 };
 
 #endif

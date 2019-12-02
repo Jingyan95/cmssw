@@ -3,6 +3,7 @@
 #define VMROUTER_H
 
 #include "ProcessBase.h"
+#include "VMStubTE.h"
 #include "TETableOuter.h"
 #include "TETableInner.h"
 #include "TETableOuterDisk.h"
@@ -341,6 +342,15 @@ public:
 		  cout << getName()<<" try adding overlap stub to "<<vmstubsTEOverlapPHI_[iphiRawTmp][l]->getName()<<endl;
 		}
 		vmstubsTEOverlapPHI_[iphiRawTmp][l]->addStub(stub);
+		int nphireg=4;
+		if (layer==1) nphireg=3; //layer 2
+		VMStubTE tmpstub(stub,
+				 stub.first->iphivmFineBins(nphireg,nfinephioverlapinner),
+				 stub.first->finez(),
+				 stub.first->bend(),
+				 binlookup,
+				 stub.first->stubindex());
+		vmstubsTEOverlapPHI_[iphiRawTmp][l]->addVMStub(tmpstub); 
 		insert=true;
 	      }
 	    } else {
@@ -396,6 +406,13 @@ public:
 		cout << getName()<<" added stub to : "<<vmstubsTEOverlapPHI_[iphiRaw][l]->getName()<<endl;
 	      }
 	      vmstubsTEOverlapPHI_[iphiRaw][l]->addStub(stub);
+	      VMStubTE tmpstub(stub,
+			       stub.first->iphivmFineBins(4,nfinephioverlapouter),
+			       stub.first->finer(),
+			       stub.first->bend(),
+			       binlookup,
+			       stub.first->stubindex());
+	      vmstubsTEOverlapPHI_[iphiRaw][l]->addVMStub(tmpstub); 
 	      insert=true;
 	    }
 	      
