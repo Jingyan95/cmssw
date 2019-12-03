@@ -330,6 +330,18 @@ public:
 		cout << getName()<<" try adding extra stub to "<<vmstubsTEExtraPHI_[iphiRawTmp][l]->getName()<<endl;
 	      }
 	      vmstubsTEExtraPHI_[iphiRawTmp][l]->addStub(stub);
+	      int nfinephi=nfinephibarrelinner;
+	      int nphireg=4;
+	      if (layer==2) {
+		nfinephi=nfinephibarrelouter;
+	      }
+	      VMStubTE tmpstub(stub,
+			       stub.first->iphivmFineBins(nphireg,nfinephi),
+			       stub.first->finer(),
+			       stub.first->bend(),
+			       binlookupextra,
+			       stub.first->stubindex());
+	      vmstubsTEExtraPHI_[iphiRawTmp][l]->addVMStub(tmpstub); 
 	      insert=true;
 	    }
 	  }
@@ -360,6 +372,21 @@ public:
 		  cout << getName()<<" try adding stub to "<<vmstubsTEPHI_[iphiRawTmp][l]->getName()<<endl;
 		}
 		vmstubsTEPHI_[iphiRawTmp][l]->addStub(stub);
+		int nfinephi=nfinephibarrelinner;
+		if (layer_==2||layer_==4|layer_==6) {
+		  nfinephi=nfinephibarrelouter;
+		}
+		int nphireg=5;
+		if (layer_==3) nphireg=4;
+		if (layer_==5) nphireg=4;
+		VMStubTE tmpstub(stub,
+				 stub.first->iphivmFineBins(nphireg,nfinephi),
+				 stub.first->finer(),
+				 stub.first->bend(),
+				 (binlookup&1023),
+				 stub.first->stubindex());
+		vmstubsTEPHI_[iphiRawTmp][l]->addVMStub(tmpstub); 
+
 		insert=true;
 	      }
 	    }
@@ -450,6 +477,18 @@ public:
 		cout << getName()<<" added stub to : "<<vmstubsTEPHI_[iphiRaw][l]->getName()<<endl;
 	      }
 	      vmstubsTEPHI_[iphiRaw][l]->addStub(stub);
+	      int nfinephi=nfinephidiskinner;
+	      if (disk_==2||disk_==4) {
+		nfinephi=nfinephidiskouter;
+	      }
+	      int nphireg=5;
+	      VMStubTE tmpstub(stub,
+			       stub.first->iphivmFineBins(nphireg,nfinephi),
+			       stub.first->finer(),
+			       stub.first->bend(),
+			       (binlookup&1023),
+			       stub.first->stubindex());
+	      vmstubsTEPHI_[iphiRaw][l]->addVMStub(tmpstub); 
 	      insert=true;
 	    }
 	    

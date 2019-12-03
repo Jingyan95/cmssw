@@ -138,7 +138,6 @@ public:
     }
 
     assert(binlookup==(int)vmstub.vmbits());
-    //cout << getName() << " binlookup:"<<binlookup<<" "<<vmstub.vmbits()<<endl;
     binlookup=(int)vmstub.vmbits();
     
     assert(binlookup>=0);

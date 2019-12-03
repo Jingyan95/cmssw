@@ -598,24 +598,31 @@ public:
 
       } else {
 
-	//cout << getName() <<" "<<innervmstubs_[ivmmem]->nStubs()<<" "<<innervmstubs_[ivmmem]->getName()<<" "<<innervmstubs_[ivmmem]<<endl;
 
 	for(unsigned int i=0;i<innervmstubs_[ivmmem]->nStubs();i++){
 	  std::pair<Stub*,L1TStub*> innerstub=innervmstubs_[ivmmem]->getStub(i);
 	  if (debug1) {
 	    cout << "In "<<getName()<<" have inner stub"<<endl;
 	  }
+
 	  
 	  if ((layer_==1 && disk_==0)||
 	      (layer_==2 && disk_==0)||
 	      (layer_==3 && disk_==0)||
 	      (layer_==5 && disk_==0)) {	  
+
+	    
+	    assert(innervmstubs_[ivmmem]->nStubs()==innervmstubs_[ivmmem]->nVMStubs());
+
+	    VMStubTE innervmstub=innervmstubs_[ivmmem]->getVMStubTE(i);
+
 	    
 	    int lookupbits=innerstub.first->getVMBits().value();
 	    if (extra_) {
 	      lookupbits=innerstub.first->getVMBitsExtra().value();
 	    }
 	    lookupbits&=1023;
+	    assert(lookupbits==(int)innervmstub.vmbits());
 	    int zdiffmax=(lookupbits>>7);	
 	    int newbin=(lookupbits&127);
 	    int bin=newbin/8;
@@ -640,13 +647,11 @@ public:
 		
 		//if (countall>=MAXTE) break;
 		countall++;
-		std::pair<Stub*,L1TStub*> outerstub=outervmstubs_[ivmmem]->getStubBinned(ibin,j);
+
+		VMStubTE outervmstub=outervmstubs_[ivmmem]->getVMStubTEBinned(ibin,j);
+
+		int zbin=(outervmstub.vmbits()&7);
 		
-		
-		int zbin=(outerstub.first->getVMBits().value()&7);
-		if (extra_) {
-		  zbin=(outerstub.first->getVMBitsExtra().value()&7);
-		}
 		if (start!=ibin) zbin+=8;
 		
 		if (zbin<zbinfirst||zbin-zbinfirst>zdiffmax) {
@@ -667,20 +672,11 @@ public:
 		assert(innerphibits_!=-1);
 		assert(outerphibits_!=-1);
 	      
-		unsigned int nvminner=nallstubslayers[layer_-1]*nvmtelayers[layer_-1];
-		unsigned int nvmouter=nallstubslayers[layer_]*nvmtelayers[layer_];
-		if (extra_){
-		  nvminner=nallstubslayers[layer_-1]*nvmteextralayers[layer_-1];
-		  nvmouter=nallstubslayers[layer_]*nvmteextralayers[layer_];
-		}
-		unsigned int nvmbitsinner=nbits(nvminner);
-		unsigned int nvmbitsouter=nbits(nvmouter);
-		int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
-		int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
+		int iphiinnerbin=(int)innervmstub.finephi();
+		int iphiouterbin=(int)outervmstub.finephi();
 		
 		int index = (iphiinnerbin<<outerphibits_)+iphiouterbin;
 		
-		//cout << getName()<<" "<<phiindex<<" "<<ivmmem<<" "<<innerphibin<<" "<<outerphibin<<endl;
 		assert(index<(int)phitable_[phiindex].size());		
 		
 		
@@ -691,23 +687,20 @@ public:
 		  continue;
 		}
 		
-		FPGAWord innerbend=innerstub.first->bend();
-		FPGAWord outerbend=outerstub.first->bend();
+		FPGAWord innerbend=innervmstub.bend();
+		FPGAWord outerbend=outervmstub.bend();
+
 		
 		int ptinnerindex=(index<<innerbend.nbits())+innerbend.value();
 		int ptouterindex=(index<<outerbend.nbits())+outerbend.value();
 		
-		//cout <<"bendinner "<<bend(rmean[layer_-1],trinv)<<" "<<0.5*(innerbend.value()-15.0)
-		//	   <<" "<<pttableinner_[ptinnerindex]
-		//   <<"     bendouter "<<bend(rmean[layer_],trinv)<<" "<<0.5*(outerbend.value()-15.0)
-		//   <<" "<<pttableouter_[ptouterindex]<<endl;
 		
 		if (!(pttableinner_[phiindex][ptinnerindex]&&pttableouter_[phiindex][ptouterindex])) {
 		  if (debug1) {
 		    cout << "Stub pair rejected because of stub pt cut bends : "
-			 <<Stub::benddecode(innerstub.first->bend().value(),innerstub.first->isPSmodule())
+			 <<Stub::benddecode(innervmstub.bend().value(),innervmstub.isPSmodule())
 			 <<" "
-			 <<Stub::benddecode(outerstub.first->bend().value(),outerstub.first->isPSmodule())
+			 <<Stub::benddecode(outervmstub.bend().value(),outervmstub.isPSmodule())
 			 <<endl;
 		  }		
 		  continue;
@@ -719,7 +712,7 @@ public:
 		  fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
 		  fout.close();
 		}
-		stubpairs.addStubPair(innerstub,outerstub);
+		stubpairs.addStubPair(innervmstub.stub(),outervmstub.stub());
 		
 		countall++;
 	      }
