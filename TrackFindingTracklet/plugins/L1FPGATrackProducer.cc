@@ -107,6 +107,13 @@
 
 #include "L1Trigger/TrackFindingTracklet/interface/StubKiller.h"
 
+// L1Trk HLS end-of-job bit range checks etc.
+#ifdef USEHYBRID
+#ifdef USE_HLS
+#include "L1Trigger/TrackFindingTMTT/interface/HLS/KFParamsCombCallHLS.h"
+#endif
+#endif
+
 //////////////
 // STD HEADERS
 #include <memory>
@@ -221,6 +228,7 @@ private:
   virtual void beginRun( const edm::Run& run, const edm::EventSetup& iSetup );
   virtual void endRun( const edm::Run& run, const edm::EventSetup& iSetup );
   virtual void produce( edm::Event& iEvent, const edm::EventSetup& iSetup );
+  virtual void endJob();
 };
 
 
@@ -427,6 +435,17 @@ L1FPGATrackProducer::~L1FPGATrackProducer()
 // END JOB
 void L1FPGATrackProducer::endRun(const edm::Run& run, const edm::EventSetup& iSetup)
 {
+}
+
+void L1FPGATrackProducer::endJob()
+{
+#ifdef USEHYBRID
+#ifdef USE_HLS
+  TMTT::Settings settingsTMTT;
+  TMTT::KFParamsCombCallHLS fitterKF(&settingsTMTT, nHelixPar, "KFfitterHLS");
+  fitterKF.endJob(); // Check bits ranges of KF HLS.
+#endif
+#endif
 }
 
 ////////////
