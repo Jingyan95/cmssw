@@ -481,7 +481,7 @@ public:
 	      if (disk_==2||disk_==4) {
 		nfinephi=nfinephidiskouter;
 	      }
-	      int nphireg=5;
+	      int nphireg=4;
 	      VMStubTE tmpstub(stub,
 			       stub.first->iphivmFineBins(nphireg,nfinephi),
 			       stub.first->finer(),
