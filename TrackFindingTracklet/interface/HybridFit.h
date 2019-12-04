@@ -35,7 +35,7 @@ class HybridFit{
       std::map<unsigned int, L1TStub*> L1StubIndices;
       unsigned int L1stubID = 0;
 
-      static TMTT::Settings* settings = new TMTT::Settings();
+      static const TMTT::Settings settings;
 
       int kf_phi_sec=tracklet->homeSector();
 
@@ -81,7 +81,7 @@ class HybridFit{
 
 
         if (printDebugKF) cout <<kfphi<<" "<<kfr<<" "<<kfz<<" "<<kfbend<<" "<<kflayer<<" "<<isBarrel<<" "<<psmodule<<" "<<endl;
-        TMTT::Stub* TMTTstubptr = new TMTT::Stub(kfphi, kfr, kfz, kfbend, kflayer, psmodule, isBarrel, iphi, -alpha, settings, nullptr, L1stubID, kf_phi_sec);
+        TMTT::Stub* TMTTstubptr = new TMTT::Stub(kfphi, kfr, kfz, kfbend, kflayer, psmodule, isBarrel, iphi, -alpha, &settings, nullptr, L1stubID, kf_phi_sec);
         TMTTstubs.push_back(TMTTstubptr);
         L1StubIndices[L1stubID++] = L1stubptr;
       }
@@ -107,20 +107,19 @@ class HybridFit{
       if (kfphi0>M_PI) kfphi0-=2*M_PI;
       if (kfphi0<-M_PI) kfphi0+=2*M_PI;
 
-      //    std::pair<float,float> helixrphi(300*kfrinv/settings->getBfield(),kfphi0);
-      std::pair<float,float> helixrphi(kfrinv*1.0e11/(2.9979e8*settings->getBfield()),kfphi0);
+      std::pair<float,float> helixrphi(kfrinv*1.0e11/(2.9979e8*settings.getBfield()),kfphi0);
       std::pair<float,float> helixrz(kfz0,kft);
 
       // KF HLS uses HT mbin (which is binned q/Pt) to allow for scattering. So estimate it from tracklet.
       double chargeOverPt = helixrphi.first;
-      int mBin = std::floor(settings->houghNbinsPt()/2) + std::floor((settings->houghNbinsPt()/2) * chargeOverPt/(1./settings->houghMinPt()));
-      mBin = max(min(mBin, int(settings->houghNbinsPt()-1)), 0); // protect precision issues.
+      int mBin = std::floor(settings.houghNbinsPt()/2) + std::floor((settings.houghNbinsPt()/2) * chargeOverPt/(1./settings.houghMinPt()));
+      mBin = max(min(mBin, int(settings.houghNbinsPt()-1)), 0); // protect precision issues.
       std::pair<unsigned int, unsigned int> celllocation(mBin,1);
 
   // Get range in z of tracks covered by this sector at chosen radius from beam-line
 
-      const vector<double> etaRegions = settings->etaRegions();
-      const float chosenRofZ = settings->chosenRofZ();
+      const vector<double> etaRegions = settings.etaRegions();
+      const float chosenRofZ = settings.chosenRofZ();
 
       float  kfzRef = kfz0 + chosenRofZ*kft;
 
@@ -131,7 +130,7 @@ class HybridFit{
 	if (kfzRef > zRefMax) kf_eta_reg = iEtaSec;
       }
 
-      TMTT::L1track3D l1track3d(settings,TMTTstubs,celllocation,helixrphi,helixrz,kfd0,kf_phi_sec,kf_eta_reg,1,false);
+      TMTT::L1track3D l1track3d(&settings,TMTTstubs,celllocation,helixrphi,helixrz,kfd0,kf_phi_sec,kf_eta_reg,1,false);
       unsigned int seedType = tracklet->getISeed();
       unsigned int numPS = tracklet->PSseed(); // Function PSseed() is out of date!
       l1track3d.setSeedLayerType(seedType);
@@ -141,17 +140,16 @@ class HybridFit{
       static bool firstPrint = true;
 #ifdef USE_HLS
       if (firstPrint) cout << "Will make KFParamsCombHLS for " << nHelixPar << " param fit" << endl;
-      static TMTT::TrackFitGeneric* fitterKF = new TMTT::KFParamsCombCallHLS(settings, nHelixPar, "KFfitterHLS");
+      static TMTT::KFParamsCombCallHLS fitterKF(&settings, nHelixPar, "KFfitterHLS");
 #else
       if (firstPrint) cout << "Will make KFParamsComb for " << nHelixPar << " param fit"<< endl;
-      static TMTT::TrackFitGeneric* fitterKF = new TMTT::KFParamsComb(settings, nHelixPar, "KFfitter");
+      static TMTT::KFParamsComb fitterKF(&settings, nHelixPar, "KFfitter");
 #endif
       firstPrint = false;
 
       //  cout << "Will call fit" << endl;
-      //fitterKF->fit(l1track3d,1,kf_eta_reg);
 
-      TMTT::L1fittedTrack fittedTrk = fitterKF->fit(l1track3d); 
+      TMTT::L1fittedTrack fittedTrk = fitterKF.fit(l1track3d); 
      
       TMTT::KFTrackletTrack trk = fittedTrk.returnKFTrackletTrack();
 
@@ -163,7 +161,7 @@ class HybridFit{
       if (phi0fit>M_PI) phi0fit-=2*M_PI;
       if (phi0fit<-M_PI) phi0fit+=2*M_PI;
 
-      double rinvfit=0.01*0.3*settings->getBfield()*trk.qOverPt();
+      double rinvfit=0.01*0.3*settings.getBfield()*trk.qOverPt();
 
       int irinvfit = rinvfit / krinvpars;
       int iphi0fit = phi0fit / kphi0pars;
@@ -194,6 +192,8 @@ class HybridFit{
       } else {
        if (printDebugKF) cout << "FitTrack:KF rejected track"<<endl;
       }
+
+      for (const TMTT::Stub* s : TMTTstubs) delete s; // Clean up.
     }
 
   private:
