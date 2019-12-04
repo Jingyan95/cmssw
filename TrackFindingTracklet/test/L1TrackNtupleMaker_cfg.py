@@ -99,6 +99,7 @@ process.source = cms.Source("PoolSource",
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string('TTbar_PU200_hybrid.root'), closeFileFast = cms.untracked.bool(True))
 
+process.Timing = cms.Service("Timing", summaryOnly = cms.untracked.bool(True))
 
 ############################################################
 # L1 tracking

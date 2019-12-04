@@ -29,3 +29,7 @@ C++ in TrackFitGeneric.cc that call the HLS code.
 
 c) In addition to the usual track performance summary, the HLS code prints a summary recording 
 if any finite bit HLS variables overflowed. 
+
+Specific notes for use with Hybrid tracking:
+
+d) Edit L1Trigger/TrackFindingTMTT/interface/HLS/KFpragmaOpts.h to define PT_2GEV and HYBRID_FORMAT.

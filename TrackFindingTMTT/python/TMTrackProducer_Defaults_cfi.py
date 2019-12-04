@@ -66,7 +66,7 @@ TMTrackProducer_params = cms.PSet(
   StubDigitize = cms.PSet(
      EnableDigitize  = cms.bool(True),  # Digitize stub coords? If not, use floating point coords.
      #
-     #--- Parameters available in MP board.
+     #--- Parameters available in MP board. (And in case of Hybrid used internally in KF)
      #
      PhiSectorBits   = cms.uint32(6),    # Bits used to store phi sector number -- NOT USED
      PhiSBits        = cms.uint32(14),   # Bits used to store phiS coord. (13 enough?)
@@ -124,9 +124,7 @@ TMTrackProducer_params = cms.PSet(
 
   HTArraySpecRphi = cms.PSet(
      HoughMinPt      = cms.double(3.0), # Min track Pt that Hough Transform must find. Also used by StubCuts.KillLowPtStubs and by EtaPhiSectors.UseStubPhi.
-     #HoughNbinsPt    = cms.uint32(16),  # HT array dimension in track q/Pt. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
-     #HoughNbinsPhi   = cms.uint32(32),  # HT array dimension in track phi0 (or phi65 or any other track phi angle. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
-     # If using Mini-HT, increase these to:
+     # If MiniHTstage = True, these refers to mini cells in whole HT array.
      HoughNbinsPt    = cms.uint32(32),  # HT array dimension in track q/Pt. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
      HoughNbinsPhi   = cms.uint32(64),  # HT array dimension in track phi0 (or phi65 or any other track phi angle. Ignored if HoughNcellsRphi > 0. (If MiniHTstage = True, this refers to mini cells in whole HT array).
      HoughNcellsRphi = cms.int32(-1),   # If > 0, then parameters HoughNbinsPt and HoughNbinsPhi will be calculated from the constraints that their product should equal HoughNcellsRphi and their ratio should make the maximum |gradient|" of stub lines in the HT array equal to 1. If <= 0, then HoughNbinsPt and HoughNbinsPhi will be taken from the values configured above.
@@ -382,8 +380,8 @@ TMTrackProducer_params = cms.PSet(
      # Multiple scattering term - inflate hit phi errors by this divided by Pt
      # (0.00075 gives best helix resolution & 0.00450 gives best chi2 distribution).
      KalmanMultiScattTerm    = cms.double(0.00075), 
-     # Multiple scattering factor -- buggy so don't use!
-     KalmanMultiScattFactor  = cms.double(0.0),
+     # Scale down chi2 in r-phi plane by this factor to improve electron performance (should be power of 2)
+     KalmanChi2RphiScale     = cms.uint32(8),
      # N.B. KF track fit chi2 cut is not cfg param, but instead is hard-wired in KF4ParamsComb::isGoodState(...).
      #--- Enable Higher order corrections
      # Treat z uncertainty in tilted barrel modules correctly.
@@ -438,20 +436,22 @@ TMTrackProducer_params = cms.PSet(
     SLR_chisquaredBits = cms.uint32(8),
     SLR_chisquaredRange = cms.double(128.),
     
-    #====== Kalman Filter Digi parameters ========
+    #====== Kalman Filter digi parameters ========
     KF_skipTrackDigi = cms.bool( False ), # Optionally skip track digitisation if done internally inside fitting code.
-    KF_oneOver2rBits = cms.uint32(18),
-    KF_oneOver2rRange = cms.double(0.015234263), # q/Pt > 1/1.3 GeV
+    KF_oneOver2rBits = cms.uint32(15),
+    KF_oneOver2rRange = cms.double(0.0076171313), # pT > 1.5 GeV
     KF_d0Bits = cms.uint32(12),
     KF_d0Range  = cms.double(31.992876),
-    KF_phi0Bits = cms.uint32(18),
-    KF_phi0Range = cms.double(1.3962634),  # phi0 is actually only digitised relative to centre of sector.
-    KF_z0Bits = cms.uint32(18),
+    KF_phi0Bits = cms.uint32(12),
+    KF_phi0Range = cms.double(0.6981317),  # phi0 is actually only digitised relative to centre of sector.
+    KF_z0Bits = cms.uint32(12),
     KF_z0Range  = cms.double(45.826419),
-    KF_tanlambdaBits = cms.uint32(18),
-    KF_tanlambdaRange = cms.double(32.),
-    KF_chisquaredBits = cms.uint32(17),
+    KF_tanlambdaBits = cms.uint32(16),
+    KF_tanlambdaRange = cms.double(16.),
+    KF_chisquaredBits = cms.uint32(15), # N.B. 17 bits are used internally inside KF.
     KF_chisquaredRange = cms.double(1024.),
+    KF_chisquaredBinEdges = cms.vdouble(0, 0.5, 1, 2, 3, 5, 7, 10, 20, 40, 100, 200, 500, 1000, 3000 ), # Additional bin for >3000
+    KF_bendchisquaredBinEdges = cms.vdouble(0, 0.5, 1, 2, 3, 5, 10, 50 ), # Additional bin for >50
 
     #====== Other track fitter Digi params.
     # Currently equal to those for KF, although you can skip track digitisation for them with following.

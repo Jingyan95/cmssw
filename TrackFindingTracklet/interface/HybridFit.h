@@ -2,6 +2,23 @@
 #ifndef HYBRIDFIT_H
 #define HYBRIDFIT_H
 
+#ifdef USEHYBRID
+#include "DataFormats/L1TrackTrigger/interface/TTStub.h"
+#include "DataFormats/L1TrackTrigger/interface/TTCluster.h"
+#include "SimTracker/TrackTriggerAssociation/interface/TTStubAssociationMap.h"
+#include "SimTracker/TrackTriggerAssociation/interface/TTClusterAssociationMap.h"
+#include "L1Trigger/TrackFindingTMTT/interface/L1track3D.h"
+#include "L1Trigger/TrackFindingTMTT/interface/Stub.h"
+#include "L1Trigger/TrackFindingTMTT/interface/KFParamsComb.h"
+#include "L1Trigger/TrackFindingTracklet/interface/HybridFit.h"
+#ifdef USE_HLS
+#include "L1Trigger/TrackFindingTMTT/interface/HLS/KFParamsCombCallHLS.h"
+#endif
+#include "L1Trigger/TrackFindingTMTT/interface/Settings.h"
+#include "L1Trigger/TrackFindingTMTT/interface/L1fittedTrack.h"
+#include "L1Trigger/TrackFindingTMTT/interface/KFTrackletTrack.h"
+#endif
+
 using namespace std;
 
 class HybridFit{
@@ -18,7 +35,9 @@ class HybridFit{
       std::map<unsigned int, L1TStub*> L1StubIndices;
       unsigned int L1stubID = 0;
 
-      static TMTT::Settings* settings = new TMTT::Settings();
+      static const TMTT::Settings settings;
+
+      int kf_phi_sec=tracklet->homeSector();
 
       for (unsigned int k=0;k<trackstublist.size();k++) {
         L1TStub* L1stubptr=trackstublist[k].second;
@@ -62,7 +81,7 @@ class HybridFit{
 
 
         if (printDebugKF) cout <<kfphi<<" "<<kfr<<" "<<kfz<<" "<<kfbend<<" "<<kflayer<<" "<<isBarrel<<" "<<psmodule<<" "<<endl;
-        TMTT::Stub* TMTTstubptr = new TMTT::Stub(kfphi, kfr, kfz, kfbend, kflayer, psmodule, isBarrel, iphi, -alpha, settings, nullptr, L1stubID);
+        TMTT::Stub* TMTTstubptr = new TMTT::Stub(kfphi, kfr, kfz, kfbend, kflayer, psmodule, isBarrel, iphi, -alpha, &settings, nullptr, L1stubID, kf_phi_sec);
         TMTTstubs.push_back(TMTTstubptr);
         L1StubIndices[L1stubID++] = L1stubptr;
       }
@@ -88,39 +107,30 @@ class HybridFit{
       if (kfphi0>M_PI) kfphi0-=2*M_PI;
       if (kfphi0<-M_PI) kfphi0+=2*M_PI;
 
-      std::pair<unsigned int, unsigned int> celllocation(1,1);
-      //    std::pair<float,float> helixrphi(300*kfrinv/settings->getBfield(),kfphi0);
-      std::pair<float,float> helixrphi(kfrinv*1.0e11/(2.9979e8*settings->getBfield()),kfphi0);
+      std::pair<float,float> helixrphi(kfrinv*1.0e11/(2.9979e8*settings.getBfield()),kfphi0);
       std::pair<float,float> helixrz(kfz0,kft);
 
-      //  TMTT phi sector definition: phiCentre_ = 2.*M_PI * (0.5 + float(iPhiSec)) / float(settings->numPhiSectors()) - M_PI; // Centre of sector in phi
-
-      unsigned int kf_eta_reg;
-
-      /*   
-  72:  float   tanLambda()  const  {return helixRz_.second;}
-  73:  float   theta()      const  {return atan2(1., this->tanLambda());} // Use atan2 to ensure 0 < theta < pi.
-  78:  float   zAtChosenR()   const  {return (this->z0() + (settings_->chosenRofZ()) * this->tanLambda());} // neglects transverse impact parameter & track curvature.
-  */
+      // KF HLS uses HT mbin (which is binned q/Pt) to allow for scattering. So estimate it from tracklet.
+      double chargeOverPt = helixrphi.first;
+      int mBin = std::floor(settings.houghNbinsPt()/2) + std::floor((settings.houghNbinsPt()/2) * chargeOverPt/(1./settings.houghMinPt()));
+      mBin = max(min(mBin, int(settings.houghNbinsPt()-1)), 0); // protect precision issues.
+      std::pair<unsigned int, unsigned int> celllocation(mBin,1);
 
   // Get range in z of tracks covered by this sector at chosen radius from beam-line
 
-      const vector<double> etaRegions = settings->etaRegions();
-      const float chosenRofZ = settings->chosenRofZ();
+      const vector<double> etaRegions = settings.etaRegions();
+      const float chosenRofZ = settings.chosenRofZ();
 
       float  kfzRef = kfz0 + chosenRofZ*kft;
 
-      kf_eta_reg = 0;
+      unsigned int kf_eta_reg = 0;
       for (unsigned int iEtaSec = 1; iEtaSec < etaRegions.size() - 1; iEtaSec++) { // Doesn't apply eta < 2.4 cut.
         const float etaMax = etaRegions[iEtaSec];
 	const float zRefMax = chosenRofZ / tan( 2. * atan(exp(-etaMax)) );
 	if (kfzRef > zRefMax) kf_eta_reg = iEtaSec;
       }
 
-      int kf_phi_sec=tracklet->homeSector();
-
-
-      TMTT::L1track3D l1track3d(settings,TMTTstubs,celllocation,helixrphi,helixrz,kfd0,kf_phi_sec,kf_eta_reg,1,false);
+      TMTT::L1track3D l1track3d(&settings,TMTTstubs,celllocation,helixrphi,helixrz,kfd0,kf_phi_sec,kf_eta_reg,1,false);
       unsigned int seedType = tracklet->getISeed();
       unsigned int numPS = tracklet->PSseed(); // Function PSseed() is out of date!
       l1track3d.setSeedLayerType(seedType);
@@ -128,33 +138,37 @@ class HybridFit{
 
       // Create Kalman track fitter.
       static bool firstPrint = true;
-  #ifdef USE_HLS
+#ifdef USE_HLS
       if (firstPrint) cout << "Will make KFParamsCombHLS for " << nHelixPar << " param fit" << endl;
-      static TMTT::TrackFitGeneric* fitterKF = new TMTT::KFParamsCombCallHLS(settings, nHelixPar, "KFfitterHLS");
-  #else
+      static TMTT::KFParamsCombCallHLS fitterKF(&settings, nHelixPar, "KFfitterHLS");
+#else
       if (firstPrint) cout << "Will make KFParamsComb for " << nHelixPar << " param fit"<< endl;
-      static TMTT::TrackFitGeneric* fitterKF = new TMTT::KFParamsComb(settings, nHelixPar, "KFfitter");
-  #endif
+      static TMTT::KFParamsComb fitterKF(&settings, nHelixPar, "KFfitter");
+#endif
       firstPrint = false;
 
       //  cout << "Will call fit" << endl;
-      //fitterKF->fit(l1track3d,1,kf_eta_reg);
 
-      TMTT::L1fittedTrack fittedTrk = fitterKF->fit(l1track3d); 
+      TMTT::L1fittedTrack fittedTrk = fitterKF.fit(l1track3d); 
      
       TMTT::KFTrackletTrack trk = fittedTrk.returnKFTrackletTrack();
 
       if (printDebugKF) cout << "Done with Kalman fit. Pars: pt = " << trk.pt() << ", 1/2R = " << 3.8*3*trk.qOverPt()/2000 << ", phi0 = " << trk.phi0() << ", eta = " << trk.eta() << ", z0 = " << trk.z0() << ", chi2 = "<<trk.chi2()  << ", accepted = "<< trk.accepted() << endl;
 
       // Tracklet wants phi0 with respect to lower edge of sector, not global phi0.
-      double tracklet_phi0=trk.phi0()-iSector_*2*M_PI/NSector+0.5*dphisectorHG;
+      double phi0fit=trk.phi0()-iSector_*2*M_PI/NSector+0.5*dphisectorHG;
 
-      if (tracklet_phi0>M_PI) tracklet_phi0-=2*M_PI;
-      if (tracklet_phi0<-M_PI) tracklet_phi0+=2*M_PI;
+      if (phi0fit>M_PI) phi0fit-=2*M_PI;
+      if (phi0fit<-M_PI) phi0fit+=2*M_PI;
 
-      double rinvfit=0.01*0.3*settings->getBfield()*trk.qOverPt();
+      double rinvfit=0.01*0.3*settings.getBfield()*trk.qOverPt();
 
-      int id0fit   = trk.d0()  / kd0;
+      int irinvfit = rinvfit / krinvpars;
+      int iphi0fit = phi0fit / kphi0pars;
+      int itanlfit = trk.tanLambda() / ktpars;
+      int iz0fit   = trk.z0() / kz0pars;
+      int id0fit   = trk.d0() / kd0pars;
+      int ichi2fit = trk.chi2() / 16;  // CHECK THIS (but not used to make TTTrack)
 
       if(trk.accepted()){
 
@@ -168,15 +182,18 @@ class HybridFit{
 
         if (printDebugKF) cout<<"#stubs before/after KF fit = "<<TMTTstubs.size()<<"/"<<l1stubsFromFit.size()<<endl;
 
-       tracklet->setFitPars(rinvfit,tracklet_phi0,trk.d0(),sinh(trk.eta()),trk.z0(),
-         trk.chi2(),rinvfit,tracklet_phi0, trk.d0(), sinh(trk.eta()),
-         trk.z0(),trk.chi2(),rinvfit/krinvpars,
-         tracklet_phi0/kphi0pars,id0fit,
-         sinh(trk.eta())/ktpars,trk.z0()/kz0pars,trk.chi2(),l1stubsFromFit);
+	// TO DO: update setFitPars() args, adding trk.getHitPattern() 
+	// & replacing trk.chi2() by trk.chi2rphi() & trk.chi2rz().
+
+	tracklet->setFitPars(rinvfit,phi0fit,trk.d0(),trk.tanLambda(),trk.z0(),trk.chi2(),
+			     rinvfit,phi0fit,trk.d0(),trk.tanLambda(),trk.z0(),trk.chi2(),
+			     irinvfit,iphi0fit,id0fit,itanlfit,iz0fit,ichi2fit,l1stubsFromFit);
        //cout<<" KF fit d0 is "<<trk.d0()<<"\n";
       } else {
        if (printDebugKF) cout << "FitTrack:KF rejected track"<<endl;
       }
+
+      for (const TMTT::Stub* s : TMTTstubs) delete s; // Clean up.
     }
 
   private:
