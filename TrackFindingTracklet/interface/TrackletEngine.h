@@ -111,8 +111,6 @@ public:
 
   void execute() {
 
-    cout << "In TrackletEngine"<<endl;
-    
     if (!((doL1L2&&(layer1_==1)&&(layer2_==2))||
 	  (doL2L3&&(layer1_==2)&&(layer2_==3))||
 	  (doL3L4&&(layer1_==3)&&(layer2_==4))||
@@ -131,19 +129,16 @@ public:
     unsigned int countall=0;
     unsigned int countpass=0;
 
-    //cout << "In "<<getName()<<endl;
-    
     assert(innervmstubs_!=0);
     assert(outervmstubs_!=0);
 
     //overlap seeding
     if (disk2_==1 && (layer1_==1 || layer1_==2) ) {
-      for(unsigned int i=0;i<innervmstubs_->nStubs();i++){
-	std::pair<Stub*,L1TStub*> innerstub=innervmstubs_->getStub(i);
+      for(unsigned int i=0;i<innervmstubs_->nVMStubs();i++){
 
-	if (debug1) cout << getName()<<" have overlap stub in layer = "<<innerstub.first->layer().value()+1<<endl;
-	
-	int lookupbits=innerstub.first->getVMBitsOverlap().value();
+	VMStubTE innervmstub=innervmstubs_->getVMStubTE(i);
+
+	int lookupbits=(int)innervmstub.vmbits();
         int rdiffmax=(lookupbits>>7);	
 	int newbin=(lookupbits&127);
 	int bin=newbin/8;
@@ -155,12 +150,13 @@ public:
 
 	for(int ibin=start;ibin<=last;ibin++) {
 	  if (debug1) cout << getName() << " looking for matching stub in bin "<<ibin
-			   <<" with "<<outervmstubs_->nStubsBinned(ibin)<<" stubs"<<endl;
+			   <<" with "<<outervmstubs_->nVMStubsBinned(ibin)<<" stubs"<<endl;
 	  for(unsigned int j=0;j<outervmstubs_->nStubsBinned(ibin);j++){
 	    if (countall>=MAXTE) break;
 	    countall++;
-	    std::pair<Stub*,L1TStub*> outerstub=outervmstubs_->getStubBinned(ibin,j);
-	    int rbin=(outerstub.first->getVMBitsOverlap().value()&7);
+	    VMStubTE outervmstub=outervmstubs_->getVMStubTEBinned(ibin,j);
+
+	    int rbin=(outervmstub.vmbits()&7);
 	    if (start!=ibin) rbin+=8;
 	    if ((rbin<rbinfirst)||(rbin-rbinfirst>rdiffmax)) {
 	      if (debug1) {
@@ -176,13 +172,9 @@ public:
 	    assert(innerphibits_!=-1);
 	    assert(outerphibits_!=-1);
 	    
-	    unsigned int nvminner=nallstubsoverlaplayers[layer1_-1]*nvmteoverlaplayers[layer1_-1];
-	    unsigned int nvmouter=nallstubsoverlapdisks[disk2_-1]*nvmteoverlapdisks[disk2_-1];
-	    unsigned int nvmbitsinner=nbits(nvminner);
-	    unsigned int nvmbitsouter=nbits(nvmouter);
-	    unsigned int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
-	    unsigned int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
-
+	    unsigned int iphiinnerbin=innervmstub.finephi();
+	    unsigned int iphiouterbin=outervmstub.finephi();
+	    
 	    unsigned int index = (((iphiinnerbin<<outerphibits_)+iphiouterbin)<<5)+ir;
 	    
 	    assert(index<phitable_.size());
@@ -194,8 +186,8 @@ public:
 	      continue;
 	    }
 		
-	    FPGAWord innerbend=innerstub.first->bend();
-	    FPGAWord outerbend=outerstub.first->bend();
+	    FPGAWord innerbend=innervmstub.bend();
+	    FPGAWord outerbend=outervmstub.bend();
             
 	    int ptinnerindex=(index<<innerbend.nbits())+innerbend.value();
 	    int ptouterindex=(index<<outerbend.nbits())+outerbend.value();
@@ -203,9 +195,9 @@ public:
 	    if (!(pttableinner_[ptinnerindex]&&pttableouter_[ptouterindex])) {
 	      if (debug1) {
 		cout << "Stub pair rejected because of stub pt cut bends : "
-		     <<Stub::benddecode(innerstub.first->bend().value(),innerstub.first->isPSmodule())
+		     <<Stub::benddecode(innervmstub.bend().value(),innervmstub.isPSmodule())
 		     <<" "
-		     <<Stub::benddecode(outerstub.first->bend().value(),outerstub.first->isPSmodule())
+		     <<Stub::benddecode(outervmstub.bend().value(),outervmstub.isPSmodule())
 		     <<endl;
 	      }		
 	      continue;
@@ -217,7 +209,7 @@ public:
               fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
               fout.close();
             }
-	    stubpairs_->addStubPair(innerstub,outerstub);
+	    stubpairs_->addStubPair(innervmstub.stub(),outervmstub.stub());
 	    countpass++;
 	  }
 	}
@@ -228,7 +220,8 @@ public:
       //cout << getName() <<" "<<innervmstubs_->nStubs()<<" "<<innervmstubs_->getName()<<" "<<innervmstubs_<<endl;
 
       for(unsigned int i=0;i<innervmstubs_->nStubs();i++){
-	std::pair<Stub*,L1TStub*> innerstub=innervmstubs_->getStub(i);
+
+	VMStubTE innervmstub=innervmstubs_->getVMStubTE(i);
 	if (debug1) {
 	  cout << "In "<<getName()<<" have inner stub"<<endl;
 	}
@@ -238,11 +231,7 @@ public:
 	    (layer1_==3 && layer2_==4)||
 	    (layer1_==5 && layer2_==6)) {	  
 
-	  int lookupbits=innerstub.first->getVMBits().value();
-	  if (extra_) {
-	    lookupbits=innerstub.first->getVMBitsExtra().value();
-	  }
-          lookupbits&=1023;
+	  int lookupbits=(int)innervmstub.vmbits();
 	  int zdiffmax=(lookupbits>>7);	
 	  int newbin=(lookupbits&127);
 	  int bin=newbin/8;
@@ -260,20 +249,17 @@ public:
 	    cout << "Will look in zbins "<<start<<" to "<<last<<endl;
 	  }
 	  for(int ibin=start;ibin<=last;ibin++) {
-	    for(unsigned int j=0;j<outervmstubs_->nStubsBinned(ibin);j++){
+	    for(unsigned int j=0;j<outervmstubs_->nVMStubsBinned(ibin);j++){
 	      if (debug1) {
 		cout << "In "<<getName()<<" have outer stub"<<endl;
 	      }
 	      
 	      if (countall>=MAXTE) break;
 	      countall++;
-	      std::pair<Stub*,L1TStub*> outerstub=outervmstubs_->getStubBinned(ibin,j);
 
+	      VMStubTE outervmstub=outervmstubs_->getVMStubTEBinned(ibin,j);
 	      
-	      int zbin=(outerstub.first->getVMBits().value()&7);
-	      if (extra_) {
-		zbin=(outerstub.first->getVMBitsExtra().value()&7);
-	      }
+	      int zbin=(outervmstub.vmbits()&7);
 	      if (start!=ibin) zbin+=8;
 
 	      if (zbin<zbinfirst||zbin-zbinfirst>zdiffmax) {
@@ -294,16 +280,8 @@ public:
 	      assert(innerphibits_!=-1);
 	      assert(outerphibits_!=-1);
 	      
-	      unsigned int nvminner=nallstubslayers[layer1_-1]*nvmtelayers[layer1_-1];
-	      unsigned int nvmouter=nallstubslayers[layer1_]*nvmtelayers[layer1_];
-	      if (extra_){
-		nvminner=nallstubslayers[layer1_-1]*nvmteextralayers[layer1_-1];
-		nvmouter=nallstubslayers[layer1_]*nvmteextralayers[layer1_];
-	      }
-	      unsigned int nvmbitsinner=nbits(nvminner);
-	      unsigned int nvmbitsouter=nbits(nvmouter);
-	      int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
-	      int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
+	      int iphiinnerbin=(int)innervmstub.finephi();
+	      int iphiouterbin=(int)outervmstub.finephi();
 	      
 	      int index = (iphiinnerbin<<outerphibits_)+iphiouterbin;
 
@@ -318,9 +296,9 @@ public:
 		continue;
 	      }
 		
-              FPGAWord innerbend=innerstub.first->bend();
-              FPGAWord outerbend=outerstub.first->bend();
-              
+	      FPGAWord innerbend=innervmstub.bend();
+	      FPGAWord outerbend=outervmstub.bend();
+	      
               int ptinnerindex=(index<<innerbend.nbits())+innerbend.value();
               int ptouterindex=(index<<outerbend.nbits())+outerbend.value();
 
@@ -332,9 +310,9 @@ public:
 	      if (!(pttableinner_[ptinnerindex]&&pttableouter_[ptouterindex])) {
 		if (debug1) {
 		  cout << "Stub pair rejected because of stub pt cut bends : "
-		       <<Stub::benddecode(innerstub.first->bend().value(),innerstub.first->isPSmodule())
+		       <<Stub::benddecode(innervmstub.bend().value(),innervmstub.isPSmodule())
 		       <<" "
-		       <<Stub::benddecode(outerstub.first->bend().value(),outerstub.first->isPSmodule())
+		       <<Stub::benddecode(outervmstub.bend().value(),outervmstub.isPSmodule())
 		       <<endl;
 		}		
 		continue;
@@ -346,8 +324,7 @@ public:
                 fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
                 fout.close();
               }
-	      stubpairs_->addStubPair(innerstub,outerstub);
-
+	      stubpairs_->addStubPair(innervmstub.stub(),outervmstub.stub());
 	      countpass++;
 	    }
 	  }
@@ -357,8 +334,8 @@ public:
 	  
 	  if (debug1) cout << getName()<<"["<<iSector_<<"] Disk-disk pair" <<endl;
 	  
-	  int lookupbits=innerstub.first->getVMBits().value()&511;
-	  bool negdisk=innerstub.first->disk().value()<0;
+	  int lookupbits=(int)innervmstub.vmbits();
+	  bool negdisk=innervmstub.stub().first->disk().value()<0; //FIXME
 	  int rdiffmax=(lookupbits>>6);	
 	  int newbin=(lookupbits&63);
 	  int bin=newbin/8;
@@ -372,26 +349,23 @@ public:
 	  int last=start+(bin&1);
 	  for(int ibin=start;ibin<=last;ibin++) {
 	    if (debug1) cout << getName() << " looking for matching stub in bin "<<ibin
-			     <<" with "<<outervmstubs_->nStubsBinned(ibin)<<" stubs"<<endl;
-	    for(unsigned int j=0;j<outervmstubs_->nStubsBinned(ibin);j++){
+			     <<" with "<<outervmstubs_->nVMStubsBinned(ibin)<<" stubs"<<endl;
+	    for(unsigned int j=0;j<outervmstubs_->nVMStubsBinned(ibin);j++){
 	      if (countall>=MAXTE) break;
 	      countall++;
-	      std::pair<Stub*,L1TStub*> outerstub=outervmstubs_->getStubBinned(ibin,j);
-	      int rbin=(outerstub.first->getVMBits().value()&7);
+	      VMStubTE outervmstub=outervmstubs_->getVMStubTEBinned(ibin,j);
+	      int rbin=(outervmstub.vmbits()&7);
 	      if (start!=ibin) rbin+=8;
 	      if (rbin<rbinfirst) continue;
 	      if (rbin-rbinfirst>rdiffmax) continue;
 
 	      
-	      unsigned int irouterbin=outerstub.first->getVMBits().value()>>2;
+	      unsigned int irouterbin=outervmstub.vmbits()>>2;
 
-	      unsigned int nvminner=nallstubsdisks[disk1_-1]*nvmtedisks[disk1_-1];
-	      unsigned int nvmouter=nallstubsdisks[disk1_]*nvmtedisks[disk1_];
-	      unsigned int nvmbitsinner=nbits(nvminner);
-	      unsigned int nvmbitsouter=nbits(nvmouter);
-	      int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
-	      int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
-	      	      
+
+	      int iphiinnerbin=(int)innervmstub.finephi();
+	      int iphiouterbin=(int)outervmstub.finephi();
+	      
 	      unsigned int index = (irouterbin<<(outerphibits_+innerphibits_))+(iphiinnerbin<<outerphibits_)+iphiouterbin;
 
 	      assert(index<phitable_.size());		
@@ -402,9 +376,9 @@ public:
 		continue;
 	      }
 		
-              FPGAWord innerbend=innerstub.first->bend();
-              FPGAWord outerbend=outerstub.first->bend();
-              
+	      FPGAWord innerbend=innervmstub.bend();
+	      FPGAWord outerbend=outervmstub.bend();
+	      
               unsigned int ptinnerindex=(index<<innerbend.nbits())+innerbend.value();
               unsigned int ptouterindex=(index<<outerbend.nbits())+outerbend.value();
 
@@ -414,10 +388,10 @@ public:
 	      if (!(pttableinner_[ptinnerindex]&&pttableouter_[ptouterindex])) {
 		if (debug1) {
 		  cout << "Stub pair rejected because of stub pt cut bends : "
-		       <<Stub::benddecode(innerstub.first->bend().value(),innerstub.first->isPSmodule())
+		       <<Stub::benddecode(innervmstub.bend().value(),innervmstub.isPSmodule())
 		       <<" "
-		       <<Stub::benddecode(outerstub.first->bend().value(),outerstub.first->isPSmodule())
-		       <<" FP bend: "<<innerstub.second->bend()<<" "<<outerstub.second->bend()
+		       <<Stub::benddecode(outervmstub.bend().value(),outervmstub.isPSmodule())
+		    // <<" FP bend: "<<innerstub.second->bend()<<" "<<outerstub.second->bend()
 		       <<" pass : "<<pttableinner_[ptinnerindex]<<" "<<pttableouter_[ptouterindex]
 		       <<endl;
 		}
@@ -431,7 +405,7 @@ public:
                 fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
                 fout.close();
               }
-	      stubpairs_->addStubPair(innerstub,outerstub);
+	      stubpairs_->addStubPair(innervmstub.stub(),outervmstub.stub());
 	      countpass++;
 	
 	    }
@@ -448,15 +422,15 @@ public:
 	   <<" "<<countall<<" "<<countpass
 	   <<endl;
       for(unsigned int i=0;i<innervmstubs_->nStubs();i++){
-	std::pair<Stub*,L1TStub*> innerstub=innervmstubs_->getStub(i);
+	std::pair<Stub*,L1TStub*> innerstub=innervmstubs_->getVMStubTE(i).stub();
 	cout << "In TrackletEngine::execute inner stub : "
 	     << innerstub.second->r()<<" "
 	     << innerstub.second->phi()<<" "
 	     << innerstub.second->r()*innerstub.second->phi()<<" "
 	     << innerstub.second->z()<<endl;
       }
-      for(unsigned int i=0;i<outervmstubs_->nStubs();i++){
-	std::pair<Stub*,L1TStub*> outerstub=outervmstubs_->getStub(i);
+      for(unsigned int i=0;i<outervmstubs_->nVMStubs();i++){
+	std::pair<Stub*,L1TStub*> outerstub=outervmstubs_->getVMStubTE(i).stub();
 	cout << "In TrackletEngine::execute outer stub : "
 	     << outerstub.second->r()<<" "
 	     << outerstub.second->phi()<<" "
