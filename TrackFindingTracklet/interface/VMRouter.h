@@ -310,18 +310,6 @@ public:
 	    default : assert(0);
 	    }
 	  }
-	  if ((layer_==2 or layer_==3) && binlookupextra!=-1) {
-	    stub.first->setVMBitsExtra(binlookupextra);
-	  }
-
-	  if (binlookup!=-1) {
-	    if (overlap) {
-	      stub.first->setVMBitsOverlap(binlookup);
-	    } else {
-	      stub.first->setVMBits(binlookup);
-	    }
-	  }
-	  
 	  unsigned int layer=stub.first->layer().value();
 	  if ((layer==1 || layer== 2) && binlookupextra!=-1 ) {
 	    int iphiRawTmp=iphiRaw/(32/(nallstubslayers[layer]*nvmteextralayers[layer]));
@@ -422,7 +410,6 @@ public:
 	    
 	    int binlookup=lookupOuterOverlapD1(stub.first);
 	    assert(binlookup>=0);
-	    stub.first->setVMBitsOverlap(binlookup);
 
 	    iphiRaw=iphiRaw/(32/(nallstubsoverlapdisks[0]*nvmteoverlapdisks[0]));
 
@@ -463,7 +450,6 @@ public:
 	    }
             
 	    if (binlookup==-1) continue;
-	    stub.first->setVMBits(binlookup);
 
               
 	    unsigned int disk=abs(stub.first->disk().value());
@@ -548,15 +534,8 @@ public:
 	    default : assert(0);
 	    }
 	  }
-	  //cout<<"binlookup: "<<binlookup<<" "<<stub.first->stubz()<<"\n";
-	  if (binlookup==-1) continue;
-	  if (overlap) {
-	    stub.first->setVMBitsOverlapExtended(binlookup);
-	  } else {
-	    stub.first->setVMBitsExtended(binlookup);
-	  }
 
-	  //cout<<"set vm bits\n";
+	  if (binlookup==-1) continue;
 	  
 	  unsigned int layer=stub.first->layer().value();
 	  if (overlap) {
@@ -641,8 +620,6 @@ public:
 	  if(stub.first->isPSmodule())
 	    binlookup = 0;
 	  
-	  stub.first->setVMBitsOverlapExtended(binlookup);
-	    
 	  iphiRaw=iphiRaw/(32/(nallstubsoverlapdisks[0]*nvmteoverlapdisks[0]));
 	  
 	  for (unsigned int l=0;l<vmstubsTEOverlapExtendedPHI_[iphiRaw].size();l++){
