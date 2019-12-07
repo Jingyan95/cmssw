@@ -506,13 +506,11 @@ public:
 
       unsigned phiindex=32*innerphibin+outerphibin;
       
-      //cout << "ivmmem:"<<ivmmem<<" "<<innervmstubs_[ivmmem]->nStubs()<<" "
-      //   << outervmstubs_[ivmmem]->nStubs()<<endl;
       
       //overlap seeding
       if (disk_==1 && (layer_==1 || layer_==2) ) {
-	assert(innervmstubs_[ivmmem]->nStubs()==innervmstubs_[ivmmem]->nVMStubs());
-	for(unsigned int i=0;i<innervmstubs_[ivmmem]->nStubs();i++){
+
+	for(unsigned int i=0;i<innervmstubs_[ivmmem]->nVMStubs();i++){
 
 	  VMStubTE innervmstub=innervmstubs_[ivmmem]->getVMStubTE(i); 
 	
@@ -529,8 +527,8 @@ public:
 	  
 	  for(int ibin=start;ibin<=last;ibin++) {
 	    if (debug1) cout << getName() << " looking for matching stub in bin "<<ibin
-			     <<" with "<<outervmstubs_[ivmmem]->nStubsBinned(ibin)<<" stubs"<<endl;
-	    for(unsigned int j=0;j<outervmstubs_[ivmmem]->nStubsBinned(ibin);j++){
+			     <<" with "<<outervmstubs_[ivmmem]->nVMStubsBinned(ibin)<<" stubs"<<endl;
+	    for(unsigned int j=0;j<outervmstubs_[ivmmem]->nVMStubsBinned(ibin);j++){
 	      //if (countall>=MAXTE) break;
 	      countall++;
 	      
@@ -600,8 +598,7 @@ public:
 
 
 
-	for(unsigned int i=0;i<innervmstubs_[ivmmem]->nStubs();i++){
-	  //std::pair<Stub*,L1TStub*> innerstub=innervmstubs_[ivmmem]->getStub(i);
+	for(unsigned int i=0;i<innervmstubs_[ivmmem]->nVMStubs();i++){
 	  if (debug1) {
 	    cout << "In "<<getName()<<" have inner stub"<<endl;
 	  }
@@ -635,7 +632,7 @@ public:
 	      cout << "Will look in zbins "<<start<<" to "<<last<<endl;
 	    }
 	    for(int ibin=start;ibin<=last;ibin++) {
-	      for(unsigned int j=0;j<outervmstubs_[ivmmem]->nStubsBinned(ibin);j++){
+	      for(unsigned int j=0;j<outervmstubs_[ivmmem]->nVMStubsBinned(ibin);j++){
 		if (debug1) {
 		  cout << "In "<<getName()<<" have outer stub"<<endl;
 		}

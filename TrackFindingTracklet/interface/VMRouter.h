@@ -329,7 +329,6 @@ public:
 	      if (debug1) {
 		cout << getName()<<" try adding extra stub to "<<vmstubsTEExtraPHI_[iphiRawTmp][l]->getName()<<endl;
 	      }
-	      vmstubsTEExtraPHI_[iphiRawTmp][l]->addStub(stub);
 	      int nfinephi=nfinephibarrelinner;
 	      int nphireg=4;
 	      if (layer==2) {
@@ -353,7 +352,6 @@ public:
 		if (debug1) {
 		  cout << getName()<<" try adding overlap stub to "<<vmstubsTEOverlapPHI_[iphiRawTmp][l]->getName()<<endl;
 		}
-		vmstubsTEOverlapPHI_[iphiRawTmp][l]->addStub(stub);
 		int nphireg=4;
 		if (layer==1) nphireg=3; //layer 2
 		VMStubTE tmpstub(stub,
@@ -371,7 +369,6 @@ public:
 		if (debug1) {
 		  cout << getName()<<" try adding stub to "<<vmstubsTEPHI_[iphiRawTmp][l]->getName()<<endl;
 		}
-		vmstubsTEPHI_[iphiRawTmp][l]->addStub(stub);
 		int nfinephi=nfinephibarrelinner;
 		if (layer_==2||layer_==4|layer_==6) {
 		  nfinephi=nfinephibarrelouter;
@@ -433,7 +430,6 @@ public:
 	      if (debug1) {
 		cout << getName()<<" added stub to : "<<vmstubsTEOverlapPHI_[iphiRaw][l]->getName()<<endl;
 	      }
-	      vmstubsTEOverlapPHI_[iphiRaw][l]->addStub(stub);
 	      VMStubTE tmpstub(stub,
 			       stub.first->iphivmFineBins(4,nfinephioverlapouter),
 			       stub.first->finer(),
@@ -477,7 +473,6 @@ public:
 	      if (debug1) {
 		cout << getName()<<" added stub to : "<<vmstubsTEPHI_[iphiRaw][l]->getName()<<endl;
 	      }
-	      vmstubsTEPHI_[iphiRaw][l]->addStub(stub);
 	      int nfinephi=nfinephidiskinner;
 	      if (disk_==2||disk_==4) {
 		nfinephi=nfinephidiskouter;
@@ -514,7 +509,7 @@ public:
 	  //for(int j=0;j<vmstubsTEPHI_[i].size();j++){
 	  //  out<<vmstubsTEPHI_[i][j]->getName()<<" "<<vmstubsTEPHI_[i][j]->nStubs()<<endl;
 	  //}
-	  out<<vmstubsTEPHI_[i][0]->getName()<<" "<<vmstubsTEPHI_[i][0]->nStubs()<<endl;
+	  out<<vmstubsTEPHI_[i][0]->getName()<<" "<<vmstubsTEPHI_[i][0]->nVMStubs()<<endl;
 	}
       }
     }
@@ -567,7 +562,6 @@ public:
 	  if (overlap) {
 	    iphiRaw=iphiRaw/(32/(nallstubsoverlaplayers[layer]*nvmteoverlaplayers[layer]));
 	    for (unsigned int l=0;l<vmstubsTEOverlapExtendedPHI_[iphiRaw].size();l++){
-	      vmstubsTEOverlapExtendedPHI_[iphiRaw][l]->addStub(stub);
 	      int nfinephi=nfinephibarrelinner;
 	      if (layer_==2) {
 		nfinephi=nfinephibarrelouter;
@@ -590,7 +584,6 @@ public:
 	  } else {
 	    iphiRaw=iphiRaw/(32/(nallstubslayers[layer]*nvmtelayers[layer]));
 	    for (unsigned int l=0;l<vmstubsTEExtendedPHI_[iphiRaw].size();l++){
-	      vmstubsTEExtendedPHI_[iphiRaw][l]->addStub(stub);
 	      int nfinephi=3;
 	      int nphireg=4;
 	      if (layer_==2) {
@@ -656,7 +649,6 @@ public:
 	    if (debug1) {
 	      cout << getName()<<" added stub to : "<<vmstubsTEOverlapExtendedPHI_[iphiRaw][l]->getName()<<endl;
 	    }
-	    vmstubsTEOverlapExtendedPHI_[iphiRaw][l]->addStub(stub);
 	    int nfinephi=nfinephioverlapouter;
 	    int nphireg=4;
 	    VMStubTE tmpstub(stub,
@@ -686,7 +678,7 @@ public:
       
       for (int i=0;i<24;i++) {
 	if (vmstubsTEExtendedPHI_[i].size()!=0) {
-	  out<<vmstubsTEExtendedPHI_[i][0]->getName()<<" "<<vmstubsTEExtendedPHI_[i][0]->nStubs()<<endl;
+	  out<<vmstubsTEExtendedPHI_[i][0]->getName()<<" "<<vmstubsTEExtendedPHI_[i][0]->nVMStubs()<<endl;
 	}
       }
     }

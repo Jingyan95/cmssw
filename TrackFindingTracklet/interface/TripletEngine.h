@@ -130,7 +130,7 @@ public:
     unsigned int nThirdStubs=0;
     count_=0;
 
-    for(unsigned int iThirdMem=0;iThirdMem<thirdvmstubs_.size();nThirdStubs+=thirdvmstubs_.at(iThirdMem)->nStubs(),iThirdMem++);
+    for(unsigned int iThirdMem=0;iThirdMem<thirdvmstubs_.size();nThirdStubs+=thirdvmstubs_.at(iThirdMem)->nVMStubs(),iThirdMem++);
 
     assert(!thirdvmstubs_.empty());
     assert(!stubpairs_.empty());
@@ -144,7 +144,7 @@ public:
       cout << "In TripletEngine::execute : "<<getName()
 	   <<" "<<nThirdStubs<<":\n";
       for(unsigned int i=0; i<thirdvmstubs_.size(); ++i)
-	cout <<thirdvmstubs_.at(i)->getName()<<" "<<thirdvmstubs_.at(i)->nStubs()<<"\n";
+	cout <<thirdvmstubs_.at(i)->getName()<<" "<<thirdvmstubs_.at(i)->nVMStubs()<<"\n";
       int s = 0;
       for(unsigned int i=0; i<stubpairs_.size(); ++i){
 	cout <<stubpairs_.at(i)->nStubPairs()<<" ";
@@ -183,7 +183,7 @@ public:
               vmsteSuffix = vmsteSuffix.substr(0,vmsteSuffix.find_last_of('n'));
               if (stubpairs_.at(i)->getLastPartOfName() != vmsteSuffix)
                 continue;
-              for(unsigned int l=0;l<thirdvmstubs_.at(k)->nStubsBinned(ibin);l++){
+              for(unsigned int l=0;l<thirdvmstubs_.at(k)->nVMStubsBinned(ibin);l++){
                 if (debug1) {
                   cout << "In "<<getName()<<" have third stub"<<endl;
                 }
@@ -272,7 +272,7 @@ public:
               vmsteSuffix = vmsteSuffix.substr(0,vmsteSuffix.find_last_of('n'));
               if (stubpairs_.at(i)->getLastPartOfName() != vmsteSuffix)
                 continue;
-              for(unsigned int l=0;l<thirdvmstubs_.at(k)->nStubsBinned(ibin);l++){
+              for(unsigned int l=0;l<thirdvmstubs_.at(k)->nVMStubsBinned(ibin);l++){
                 if (countall>=MAXTRE) break;
                 countall++;
 
@@ -347,8 +347,8 @@ public:
               vmsteSuffix = vmsteSuffix.substr(0,vmsteSuffix.find_last_of('n'));
               if (stubpairs_.at(i)->getLastPartOfName() != vmsteSuffix)
                 continue;
-	      assert(thirdvmstubs_.at(k)->nStubsBinned(ibin)==thirdvmstubs_.at(k)->nVMStubsBinned(ibin));
-              for(unsigned int l=0;l<thirdvmstubs_.at(k)->nStubsBinned(ibin);l++){
+	      assert(thirdvmstubs_.at(k)->nVMStubsBinned(ibin)==thirdvmstubs_.at(k)->nVMStubsBinned(ibin));
+              for(unsigned int l=0;l<thirdvmstubs_.at(k)->nVMStubsBinned(ibin);l++){
                 if (countall>=MAXTRE) break;
                 countall++;
 

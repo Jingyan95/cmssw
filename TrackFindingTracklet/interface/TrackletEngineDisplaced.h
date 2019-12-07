@@ -119,15 +119,15 @@ public:
     unsigned int countpass=0;
     unsigned int nInnerStubs=0;
 
-    for(unsigned int iInnerMem=0;iInnerMem<firstvmstubs_.size();nInnerStubs+=firstvmstubs_.at(iInnerMem)->nStubs(),iInnerMem++);
+    for(unsigned int iInnerMem=0;iInnerMem<firstvmstubs_.size();nInnerStubs+=firstvmstubs_.at(iInnerMem)->nVMStubs(),iInnerMem++);
 
     assert(!firstvmstubs_.empty());
     assert(secondvmstubs_!=0);
 
     for(unsigned int iInnerMem=0;iInnerMem<firstvmstubs_.size();iInnerMem++){
 
-      assert(firstvmstubs_.at(iInnerMem)->nStubs()==firstvmstubs_.at(iInnerMem)->nVMStubs());
-      for(unsigned int i=0;i<firstvmstubs_.at(iInnerMem)->nStubs();i++){
+      assert(firstvmstubs_.at(iInnerMem)->nVMStubs()==firstvmstubs_.at(iInnerMem)->nVMStubs());
+      for(unsigned int i=0;i<firstvmstubs_.at(iInnerMem)->nVMStubs();i++){
 	//std::pair<Stub*,L1TStub*> firststub=firstvmstubs_.at(iInnerMem)->getStub(i);
 	VMStubTE firstvmstub=firstvmstubs_.at(iInnerMem)->getVMStubTE(i);
 	if (debug1) {
@@ -150,7 +150,7 @@ public:
 	    cout << "Will look in zbins "<<start<<" to "<<last<<endl;
 	  }
 	  for(int ibin=start;ibin<=last;ibin++) {
-	    for(unsigned int j=0;j<secondvmstubs_->nStubsBinned(ibin);j++){
+	    for(unsigned int j=0;j<secondvmstubs_->nVMStubsBinned(ibin);j++){
 	      if (debug1) {
 		cout << "In "<<getName()<<" have second stub"<<endl;
 	      }
@@ -229,7 +229,7 @@ public:
 	    cout << "Will look in zbins "<<start<<" to "<<last<<endl;
 	  }
 	  for(int ibin=start;ibin<=last;ibin++) {
-	    for(unsigned int j=0;j<secondvmstubs_->nStubsBinned(ibin);j++){
+	    for(unsigned int j=0;j<secondvmstubs_->nVMStubsBinned(ibin);j++){
 	      if (debug1) {
 		cout << "In "<<getName()<<" have second stub"<<endl;
 	      }
@@ -313,8 +313,8 @@ public:
 	  int last=start+(bin&1);
 	  for(int ibin=start;ibin<=last;ibin++) {
 	    if (debug1) cout << getName() << " looking for matching stub in bin "<<ibin
-			     <<" with "<<secondvmstubs_->nStubsBinned(ibin)<<" stubs"<<endl;
-	    for(unsigned int j=0;j<secondvmstubs_->nStubsBinned(ibin);j++){
+			     <<" with "<<secondvmstubs_->nVMStubsBinned(ibin)<<" stubs"<<endl;
+	    for(unsigned int j=0;j<secondvmstubs_->nVMStubsBinned(ibin);j++){
 	      if (countall>=MAXTE) break;
 	      countall++;
 
@@ -379,26 +379,26 @@ public:
     if (countall>5000) {
       cout << "In TrackletEngineDisplaced::execute : "<<getName()
 	   <<" "<<nInnerStubs
-	   <<" "<<secondvmstubs_->nStubs()
+	   <<" "<<secondvmstubs_->nVMStubs()
 	   <<" "<<countall<<" "<<countpass
 	   <<endl;
       for(unsigned int iInnerMem=0;iInnerMem<firstvmstubs_.size();iInnerMem++){
-        for(unsigned int i=0;i<firstvmstubs_.at(iInnerMem)->nStubs();i++){
-          std::pair<Stub*,L1TStub*> firststub=firstvmstubs_.at(iInnerMem)->getStub(i);
+        for(unsigned int i=0;i<firstvmstubs_.at(iInnerMem)->nVMStubs();i++){
+          VMStubTE firstvmstub=firstvmstubs_.at(iInnerMem)->getVMStubTE(i);
           cout << "In TrackletEngineDisplaced::execute first stub : "
-               << firststub.second->r()<<" "
-               << firststub.second->phi()<<" "
-               << firststub.second->r()*firststub.second->phi()<<" "
-               << firststub.second->z()<<endl;
+               << firstvmstub.stub().second->r()<<" "
+               << firstvmstub.stub().second->phi()<<" "
+               << firstvmstub.stub().second->r()*firstvmstub.stub().second->phi()<<" "
+               << firstvmstub.stub().second->z()<<endl;
         }
       }
-      for(unsigned int i=0;i<secondvmstubs_->nStubs();i++){
-	std::pair<Stub*,L1TStub*> secondstub=secondvmstubs_->getStub(i);
+      for(unsigned int i=0;i<secondvmstubs_->nVMStubs();i++){
+	VMStubTE secondvmstub=secondvmstubs_->getVMStubTE(i);
 	cout << "In TrackletEngineDisplaced::execute second stub : "
-	     << secondstub.second->r()<<" "
-	     << secondstub.second->phi()<<" "
-	     << secondstub.second->r()*secondstub.second->phi()<<" "
-	     << secondstub.second->z()<<endl;
+	     << secondvmstub.stub().second->r()<<" "
+	     << secondvmstub.stub().second->phi()<<" "
+	     << secondvmstub.stub().second->r()*secondvmstub.stub().second->phi()<<" "
+	     << secondvmstub.stub().second->z()<<endl;
       }
       
     }

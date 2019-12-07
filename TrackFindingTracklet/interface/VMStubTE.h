@@ -59,6 +59,10 @@ public:
   bool isPSmodule() const {
     return stub_.first->isPSmodule();
   }
+
+  FPGAWord stubindex() const {
+    return allStubIndex_;
+  }
   
 private:
 

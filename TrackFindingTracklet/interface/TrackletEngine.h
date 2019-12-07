@@ -153,7 +153,7 @@ public:
 	for(int ibin=start;ibin<=last;ibin++) {
 	  if (debug1) cout << getName() << " looking for matching stub in bin "<<ibin
 			   <<" with "<<outervmstubs_->nVMStubsBinned(ibin)<<" stubs"<<endl;
-	  for(unsigned int j=0;j<outervmstubs_->nStubsBinned(ibin);j++){
+	  for(unsigned int j=0;j<outervmstubs_->nVMStubsBinned(ibin);j++){
 	    if (countall>=MAXTE) break;
 	    countall++;
 	    VMStubTE outervmstub=outervmstubs_->getVMStubTEBinned(ibin,j);
@@ -219,9 +219,8 @@ public:
 
     } else {
 
-      //cout << getName() <<" "<<innervmstubs_->nStubs()<<" "<<innervmstubs_->getName()<<" "<<innervmstubs_<<endl;
 
-      for(unsigned int i=0;i<innervmstubs_->nStubs();i++){
+      for(unsigned int i=0;i<innervmstubs_->nVMStubs();i++){
 
 	VMStubTE innervmstub=innervmstubs_->getVMStubTE(i);
 	if (debug1) {
@@ -419,11 +418,11 @@ public:
   
     if (countall>5000) {
       cout << "In TrackletEngine::execute : "<<getName()
-	   <<" "<<innervmstubs_->nStubs()
-	   <<" "<<outervmstubs_->nStubs()
+	   <<" "<<innervmstubs_->nVMStubs()
+	   <<" "<<outervmstubs_->nVMStubs()
 	   <<" "<<countall<<" "<<countpass
 	   <<endl;
-      for(unsigned int i=0;i<innervmstubs_->nStubs();i++){
+      for(unsigned int i=0;i<innervmstubs_->nVMStubs();i++){
 	std::pair<Stub*,L1TStub*> innerstub=innervmstubs_->getVMStubTE(i).stub();
 	cout << "In TrackletEngine::execute inner stub : "
 	     << innerstub.second->r()<<" "
