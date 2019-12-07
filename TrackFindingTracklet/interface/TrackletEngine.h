@@ -111,6 +111,8 @@ public:
 
   void execute() {
 
+    return;
+    
     if (!((doL1L2&&(layer1_==1)&&(layer2_==2))||
 	  (doL2L3&&(layer1_==2)&&(layer2_==3))||
 	  (doL3L4&&(layer1_==3)&&(layer2_==4))||
@@ -209,7 +211,7 @@ public:
               fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
               fout.close();
             }
-	    stubpairs_->addStubPair(innervmstub.stub(),outervmstub.stub());
+	    stubpairs_->addStubPair(innervmstub,outervmstub);
 	    countpass++;
 	  }
 	}
@@ -324,7 +326,7 @@ public:
                 fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
                 fout.close();
               }
-	      stubpairs_->addStubPair(innervmstub.stub(),outervmstub.stub());
+	      stubpairs_->addStubPair(innervmstub,outervmstub);
 	      countpass++;
 	    }
 	  }
@@ -405,7 +407,7 @@ public:
                 fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
                 fout.close();
               }
-	      stubpairs_->addStubPair(innervmstub.stub(),outervmstub.stub());
+	      stubpairs_->addStubPair(innervmstub,outervmstub);
 	      countpass++;
 	
 	    }

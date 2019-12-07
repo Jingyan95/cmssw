@@ -4,6 +4,7 @@
 
 #include "L1TStub.h"
 #include "Stub.h"
+#include "VMStubTE.h"
 #include "MemoryBase.h"
 
 using namespace std;
@@ -19,8 +20,8 @@ public:
     phimax_=phimax;
   }
 
-  void addStubPair(std::pair<Stub*,L1TStub*> stub1,
-		   std::pair<Stub*,L1TStub*> stub2,
+  void addStubPair(const VMStubTE& stub1,
+		   const VMStubTE& stub2,
                    const unsigned index = 0,
                    const std::string &tedName = "") {
     stubs1_.push_back(stub1);
@@ -31,13 +32,15 @@ public:
 
   unsigned int nStubPairs() const {return stubs1_.size();}
 
-  Stub* getFPGAStub1(unsigned int i) const {return stubs1_[i].first;}
-  L1TStub* getL1TStub1(unsigned int i) const {return stubs1_[i].second;}
-  std::pair<Stub*,L1TStub*> getStub1(unsigned int i) const {return stubs1_[i];}
+  VMStubTE getVMStub1(unsigned int i) const {return stubs1_[i];}
+  Stub* getFPGAStub1(unsigned int i) const {return stubs1_[i].stub().first;}
+  L1TStub* getL1TStub1(unsigned int i) const {return stubs1_[i].stub().second;}
+  std::pair<Stub*,L1TStub*> getStub1(unsigned int i) const {return stubs1_[i].stub();}
 
-  Stub* getFPGAStub2(unsigned int i) const {return stubs2_[i].first;}
-  L1TStub* getL1TStub2(unsigned int i) const {return stubs2_[i].second;}
-  std::pair<Stub*,L1TStub*> getStub2(unsigned int i) const {return stubs2_[i];}
+  VMStubTE getVMStub2(unsigned int i) const {return stubs2_[i];}
+  Stub* getFPGAStub2(unsigned int i) const {return stubs2_[i].stub().first;}
+  L1TStub* getL1TStub2(unsigned int i) const {return stubs2_[i].stub().second;}
+  std::pair<Stub*,L1TStub*> getStub2(unsigned int i) const {return stubs2_[i].stub();}
 
   unsigned getIndex(const unsigned i) const {return indices_.at(i);}
   const std::string &getTEDName(const unsigned i) const {return tedNames_.at(i);}
@@ -70,8 +73,8 @@ public:
     out_ << "BX = "<<(bitset<3>)bx_ << " Event : " << event_ << endl;
 
     for (unsigned int j=0;j<stubs1_.size();j++){
-      string stub1index=stubs1_[j].first->stubindex().str();
-      string stub2index=stubs2_[j].first->stubindex().str();
+      string stub1index=stubs1_[j].stub().first->stubindex().str();
+      string stub2index=stubs2_[j].stub().first->stubindex().str();
       //string stub1index=stubs1_[j].first->stubaddressaste().str();
       //string stub2index=stubs2_[j].first->stubaddressaste().str();
       out_ << "0x";
@@ -100,8 +103,9 @@ private:
 
   double phimin_;
   double phimax_;
-  std::vector<std::pair<Stub*,L1TStub*> > stubs1_;
-  std::vector<std::pair<Stub*,L1TStub*> > stubs2_;
+  //FIXME should not be two vectors
+  std::vector<VMStubTE> stubs1_;
+  std::vector<VMStubTE> stubs2_;
 
   std::vector<unsigned> indices_;
   std::vector<std::string> tedNames_;

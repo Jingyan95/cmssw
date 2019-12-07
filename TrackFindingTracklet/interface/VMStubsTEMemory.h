@@ -115,8 +115,8 @@ public:
     std::pair<Stub*,L1TStub*> stub=vmstub.stub();
 
     int mask=-1;
-    if (layer_==1 || layer_==3 || layer_==5 || (extended_ && layer_==2))
-      mask=1023;
+    //if (layer_==1 || layer_==3 || layer_==5 || (extended_ && layer_==2))
+    //  mask=1023;
 
     int binlookup= -1;
     if(!extended_){
@@ -137,6 +137,8 @@ public:
       cout << getName() << " binlookup = "<<binlookup<<endl;
     }
 
+    //cout << getName() << " " << binlookup<<" "<<vmstub.vmbits()<<endl;
+    
     assert(binlookup==(int)vmstub.vmbits());
     binlookup=(int)vmstub.vmbits();
     

@@ -164,13 +164,13 @@ public:
 	if(print)
 	  cout<<"     *****    "<<stubpairs_.at(i)->getName()<<" "<<stubpairs_.at(i)->nStubPairs()<<"\n";
 
-        auto firststub = stubpairs_.at(i)->getStub1(j);
-        auto secondstub = stubpairs_.at(i)->getStub2(j);
+        auto firstvmstub = stubpairs_.at(i)->getVMStub1(j);
+        auto secondvmstub = stubpairs_.at(i)->getVMStub2(j);
 
         if ((layer2_==4 && layer3_==2)||
             (layer2_==6 && layer3_==4)){
 
-	  int lookupbits=(firststub.first->getVMBits().value()>>10)&1023;
+	  int lookupbits=(int)((firstvmstub.vmbits()>>10)&1023);
 	  int newbin=(lookupbits&127);
 	  int bin=newbin/8;
 	
@@ -190,45 +190,28 @@ public:
 
                 if (countall>=MAXTRE) break;
                 countall++;
-                std::pair<Stub*,L1TStub*> thirdstub=thirdvmstubs_.at(k)->getStubBinned(ibin,l);
 
-                //For debugging
-                //double trinv=rinv(secondstub.second->phi(), thirdstub.second->phi(),
-                //		       secondstub.second->r(), thirdstub.second->r());
-                
+                VMStubTE thirdvmstub=thirdvmstubs_.at(k)->getVMStubTEBinned(ibin,l);
+
                 assert(secondphibits_!=-1);
                 assert(thirdphibits_!=-1);
                 
 		unsigned int nvmsecond=nallstubslayers[layer2_-1]*nvmtelayers[layer2_-1];
-		unsigned int nvmthird=nallstubslayers[layer3_-1]*nvmtelayers[layer3_-1];
 		unsigned int nvmbitssecond=nbits(nvmsecond);
-		unsigned int nvmbitsthird=nbits(nvmthird);
-		int iphisecondbin=secondstub.first->iphivmFineBins(nvmbitssecond,secondphibits_);
-		int iphithirdbin=thirdstub.first->iphivmFineBins(nvmbitsthird,thirdphibits_);
-                
+
+		int iphisecondbin=secondvmstub.stub().first->iphivmFineBins(nvmbitssecond,secondphibits_);
+
+		//FIXME not using same number of bits as in the TED?
+		//assert(iphisecondbin==(int)secondvmstub.finephi());
+		int iphithirdbin=(int)thirdvmstub.finephi();
+		
                 unsigned int index = (iphisecondbin<<thirdphibits_)+iphithirdbin;
 
-                //assert(index<(int)phitable_.size());		
-
-                //cout << "Stubpair layer rinv/rinvmax : "<<layer1_<<" "<<trinv/0.0057<<" "<<phitable_[index]<<endl;
-                
-                /*if (!phitable_[index]) {
-                  if (debug1) {
-                    cout << "Stub pair rejected because of tracklet pt cut"<<endl;
-                  }
-                  continue;
-                }*/
-                  
-                FPGAWord secondbend=secondstub.first->bend();
-                FPGAWord thirdbend=thirdstub.first->bend();
-                
+		FPGAWord secondbend=secondvmstub.bend();
+		FPGAWord thirdbend=thirdvmstub.bend();
+		
                 index=(index<<secondbend.nbits())+secondbend.value();
                 index=(index<<thirdbend.nbits())+thirdbend.value();
-
-                //cout <<"bendsecond "<<bend(rmean[layer1_-1],trinv)<<" "<<0.5*(secondbend.value()-15.0)
-                //	   <<" "<<pttablesecond_[ptsecondindex]
-                //   <<"     bendthird "<<bend(rmean[layer1_],trinv)<<" "<<0.5*(thirdbend.value()-15.0)
-                //   <<" "<<pttablethird_[ptthirdindex]<<endl;
 
                 if (index >= table_.size())
                   table_.resize(index+1, false);
@@ -236,9 +219,9 @@ public:
                 if (!table_[index]) {
                   if (debug1) {
                     cout << "Stub pair rejected because of stub pt cut bends : "
-                         <<Stub::benddecode(secondstub.first->bend().value(),secondstub.first->isPSmodule())
+                         <<Stub::benddecode(secondvmstub.bend().value(),secondvmstub.isPSmodule())
                          <<" "
-                         <<Stub::benddecode(thirdstub.first->bend().value(),thirdstub.first->isPSmodule())
+                         <<Stub::benddecode(thirdvmstub.bend().value(),thirdvmstub.isPSmodule())
                          <<endl;
                   }		
                   if (!writeTripletTables)
@@ -261,7 +244,7 @@ public:
                   fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
                   fout.close();
                 }
-                stubtriplets_->addStubs(thirdstub, (stubpairs_.at(i))->getStub1(j), (stubpairs_.at(i))->getStub2(j));
+                stubtriplets_->addStubs(thirdvmstub.stub(), (stubpairs_.at(i))->getStub1(j), (stubpairs_.at(i))->getStub2(j));
 
                 countpass++;
               }
@@ -272,13 +255,13 @@ public:
 
         else if (disk2_ == 2 && layer3_ == 2){
 
-	  int lookupbits=(firststub.first->getVMBits().value()>>9)&1023;
+	  int lookupbits=(int)((firstvmstub.vmbits()>>9)&1023);
 	  int newbin=(lookupbits&127);
 	  int bin=newbin/8;
 	
 	  int start=(bin>>1);
 	  int last=start+(bin&1);
-          if (firststub.first->disk().value() < 0){
+          if (firstvmstub.stub().first->disk().value() < 0){  //FIXME
             start = NLONGVMBINS - last - 1;
             last = NLONGVMBINS - start - 1;
           }
@@ -292,33 +275,21 @@ public:
               for(unsigned int l=0;l<thirdvmstubs_.at(k)->nStubsBinned(ibin);l++){
                 if (countall>=MAXTRE) break;
                 countall++;
-                std::pair<Stub*,L1TStub*> thirdstub=thirdvmstubs_.at(k)->getStubBinned(ibin,l);
+
+                VMStubTE thirdvmstub=thirdvmstubs_.at(k)->getVMStubTEBinned(ibin,l);
 
                 assert(secondphibits_!=-1);
                 assert(thirdphibits_!=-1);
                 
-		unsigned int nvmsecond;
-		unsigned int nvmthird;
-		nvmsecond=nallstubsoverlapdisks[disk2_-1]*nvmteoverlapdisks[disk2_-1];
-		nvmthird=nallstubsoverlaplayers[layer3_-1]*nvmteoverlaplayers[layer3_-1];
-		unsigned int nvmbitssecond=nbits(nvmsecond);
-		unsigned int nvmbitsthird=nbits(nvmthird);
-		int iphisecondbin=secondstub.first->iphivmFineBins(nvmbitssecond,secondphibits_);
-		int iphithirdbin=thirdstub.first->iphivmFineBins(nvmbitsthird,thirdphibits_);
-                  
+		int iphisecondbin=(int)secondvmstub.finephi();
+		int iphithirdbin=(int)thirdvmstub.finephi();
+	       
+		
                 unsigned int index = (iphisecondbin<<thirdphibits_)+iphithirdbin;
                 
-                  
-                /*if (!phitable_[index]) {
-                  if (debug1) {
-                    cout << "Stub pair rejected because of tracklet pt cut"<<endl;
-                  }
-                  continue;
-                }*/
-                    
-                FPGAWord secondbend=secondstub.first->bend();
-                FPGAWord thirdbend=thirdstub.first->bend();
-                
+		FPGAWord secondbend=secondvmstub.bend();
+		FPGAWord thirdbend=thirdvmstub.bend();
+		
                 index=(index<<secondbend.nbits())+secondbend.value();
                 index=(index<<thirdbend.nbits())+thirdbend.value();
 
@@ -328,9 +299,9 @@ public:
                 if (!table_[index]) {
                   if (debug1) {
                     cout << "Stub pair rejected because of stub pt cut bends : "
-                         <<Stub::benddecode(secondstub.first->bend().value(),secondstub.first->isPSmodule())
+                         <<Stub::benddecode(secondvmstub.bend().value(),secondvmstub.isPSmodule())
                          <<" "
-                         <<Stub::benddecode(thirdstub.first->bend().value(),thirdstub.first->isPSmodule())
+                         <<Stub::benddecode(thirdvmstub.bend().value(),thirdvmstub.isPSmodule())
                          <<endl;
                   }		
                   if (!writeTripletTables)
@@ -353,7 +324,7 @@ public:
                   fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
                   fout.close();
                 }
-                stubtriplets_->addStubs(thirdstub, (stubpairs_.at(i))->getStub1(j), (stubpairs_.at(i))->getStub2(j));
+                stubtriplets_->addStubs(thirdvmstub.stub(), (stubpairs_.at(i))->getStub1(j), (stubpairs_.at(i))->getStub2(j));
                 countpass++;
               }
             }
@@ -362,7 +333,8 @@ public:
 
         else if (layer2_ == 3 && disk3_ == 1){
 
-	  int lookupbits=(firststub.first->getVMBitsExtended().value()>>10)&1023;
+	  int lookupbits=(int)((firstvmstub.vmbits()>>10)&1023);
+
 	  int newbin=(lookupbits&127);
 	  int bin=newbin/8;
 	
@@ -375,37 +347,33 @@ public:
               vmsteSuffix = vmsteSuffix.substr(0,vmsteSuffix.find_last_of('n'));
               if (stubpairs_.at(i)->getLastPartOfName() != vmsteSuffix)
                 continue;
+	      assert(thirdvmstubs_.at(k)->nStubsBinned(ibin)==thirdvmstubs_.at(k)->nVMStubsBinned(ibin));
               for(unsigned int l=0;l<thirdvmstubs_.at(k)->nStubsBinned(ibin);l++){
                 if (countall>=MAXTRE) break;
                 countall++;
-                std::pair<Stub*,L1TStub*> thirdstub=thirdvmstubs_.at(k)->getStubBinned(ibin,l);
+
+                VMStubTE thirdvmstub=thirdvmstubs_.at(k)->getVMStubTEBinned(ibin,l);
 
                 assert(secondphibits_!=-1);
                 assert(thirdphibits_!=-1);
                 
 		unsigned int nvmsecond;
-		unsigned int nvmthird;
+
 		nvmsecond=nallstubsoverlaplayers[layer2_-1]*nvmteoverlaplayers[layer2_-1];
-		nvmthird=nallstubsoverlapdisks[disk3_-1]*nvmteoverlapdisks[disk3_-1];
 		unsigned int nvmbitssecond=nbits(nvmsecond);
-		unsigned int nvmbitsthird=nbits(nvmthird);
-		int iphisecondbin=secondstub.first->iphivmFineBins(nvmbitssecond,secondphibits_);
-		int iphithirdbin=thirdstub.first->iphivmFineBins(nvmbitsthird,thirdphibits_);
+
+		int iphisecondbin=secondvmstub.stub().first->iphivmFineBins(nvmbitssecond,secondphibits_);
                   
+		//FIXME not using same number of bits as in the TED?
+		//assert(iphisecondbin==(int)secondvmstub.finephi());
+		int iphithirdbin=(int)thirdvmstub.finephi();
+
                 unsigned int index = (iphisecondbin<<thirdphibits_)+iphithirdbin;
-                
-                
-                  
-                /*if (!phitable_[index]) {
-                  if (debug1) {
-                    cout << "Stub pair rejected because of tracklet pt cut"<<endl;
-                  }
-                  continue;
-                }*/
-                    
-                FPGAWord secondbend=secondstub.first->bend();
-                FPGAWord thirdbend=thirdstub.first->bend();
-                
+		
+		FPGAWord secondbend=secondvmstub.bend();
+		FPGAWord thirdbend=thirdvmstub.bend();
+
+		
                 index=(index<<secondbend.nbits())+secondbend.value();
                 index=(index<<thirdbend.nbits())+thirdbend.value();
 
@@ -415,9 +383,9 @@ public:
                 if (!table_[index]) {
                   if (debug1) {
                     cout << "Stub pair rejected because of stub pt cut bends : "
-                         <<Stub::benddecode(secondstub.first->bend().value(),secondstub.first->isPSmodule())
+                         <<Stub::benddecode(secondvmstub.bend().value(),secondvmstub.isPSmodule())
                          <<" "
-                         <<Stub::benddecode(thirdstub.first->bend().value(),thirdstub.first->isPSmodule())
+                         <<Stub::benddecode(thirdvmstub.bend().value(),thirdvmstub.isPSmodule())
                          <<endl;
                   }		
                   if (!writeTripletTables)
@@ -440,7 +408,7 @@ public:
                   fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
                   fout.close();
                 }
-                stubtriplets_->addStubs(thirdstub, (stubpairs_.at(i))->getStub1(j), (stubpairs_.at(i))->getStub2(j));
+                stubtriplets_->addStubs(thirdvmstub.stub(), (stubpairs_.at(i))->getStub1(j), (stubpairs_.at(i))->getStub2(j));
                 countpass++;
               }
             }

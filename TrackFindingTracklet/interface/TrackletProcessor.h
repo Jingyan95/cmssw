@@ -590,7 +590,7 @@ public:
 		fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
 		fout.close();
 	      }
-	      stubpairs.addStubPair(innervmstub.stub(),outervmstub.stub());
+	      stubpairs.addStubPair(innervmstub,outervmstub);
 	      countall++;
 	    }
 	  }
@@ -707,7 +707,7 @@ public:
 		  fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
 		  fout.close();
 		}
-		stubpairs.addStubPair(innervmstub.stub(),outervmstub.stub());
+		stubpairs.addStubPair(innervmstub,outervmstub);
 		
 		countall++;
 	      }
@@ -794,7 +794,7 @@ public:
 		  fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
 		  fout.close();
 		}
-		stubpairs.addStubPair(innervmstub.stub(),outervmstub.stub());
+		stubpairs.addStubPair(innervmstub,outervmstub);
 		countall++;
 	
 	      }
