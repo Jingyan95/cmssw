@@ -112,9 +112,6 @@ public:
   
   bool addVMStub(VMStubTE vmstub) {
 
-    std::pair<Stub*,L1TStub*> stub=vmstub.stub();
-
-
     int binlookup= -1;
 
     binlookup=(int)vmstub.vmbits();
@@ -122,17 +119,21 @@ public:
     assert(binlookup>=0);
     int bin=(binlookup/8);
 
-    bool pass=passbend(stub.first->bend().value());
+    //If the pt of the stub is consistent with the allowed pt of tracklets
+    //in that can be formed in this VM and the other VM used in the TE.
+    bool pass=passbend(vmstub.bend().value());
 
     if (!pass) {
-      if (debug1) cout << getName() << " Stub failed bend cut. bend = "<<Stub::benddecode(stub.first->bend().value(),stub.first->isPSmodule())<<endl;
+      if (debug1) cout << getName() << " Stub failed bend cut. bend = "<<Stub::benddecode(vmstub.bend().value(),vmstub.isPSmodule())<<endl;
       return false;
     }
+
+    bool negdisk=vmstub.stub().first->disk().value()<0.0;
 
     if(!extended_){
       if (overlap_) {
 	if (disk_==1) {
-	  bool negdisk=stub.first->disk().value()<0.0;
+	  //bool negdisk=vmstub.stub().first->disk().value()<0.0;
 	  assert(bin<4);
 	  if (negdisk) bin+=4;
 	  stubsbinnedvm_[bin].push_back(vmstub);
@@ -140,14 +141,14 @@ public:
 			   <<" in disk = "<<disk_<<"  in bin = "<<bin<<endl;
 	}
       } else {
-        if (stub.first->isBarrel()){
+        if (vmstub.stub().first->isBarrel()){
           if (!isinner_) {
 	    stubsbinnedvm_[bin].push_back(vmstub);
           }
 	
 	} else {
 
-	  bool negdisk=stub.first->disk().value()<0.0;
+	  //bool negdisk=vmstub.stub().first->disk().value()<0.0;
 
 	  if (disk_%2==0) {
 	    assert(bin<4);
@@ -158,7 +159,7 @@ public:
 	}
       }
     }
-    else {
+    else {  //extended
       if(!isinner_){
 	if(layer_>0){
 	  stubsbinnedvm_[bin].push_back(vmstub);
@@ -168,20 +169,23 @@ public:
 	    assert(disk_==1); // D1 from L2L3D1
 
 	    //bin 0 is PS, 1 through 3 is 2S
-	    
-	    bin = stub.first->ir(); // 0 to 9
-	    bin = bin >> 2; // 0 to 2
-	    bin += 1;
-	    if(stub.first->isPSmodule())
+	    if(vmstub.stub().first->isPSmodule()) {
 	      bin = 0;
+	    } else {
+	      bin = vmstub.stub().first->ir(); // 0 to 9 //FIXME
+	      bin = bin >> 2; // 0 to 2
+	      bin += 1;
+	    }
+	    
 	  }
+	  //bool negdisk=vmstub.stub().first->disk().value()<0.0;
 	  assert(bin<4);
-	  bool negdisk=stub.first->disk().value()<0.0;
 	  if (negdisk) bin+=4;
 	  stubsbinnedvm_[bin].push_back(vmstub);	  
 	}
       }
     }
+
     if (debug1) cout << "Adding stubs to "<<getName()<<endl;
     stubsvm_.push_back(vmstub);
     return true;
