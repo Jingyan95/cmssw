@@ -276,10 +276,19 @@ public:
 
   //VMbits is the number of bits for the fine bins. E.g. 32 bins would use VMbits=5
   //finebits is the number of bits within the VM 
-  
+
+  /*
   unsigned int iphivmFineBins(int VMbits, int finebits) const {
 
     return (phicorr_.value()>>(phicorr_.nbits()-VMbits-finebits))&((1<<finebits)-1);
+  }
+  */
+
+  FPGAWord iphivmFineBins(int VMbits, int finebits) const {
+
+    unsigned int finephi=(phicorr_.value()>>(phicorr_.nbits()-VMbits-finebits))&((1<<finebits)-1);
+
+    return FPGAWord(finephi,finebits,true,__LINE__,__FILE__);
 
   }
 

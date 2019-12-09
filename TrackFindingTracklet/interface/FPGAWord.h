@@ -20,6 +20,10 @@ public:
     nbits_=-1;
   }
 
+  FPGAWord(int value, int nbits,bool positive=true, int line=-1, const char* file=0) {
+    set(value,nbits,positive,line,file);
+  }
+
   void set(int value, int nbits,bool positive=true, int line=-1, const char* file=0) {
     value_=value;
     nbits_=nbits;

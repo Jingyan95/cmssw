@@ -174,10 +174,10 @@ public:
 	    assert(innerphibits_!=-1);
 	    assert(outerphibits_!=-1);
 	    
-	    unsigned int iphiinnerbin=innervmstub.finephi();
-	    unsigned int iphiouterbin=outervmstub.finephi();
+	    FPGAWord iphiinnerbin=innervmstub.finephi();
+	    FPGAWord iphiouterbin=outervmstub.finephi();
 	    
-	    unsigned int index = (((iphiinnerbin<<outerphibits_)+iphiouterbin)<<5)+ir;
+	    unsigned int index = (((iphiinnerbin.value()<<outerphibits_)+iphiouterbin.value())<<5)+ir;
 	    
 	    assert(index<phitable_.size());
 	      
@@ -281,10 +281,10 @@ public:
 	      assert(innerphibits_!=-1);
 	      assert(outerphibits_!=-1);
 	      
-	      int iphiinnerbin=(int)innervmstub.finephi();
-	      int iphiouterbin=(int)outervmstub.finephi();
+	      FPGAWord iphiinnerbin=innervmstub.finephi();
+	      FPGAWord iphiouterbin=outervmstub.finephi();
 	      
-	      int index = (iphiinnerbin<<outerphibits_)+iphiouterbin;
+	      int index = (iphiinnerbin.value()<<outerphibits_)+iphiouterbin.value();
 
 
 	      assert(index<(int)phitable_.size());		
@@ -364,10 +364,10 @@ public:
 	      unsigned int irouterbin=outervmstub.vmbits()>>2;
 
 
-	      int iphiinnerbin=(int)innervmstub.finephi();
-	      int iphiouterbin=(int)outervmstub.finephi();
+	      FPGAWord iphiinnerbin=innervmstub.finephi();
+	      FPGAWord iphiouterbin=outervmstub.finephi();
 	      
-	      unsigned int index = (irouterbin<<(outerphibits_+innerphibits_))+(iphiinnerbin<<outerphibits_)+iphiouterbin;
+	      unsigned int index = (irouterbin<<(outerphibits_+innerphibits_))+(iphiinnerbin.value()<<outerphibits_)+iphiouterbin.value();
 
 	      assert(index<phitable_.size());		
 	      if (!phitable_[index]) {

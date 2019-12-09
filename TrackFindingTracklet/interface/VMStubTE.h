@@ -22,7 +22,7 @@ public:
   VMStubTE() {}
   
 
-  VMStubTE(std::pair<Stub*, L1TStub*> stub, unsigned int finephi, FPGAWord finerz, FPGAWord bend, unsigned int vmbits, FPGAWord allstubindex) {
+  VMStubTE(std::pair<Stub*, L1TStub*> stub, FPGAWord finephi, FPGAWord finerz, FPGAWord bend, unsigned int vmbits, FPGAWord allstubindex) {
     stub_=stub;
     finephi_=finephi;
     finerz_=finerz;
@@ -36,7 +36,7 @@ public:
 
   }
 
-  unsigned int finephi() const {
+  FPGAWord finephi() const {
     return finephi_;
   }
   
@@ -66,7 +66,7 @@ public:
   
 private:
 
-  unsigned int finephi_;
+  FPGAWord finephi_;
   FPGAWord finerz_;
   FPGAWord bend_;
   unsigned int vmbits_;

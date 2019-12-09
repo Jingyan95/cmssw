@@ -199,13 +199,13 @@ public:
 		unsigned int nvmsecond=nallstubslayers[layer2_-1]*nvmtelayers[layer2_-1];
 		unsigned int nvmbitssecond=nbits(nvmsecond);
 
-		int iphisecondbin=secondvmstub.stub().first->iphivmFineBins(nvmbitssecond,secondphibits_);
+		FPGAWord iphisecondbin=secondvmstub.stub().first->iphivmFineBins(nvmbitssecond,secondphibits_);
 
 		//FIXME not using same number of bits as in the TED?
 		//assert(iphisecondbin==(int)secondvmstub.finephi());
-		int iphithirdbin=(int)thirdvmstub.finephi();
+		FPGAWord iphithirdbin=thirdvmstub.finephi();
 		
-                unsigned int index = (iphisecondbin<<thirdphibits_)+iphithirdbin;
+                unsigned int index = (iphisecondbin.value()<<thirdphibits_)+iphithirdbin.value();
 
 		FPGAWord secondbend=secondvmstub.bend();
 		FPGAWord thirdbend=thirdvmstub.bend();
@@ -281,11 +281,11 @@ public:
                 assert(secondphibits_!=-1);
                 assert(thirdphibits_!=-1);
                 
-		int iphisecondbin=(int)secondvmstub.finephi();
-		int iphithirdbin=(int)thirdvmstub.finephi();
+		FPGAWord iphisecondbin=secondvmstub.finephi();
+		FPGAWord iphithirdbin=thirdvmstub.finephi();
 	       
 		
-                unsigned int index = (iphisecondbin<<thirdphibits_)+iphithirdbin;
+                unsigned int index = (iphisecondbin.value()<<thirdphibits_)+iphithirdbin.value();
                 
 		FPGAWord secondbend=secondvmstub.bend();
 		FPGAWord thirdbend=thirdvmstub.bend();
@@ -362,13 +362,13 @@ public:
 		nvmsecond=nallstubsoverlaplayers[layer2_-1]*nvmteoverlaplayers[layer2_-1];
 		unsigned int nvmbitssecond=nbits(nvmsecond);
 
-		int iphisecondbin=secondvmstub.stub().first->iphivmFineBins(nvmbitssecond,secondphibits_);
+		FPGAWord iphisecondbin=secondvmstub.stub().first->iphivmFineBins(nvmbitssecond,secondphibits_);
                   
 		//FIXME not using same number of bits as in the TED?
 		//assert(iphisecondbin==(int)secondvmstub.finephi());
-		int iphithirdbin=(int)thirdvmstub.finephi();
+		FPGAWord iphithirdbin=thirdvmstub.finephi();
 
-                unsigned int index = (iphisecondbin<<thirdphibits_)+iphithirdbin;
+                unsigned int index = (iphisecondbin.value()<<thirdphibits_)+iphithirdbin.value();
 		
 		FPGAWord secondbend=secondvmstub.bend();
 		FPGAWord thirdbend=thirdvmstub.bend();

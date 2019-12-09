@@ -171,10 +171,10 @@ public:
 	      assert(firstphibits_!=-1);
 	      assert(secondphibits_!=-1);
 	      
-	      int iphifirstbin=(int)firstvmstub.finephi();
-	      int iphisecondbin=(int)secondvmstub.finephi();
+	      FPGAWord iphifirstbin=firstvmstub.finephi();
+	      FPGAWord iphisecondbin=secondvmstub.finephi();
 	      
-	      unsigned int index = (iphifirstbin<<secondphibits_)+iphisecondbin;
+	      unsigned int index = (iphifirstbin.value()<<secondphibits_)+iphisecondbin.value();
 
 	      FPGAWord firstbend=firstvmstub.bend();
 	      FPGAWord secondbend=secondvmstub.bend();
@@ -252,10 +252,10 @@ public:
 	      assert(secondphibits_!=-1);
 	      
 
-	      int iphifirstbin=(int)firstvmstub.finephi();
-	      int iphisecondbin=(int)secondvmstub.finephi();
+	      FPGAWord iphifirstbin=firstvmstub.finephi();
+	      FPGAWord iphisecondbin=secondvmstub.finephi();
 	      
-	      unsigned int index = (iphifirstbin<<secondphibits_)+iphisecondbin;
+	      unsigned int index = (iphifirstbin.value()<<secondphibits_)+iphisecondbin.value();
 
 
 	      FPGAWord firstbend=firstvmstub.bend();
@@ -329,10 +329,10 @@ public:
 	      
 	      unsigned int irsecondbin=secondvmstub.vmbits()>>2;
 
-	      int iphifirstbin=(int)firstvmstub.finephi();
-	      int iphisecondbin=(int)secondvmstub.finephi();
+	      FPGAWord iphifirstbin=firstvmstub.finephi();
+	      FPGAWord iphisecondbin=secondvmstub.finephi();
 	      
-	      unsigned int index = (irsecondbin<<(secondphibits_+firstphibits_))+(iphifirstbin<<secondphibits_)+iphisecondbin;
+	      unsigned int index = (irsecondbin<<(secondphibits_+firstphibits_))+(iphifirstbin.value()<<secondphibits_)+iphisecondbin.value();
 
 	      FPGAWord firstbend=firstvmstub.bend();
 	      FPGAWord secondbend=secondvmstub.bend();

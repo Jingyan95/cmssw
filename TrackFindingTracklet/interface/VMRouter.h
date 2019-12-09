@@ -220,9 +220,7 @@ public:
       for(unsigned int i=0;i<stubinputs_[j]->nStubs();i++){
 	if (count>MAXVMROUTER) continue;
 	std::pair<Stub*,L1TStub*> stub=stubinputs_[j]->getStub(i);
-	
-
-	
+		
 	stub.first->setAllStubIndex(count);
 	stub.second->setAllStubIndex(count);
 
