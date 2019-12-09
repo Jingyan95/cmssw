@@ -137,7 +137,7 @@ public:
 	if ((layer1_==3 && layer2_==4)||
 	    (layer1_==5 && layer2_==6)) {
 	  
-	  int lookupbits=firstvmstub.vmbits()&1023;
+	  int lookupbits=firstvmstub.vmbits().value()&1023;
 	  int zdiffmax=(lookupbits>>7);	
 	  int newbin=(lookupbits&127);
 	  int bin=newbin/8;
@@ -159,7 +159,7 @@ public:
 	      countall++;
 	      VMStubTE secondvmstub=secondvmstubs_->getVMStubTEBinned(ibin,j);
 
-	      int zbin=(secondvmstub.vmbits()&7);
+	      int zbin=(secondvmstub.vmbits().value()&7);
 	      if (start!=ibin) zbin+=8;
 	      if (zbin<zbinfirst||zbin-zbinfirst>zdiffmax) {
 		if (debug1) {
@@ -215,8 +215,7 @@ public:
 
         } else if (layer1_==2 && layer2_==3) {
 
-	  //assert(firststub.first->getVMBitsExtended().value()==(int)firstvmstub.vmbits());
-	  int lookupbits=firstvmstub.vmbits()&1023;
+	  int lookupbits=firstvmstub.vmbits().value()&1023;
 	  int zdiffmax=(lookupbits>>7);	
 	  int newbin=(lookupbits&127);
 	  int bin=newbin/8;
@@ -239,7 +238,7 @@ public:
 
 	      VMStubTE secondvmstub=secondvmstubs_->getVMStubTEBinned(ibin,j);
 
-	      int zbin=(secondvmstub.vmbits()&7);
+	      int zbin=(secondvmstub.vmbits().value()&7);
 	      if (start!=ibin) zbin+=8;
 	      if (zbin<zbinfirst||zbin-zbinfirst>zdiffmax) {
 		if (debug1) {
@@ -299,8 +298,7 @@ public:
 	  
 	  if (debug1) cout << getName()<<"["<<iSector_<<"] Disk-disk pair" <<endl;
 
-	  //assert(firststub.first->getVMBits().value()==(int)firstvmstub.vmbits());
-	  int lookupbits=firstvmstub.vmbits()&511;
+	  int lookupbits=firstvmstub.vmbits().value()&511;
 	  bool negdisk=firstvmstub.stub().first->disk().value()<0; //FIXME
 	  int rdiffmax=(lookupbits>>6);	
 	  int newbin=(lookupbits&63);
@@ -320,14 +318,14 @@ public:
 
 	      VMStubTE secondvmstub=secondvmstubs_->getVMStubTEBinned(ibin,j);	
       
-	      int rbin=(secondvmstub.vmbits()&7);
+	      int rbin=(secondvmstub.vmbits().value()&7);
 	      if (start!=ibin) rbin+=8;
 	      if (rbin<rbinfirst) continue;
 	      if (rbin-rbinfirst>rdiffmax) continue;
 
 	      
 	      
-	      unsigned int irsecondbin=secondvmstub.vmbits()>>2;
+	      unsigned int irsecondbin=secondvmstub.vmbits().value()>>2;
 
 	      FPGAWord iphifirstbin=firstvmstub.finephi();
 	      FPGAWord iphisecondbin=secondvmstub.finephi();

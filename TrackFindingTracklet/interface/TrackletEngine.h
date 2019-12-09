@@ -140,7 +140,7 @@ public:
 
 	VMStubTE innervmstub=innervmstubs_->getVMStubTE(i);
 
-	int lookupbits=(int)innervmstub.vmbits();
+	int lookupbits=(int)innervmstub.vmbits().value();
         int rdiffmax=(lookupbits>>7);	
 	int newbin=(lookupbits&127);
 	int bin=newbin/8;
@@ -158,7 +158,7 @@ public:
 	    countall++;
 	    VMStubTE outervmstub=outervmstubs_->getVMStubTEBinned(ibin,j);
 
-	    int rbin=(outervmstub.vmbits()&7);
+	    int rbin=(outervmstub.vmbits().value()&7);
 	    if (start!=ibin) rbin+=8;
 	    if ((rbin<rbinfirst)||(rbin-rbinfirst>rdiffmax)) {
 	      if (debug1) {
@@ -232,7 +232,7 @@ public:
 	    (layer1_==3 && layer2_==4)||
 	    (layer1_==5 && layer2_==6)) {	  
 
-	  int lookupbits=(int)innervmstub.vmbits();
+	  int lookupbits=(int)innervmstub.vmbits().value();
 	  int zdiffmax=(lookupbits>>7);	
 	  int newbin=(lookupbits&127);
 	  int bin=newbin/8;
@@ -260,7 +260,7 @@ public:
 
 	      VMStubTE outervmstub=outervmstubs_->getVMStubTEBinned(ibin,j);
 	      
-	      int zbin=(outervmstub.vmbits()&7);
+	      int zbin=(outervmstub.vmbits().value()&7);
 	      if (start!=ibin) zbin+=8;
 
 	      if (zbin<zbinfirst||zbin-zbinfirst>zdiffmax) {
@@ -335,7 +335,7 @@ public:
 	  
 	  if (debug1) cout << getName()<<"["<<iSector_<<"] Disk-disk pair" <<endl;
 	  
-	  int lookupbits=(int)innervmstub.vmbits();
+	  int lookupbits=(int)innervmstub.vmbits().value();
 	  bool negdisk=innervmstub.stub().first->disk().value()<0; //FIXME
 	  int rdiffmax=(lookupbits>>6);	
 	  int newbin=(lookupbits&63);
@@ -355,13 +355,13 @@ public:
 	      if (countall>=MAXTE) break;
 	      countall++;
 	      VMStubTE outervmstub=outervmstubs_->getVMStubTEBinned(ibin,j);
-	      int rbin=(outervmstub.vmbits()&7);
+	      int rbin=(outervmstub.vmbits().value()&7);
 	      if (start!=ibin) rbin+=8;
 	      if (rbin<rbinfirst) continue;
 	      if (rbin-rbinfirst>rdiffmax) continue;
 
 	      
-	      unsigned int irouterbin=outervmstub.vmbits()>>2;
+	      unsigned int irouterbin=outervmstub.vmbits().value()>>2;
 
 
 	      FPGAWord iphiinnerbin=innervmstub.finephi();

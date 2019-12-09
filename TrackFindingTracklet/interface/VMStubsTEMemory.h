@@ -112,12 +112,10 @@ public:
   
   bool addVMStub(VMStubTE vmstub) {
 
-    int binlookup= -1;
-
-    binlookup=(int)vmstub.vmbits();
+    FPGAWord binlookup=vmstub.vmbits();
     
-    assert(binlookup>=0);
-    int bin=(binlookup/8);
+    assert(binlookup.value()>=0);
+    int bin=(binlookup.value()/8);
 
     //If the pt of the stub is consistent with the allowed pt of tracklets
     //in that can be formed in this VM and the other VM used in the TE.
@@ -137,7 +135,7 @@ public:
 	  assert(bin<4);
 	  if (negdisk) bin+=4;
 	  stubsbinnedvm_[bin].push_back(vmstub);
-	  if (debug1) cout << getName()<<" Stub with lookup = "<<binlookup
+	  if (debug1) cout << getName()<<" Stub with lookup = "<<binlookup.value()
 			   <<" in disk = "<<disk_<<"  in bin = "<<bin<<endl;
 	}
       } else {

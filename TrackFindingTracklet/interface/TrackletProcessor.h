@@ -514,7 +514,7 @@ public:
 
 	  VMStubTE innervmstub=innervmstubs_[ivmmem]->getVMStubTE(i); 
 	
-	  int lookupbits=innervmstub.vmbits();
+	  int lookupbits=innervmstub.vmbits().value();
 
 	  int rdiffmax=(lookupbits>>7);	
 	  int newbin=(lookupbits&127);
@@ -533,7 +533,7 @@ public:
 	      countall++;
 	      
 	      VMStubTE outervmstub=outervmstubs_[ivmmem]->getVMStubTEBinned(ibin,j);
-	      int rbin=(outervmstub.vmbits()&7);
+	      int rbin=(outervmstub.vmbits().value()&7);
 	      if (start!=ibin) rbin+=8;
 	      if ((rbin<rbinfirst)||(rbin-rbinfirst>rdiffmax)) {
 		if (debug1) {
@@ -614,7 +614,7 @@ public:
 	    VMStubTE innervmstub=innervmstubs_[ivmmem]->getVMStubTE(i);
 
 	    
-	    int lookupbits=(int)innervmstub.vmbits();
+	    int lookupbits=(int)innervmstub.vmbits().value();
 	    int zdiffmax=(lookupbits>>7);	
 	    int newbin=(lookupbits&127);
 	    int bin=newbin/8;
@@ -642,7 +642,7 @@ public:
 
 		VMStubTE outervmstub=outervmstubs_[ivmmem]->getVMStubTEBinned(ibin,j);
 
-		int zbin=(outervmstub.vmbits()&7);
+		int zbin=(outervmstub.vmbits().value()&7);
 		
 		if (start!=ibin) zbin+=8;
 		
@@ -718,7 +718,7 @@ public:
 	    VMStubTE innervmstub=innervmstubs_[ivmmem]->getVMStubTE(i);
 
 	    
-	    int lookupbits=(int)innervmstub.vmbits();
+	    int lookupbits=(int)innervmstub.vmbits().value();
 	    bool negdisk=innervmstub.stub().first->disk().value()<0; //FIXME
 	    int rdiffmax=(lookupbits>>6);	
 	    int newbin=(lookupbits&63);
@@ -740,7 +740,7 @@ public:
 		
 		VMStubTE outervmstub=outervmstubs_[ivmmem]->getVMStubTEBinned(ibin,j);
 
-		int vmbits=(int)outervmstub.vmbits();
+		int vmbits=(int)outervmstub.vmbits().value();
 		int rbin=(vmbits&7);
 		if (start!=ibin) rbin+=8;
 		if (rbin<rbinfirst) continue;

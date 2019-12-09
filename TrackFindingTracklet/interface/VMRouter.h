@@ -284,8 +284,8 @@ public:
 	  bool insert=false;
 
 
-	  int binlookup=-1;
-	  int binlookupextra=-1;
+	  FPGAWord binlookup;
+	  FPGAWord binlookupextra;
 	  if (overlap) {
 	    assert(layer_==1||layer_==2);
 	    binlookup=lookupInnerOverlapLayer(stub.first);
@@ -309,7 +309,7 @@ public:
 	    }
 	  }
 	  unsigned int layer=stub.first->layer().value();
-	  if ((layer==1 || layer== 2) && binlookupextra!=-1 ) {
+	  if ((layer==1 || layer== 2) && binlookupextra.value()!=-1 ) {
 	    int iphiRawTmp=iphiRaw/(32/(nallstubslayers[layer]*nvmteextralayers[layer]));
 	    for (unsigned int l=0;l<vmstubsTEExtraPHI_[iphiRawTmp].size();l++){
 	      if (debug1) {
@@ -331,7 +331,7 @@ public:
 	    }
 	  }
 	  
-	  if (binlookup!=-1) {
+	  if (binlookup.value()!=-1) {
 	    if (overlap) {
 	      int iphiRawTmp=iphiRaw/(32/(nallstubsoverlaplayers[layer]*nvmteoverlaplayers[layer]));
 	      for (unsigned int l=0;l<vmstubsTEOverlapPHI_[iphiRawTmp].size();l++){
@@ -406,8 +406,8 @@ public:
 
 	  if (overlap) {
 	    
-	    int binlookup=lookupOuterOverlapD1(stub.first);
-	    assert(binlookup>=0);
+	    FPGAWord binlookup=lookupOuterOverlapD1(stub.first);
+	    assert(binlookup.value()>=0);
 
 	    iphiRaw=iphiRaw/(32/(nallstubsoverlapdisks[0]*nvmteoverlapdisks[0]));
 
@@ -428,7 +428,7 @@ public:
 	  } else {
 	    // disk-disk seeding
 	    
-	    int binlookup=-1;
+	    FPGAWord binlookup;
 
 	    if (!overlap) {
 	      switch (disk_) {
@@ -447,7 +447,7 @@ public:
 	      binlookup=lookupOuterOverlapD1(stub.first);
 	    }
             
-	    if (binlookup==-1) continue;
+	    if (binlookup.value()==-1) continue;
 
               
 	    unsigned int disk=abs(stub.first->disk().value());
@@ -519,7 +519,7 @@ public:
 	  int iphiRaw=stub.first->iphivmRaw();
 	  bool insert=false;
 
-	  int binlookup=-1;
+	  FPGAWord binlookup;
 	  if (overlap) {
 	    assert(layer_==2);//D1D2L2
 	    binlookup=lookupOuterLayer(stub.first);//no special selection, just an outer stub with overlap VM segmentation.
@@ -533,7 +533,7 @@ public:
 	    }
 	  }
 
-	  if (binlookup==-1) continue;
+	  if (binlookup.value()==-1) continue;
 	  
 	  unsigned int layer=stub.first->layer().value();
 	  if (overlap) {
@@ -631,7 +631,7 @@ public:
 			     stub.first->finer(),
 			     stub.first->bend(),
 			     //(binlookup&1023),
-			     binlookup,
+			     FPGAWord(binlookup,4,true,__LINE__,__FILE__),
 			     stub.first->stubindex());
 	    vmstubsTEOverlapExtendedPHI_[iphiRaw][l]->addVMStub(tmpstub); 
 
@@ -782,7 +782,7 @@ public:
 
   }
 
-  int lookupOuterOverlapD1(Stub* stub){
+  FPGAWord lookupOuterOverlapD1(Stub* stub){
 
     assert(disk_==1);
     
@@ -800,12 +800,12 @@ public:
     int zbin=(z.value()+(1<<(z.nbits()-1)))>>(z.nbits()-3);
     bool negdisk=stub->disk().value()<0;
     if (negdisk) zbin=7-zbin; //Should this be separate table?
-    return outerTableOverlapD1.lookup(rbin,zbin);
+    return FPGAWord(outerTableOverlapD1.lookup(rbin,zbin),10,true,__LINE__,__FILE__);
 
   }
 
 
-  int lookupOuterDisk(Stub* stub){
+  FPGAWord lookupOuterDisk(Stub* stub){
 
     assert(disk_==2||disk_==4);
     
@@ -826,16 +826,16 @@ public:
     bool negdisk=stub->disk().value()<0;
     if (negdisk) zbin=7-zbin; //Should this be separate table?
     switch (disk_){
-    case 2: return outerTableD2.lookup(rbin,zbin);
+    case 2: return FPGAWord(outerTableD2.lookup(rbin,zbin),10,true,__LINE__,__FILE__);
       break;
-    case 4: return outerTableD4.lookup(rbin,zbin);
+    case 4: return FPGAWord(outerTableD4.lookup(rbin,zbin),10,true,__LINE__,__FILE__);
       break;
     }
     assert(0);
   }
 
 
-  int lookupInnerDisk(Stub* stub, const bool extended = false){
+  FPGAWord lookupInnerDisk(Stub* stub, const bool extended = false){
 
     assert(disk_==1||disk_==3);
     
@@ -862,17 +862,17 @@ public:
     switch (disk_){
     case 1:
       if (!extended)
-        return innerTableD1.lookup(rbin,zbin);
+        return FPGAWord(innerTableD1.lookup(rbin,zbin),21,false,__LINE__,__FILE__);
       else
-        return innerTableD1_extended.lookup(rbin,zbin);
+        return FPGAWord(innerTableD1_extended.lookup(rbin,zbin),21,false,__LINE__,__FILE__);
       break;
-    case 3: return innerTableD3.lookup(rbin,zbin);
+    case 3: return FPGAWord(innerTableD3.lookup(rbin,zbin),21,false,__LINE__,__FILE__);
       break;
     }
     assert(0);
   }
 
-  int lookupOuterLayer(Stub* stub){
+  FPGAWord lookupOuterLayer(Stub* stub){
 
     assert(layer_==2||layer_==3||layer_==4||layer_==6);
     
@@ -895,20 +895,20 @@ public:
     int zbin=(z.value()+(1<<(z.nbits()-1)))>>(z.nbits()-7);
     int rbin=(r.value()+(1<<(r.nbits()-1)))>>(r.nbits()-4);
     switch (layer_){
-    case 2: return outerTableL2.lookup(zbin,rbin);
+    case 2: return FPGAWord(outerTableL2.lookup(zbin,rbin),11,false,__LINE__,__FILE__);
       break;
-    case 3: return outerTableL3.lookup(zbin,rbin);
+    case 3: return FPGAWord(outerTableL3.lookup(zbin,rbin),11,false,__LINE__,__FILE__);
       break;
-    case 4: return outerTableL4.lookup(zbin,rbin);
+    case 4: return FPGAWord(outerTableL4.lookup(zbin,rbin),11,false,__LINE__,__FILE__);
       break;
-    case 6: return outerTableL6.lookup(zbin,rbin);
+    case 6: return FPGAWord(outerTableL6.lookup(zbin,rbin),11,false,__LINE__,__FILE__);
       break;
     }
     assert(0);
   }
 
 
-  int lookupInnerLayer(Stub* stub, const bool extended = false){
+  FPGAWord lookupInnerLayer(Stub* stub, const bool extended = false){
 
     assert(layer_==1||layer_==2||layer_==3||layer_==5);
     
@@ -933,24 +933,24 @@ public:
     int zbin=(z.value()+(1<<(z.nbits()-1)))>>(z.nbits()-7);
     int rbin=(r.value()+(1<<(r.nbits()-1)))>>(r.nbits()-4);
     switch (layer_){
-    case 1: return innerTableL1.lookup(zbin,rbin);
+    case 1: return FPGAWord(innerTableL1.lookup(zbin,rbin),21,false,__LINE__,__FILE__);
       break;
     case 2:
       if (!extended)
-        return innerTableL2.lookup(zbin,rbin);
+        return FPGAWord(innerTableL2.lookup(zbin,rbin),21,false,__LINE__,__FILE__);
       else
-        return innerTableL2_extended.lookup(zbin,rbin);
+        return FPGAWord(innerTableL2_extended.lookup(zbin,rbin),21,false,__LINE__,__FILE__);
       break;
-    case 3: return innerTableL3.lookup(zbin,rbin);
+    case 3: return FPGAWord(innerTableL3.lookup(zbin,rbin),21,false,__LINE__,__FILE__);
       break;
-    case 5: return innerTableL5.lookup(zbin,rbin);
+    case 5: return FPGAWord(innerTableL5.lookup(zbin,rbin),21,false,__LINE__,__FILE__);
       break;
     }
     assert(0);
   }
 
 
-  int lookupInnerOverlapLayer(Stub* stub){
+  FPGAWord lookupInnerOverlapLayer(Stub* stub){
 
     assert(layer_==1||layer_==2);
     
@@ -969,9 +969,9 @@ public:
     int zbin=(z.value()+(1<<(z.nbits()-1)))>>(z.nbits()-7);
     int rbin=(r.value()+(1<<(r.nbits()-1)))>>(r.nbits()-3);
     switch (layer_){
-    case 1: return innerTableOverlapL1.lookup(zbin,rbin);
+    case 1: return FPGAWord(innerTableOverlapL1.lookup(zbin,rbin),11,false,__LINE__,__FILE__);
       break;
-    case 2: return innerTableOverlapL2.lookup(zbin,rbin);
+    case 2: return FPGAWord(innerTableOverlapL2.lookup(zbin,rbin),11,false,__LINE__,__FILE__);
       break;
     }
     assert(0);
