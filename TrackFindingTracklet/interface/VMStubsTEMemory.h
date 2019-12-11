@@ -18,75 +18,23 @@ public:
   MemoryBase(name,iSector){
     phimin_=phimin;
     phimax_=phimax;
-    string subname=name.substr(6,2);
-    layer_ = 0;
-    disk_  = 0;
-    phibin_=-1;
-    other_=0;
-    if (subname=="L1") layer_=1;
-    if (subname=="L2") layer_=2;
-    if (subname=="L3") layer_=3;
-    if (subname=="L4") layer_=4;
-    if (subname=="L5") layer_=5;
-    if (subname=="L6") layer_=6;
-    if (subname=="D1") disk_=1;
-    if (subname=="D2") disk_=2;
-    if (subname=="D3") disk_=3;
-    if (subname=="D4") disk_=4;
-    if (subname=="D5") disk_=5;
-    if (layer_==0&&disk_==0) {
-      cout << name<<" subname = "<<subname<<" "<<layer_<<" "<<disk_<<endl;
-    }
-    assert((layer_!=0)||(disk_!=0));
-    overlap_=false;
-    extra_=false;
-    subname=name.substr(11,1);
-    if (subname=="X") overlap_=true;
-    if (subname=="Y") overlap_=true;
-    if (subname=="W") overlap_=true;
-    if (subname=="Q") overlap_=true;
-    if (subname=="R") overlap_=true;
-    if (subname=="S") overlap_=true;
-    if (subname=="T") overlap_=true;
-    if (subname=="Z") overlap_=true;
-    if (subname=="x") overlap_=true;
-    if (subname=="y") overlap_=true;
-    if (subname=="z") overlap_=true;
-    if (subname=="w") overlap_=true;
-    if (subname=="q") overlap_=true;
-    if (subname=="r") overlap_=true;
-    if (subname=="s") overlap_=true;
-    if (subname=="t") overlap_=true;
-    if (subname=="I") extra_=true;
-    if (subname=="J") extra_=true;
-    if (subname=="K") extra_=true;
-    if (subname=="L") extra_=true;
+
+    //set the layer or disk that the memory is in
+    initLayerDisk(6,layer_,disk_);
+
+    //Pointer to other VMStub memory for creating stub pairs
+    other_=0;    
+
+    //What type of seeding is this memory used for
+    initSpecialSeeding(11,overlap_,extra_,extended_);
     
-    
-    extended_ = false;
-    if (subname=="a") extended_=true;
-    if (subname=="b") extended_=true;
-    if (subname=="c") extended_=true;
-    if (subname=="d") extended_=true;
-    if (subname=="e") extended_=true;
-    if (subname=="f") extended_=true;
-    if (subname=="g") extended_=true;
-    if (subname=="h") extended_=true;
-    if (subname=="x") extended_=true;
-    if (subname=="y") extended_=true;
-    if (subname=="z") extended_=true;
-    if (subname=="w") extended_=true;
-    if (subname=="q") extended_=true;
-    if (subname=="r") extended_=true;
-    if (subname=="s") extended_=true;
-    if (subname=="t") extended_=true;
-    
-    subname=name.substr(12,2);
+    string subname=name.substr(12,2);
     phibin_=subname[0]-'0';
     if (subname[1]!='n') {
       phibin_=10*phibin_+(subname[1]-'0');
     }
-    
+
+    //set the bins used in the bend tabele
     unsigned int nbins=8;
     if (layer_>=4) nbins=16;
     if (disk_==1 && extended_ && overlap_) nbins = 16;
@@ -190,8 +138,11 @@ public:
   }
     
   unsigned int nVMStubs() const {return stubsvm_.size();}
+
   unsigned int nVMStubsBinned(unsigned int bin) const {return stubsbinnedvm_[bin].size();}
+
   VMStubTE getVMStubTE(unsigned int i) const {return stubsvm_[i];}
+
   VMStubTE getVMStubTEBinned(unsigned int bin, unsigned int i) const {return stubsbinnedvm_[bin][i];}
 
 
@@ -204,65 +155,28 @@ public:
 
   void writeStubs(bool first) {
 
-    std::string fname="../data/MemPrints/VMStubsTE/VMStubs_";
-    fname+=getName();
 
-    fname+="_";
-    ostringstream oss;
-    oss << iSector_+1;
-    if (iSector_+1<10) fname+="0";
-    fname+=oss.str();
-    fname+=".dat";
-    if (first) {
-      bx_ = 0;
-      event_ = 1;
-      out_.open(fname.c_str());
-    } else {
-      out_.open(fname.c_str(),std::ofstream::app);
+    openFile(first,"../data/MemPrints/VMStubsTE/VMStubs_");
+    
+    if (isinner_) { // inner VM for TE purpose
+      for (unsigned int j=0;j<stubsvm_.size();j++){
+	out_<<"0x";
+	if (j<16) out_ <<"0";
+	out_ << hex << j << dec ;
+	string stub=stubsvm_[j].str();
+	out_ <<" "<<stub<<" "<<hexFormat(stub)<<endl;
+      }     
     }
-      
-    out_ << "BX = "<<(bitset<3>)bx_ << " Event : " << event_ << endl;
-
-    //if (layer_!=0) { // barrel
-    if (layer_!=0 or disk_!=0) { // same format for barrel and disk?
-      if (isinner_) { // inner VM for TE purpose
-        for (unsigned int j=0;j<stubsvm_.size();j++){
-          string stub=stubsvm_[j].stubindex().str();
-          stub+="|";
-          stub+=stubsvm_[j].bend().str();
-          stub+="|";	  
-          //stub+=stubsvm_[j].finephi().str(); //FIXME
-          //stub+="|";
-   	  //stub+=stubs_[j].vmbits().str(); //FIXME
-
-	  out_<<"0x";
-          if (j<16) out_ <<"0";
-          out_ << hex << j << dec ;
-          out_ <<" "<<stub<<" "<<hexFormat(stub)<<endl;
-        }     
-      }
-      else { // outer VM for TE purpose
-        for (unsigned int i=0;i<NLONGVMBINS;i++) {
-      for (unsigned int j=0;j<stubsbinnedvm_[i].size();j++){
-        string stub=stubsbinnedvm_[i][j].stubindex().str();
-        stub+="|";
-        stub+=stubsbinnedvm_[i][j].bend().str();
-        stub+="|";
-        FPGAWord iphifinebins;
-        //stub+=stubsbinnedvm_[i][j].finephi().str(); //FIXME
-        //stub+="|";
-	stub+=stubsbinnedvm_[i][j].finerz().str();
-        out_ << hex << i << " " << j << dec << " "<<stub<<" "<<hexFormat(stub)<<endl;
-      }
-        }
+    else { // outer VM for TE purpose
+      for (unsigned int i=0;i<NLONGVMBINS;i++) {
+	for (unsigned int j=0;j<stubsbinnedvm_[i].size();j++){
+	  string stub=stubsbinnedvm_[i][j].str();
+	  out_ << hex << i << " " << j << dec << " "<<stub<<" "<<hexFormat(stub)<<endl;
+	}
       }
     }
     
     out_.close();
-
-    bx_++;
-    event_++;
-    if (bx_>7) bx_=0;
 
   }
 
@@ -297,7 +211,7 @@ public:
     double dphi=dphisectorHG/nvm;
     phimax=phibin()*dphi;
     phimin=phimax-dphi;
-    //if (iSector_==1) cout << "phiRange: "<<getName()<<" "<<phibin()<<" overlap "<<overlap_<<" phimin, max "<<phimin<<" "<<phimax<<endl;
+
     return;
     
   }
@@ -331,7 +245,6 @@ public:
     unsigned int vmbendtableSize = vmbendtable_.size();
     assert(vmbendtableSize==16||vmbendtableSize==8);
     for (unsigned int i=0;i<vmbendtableSize;i++){
-      //outvmbendcut << i << " " << vmbendtable_[i] << endl;
       outvmbendcut << vmbendtable_[i] << endl;
     }
     outvmbendcut.close();

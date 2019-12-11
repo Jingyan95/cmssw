@@ -63,6 +63,25 @@ public:
   FPGAWord stubindex() const {
     return allStubIndex_;
   }
+
+
+  //return binary string for memory printout
+  std::string str() const {
+    
+    string stub=allStubIndex_.str();
+    stub+="|";
+    stub+=bend_.str();
+    stub+="|";
+    stub+=finephi_.str();
+    stub+="|";
+    stub+=finerz_.str();
+    stub+="|";
+    stub+=vmbits_.str();
+
+    return stub;
+    
+  }
+
   
 private:
 

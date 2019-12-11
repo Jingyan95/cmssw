@@ -257,18 +257,13 @@ static const unsigned int nvmteoverlapdisks[2] = {4, 4};
 static const double rcrit=55.0;
 
 
-static const double rminL1=rmeanL1-drmax; 
 static const double rmaxL1=rmeanL1+drmax; 
-static const double rminL2=rmeanL2-drmax; 
 static const double rmaxL2=rmeanL2+drmax; 
-static const double rminL3=rmeanL3-drmax; 
 static const double rmaxL3=rmeanL3+drmax; 
-static const double rminL4=rmeanL4-drmax; 
 static const double rmaxL4=rmeanL4+drmax; 
-static const double rminL5=rmeanL5-drmax; 
 static const double rmaxL5=rmeanL5+drmax; 
-static const double rminL6=rmeanL6-drmax; 
 static const double rmaxL6=rmeanL6+drmax; 
+
 
 static const double zminD1=zmeanD1-dzmax; 
 static const double zmaxD1=zmeanD1+dzmax; 
@@ -406,7 +401,6 @@ static const double maxrinv=0.006;
 //static const double maxz0=28.0;
 static const double maxd0=10.;
 
-static const double rmin[6]={rminL1,rminL2,rminL3,rminL4,rminL5,rminL6};
 
 //These are constants defining global coordinate system
 

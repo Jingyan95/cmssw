@@ -216,9 +216,9 @@ public:
             {
               int i = stubsTrk1[stcount].first;
               int reg = (i>0&&i<10)*(i-1) + (i>10)*(i-5) - (i<0)*i;
-              double nres = getPhiRes(inputtracklets_[itrk],fullStubslistsTrk1[stcount].first);
+              double nres = getPhiRes(inputtracklets_[itrk],fullStubslistsTrk1[stcount]);
               double ores = 0;
-              if (URStubidsTrk1[reg] != -1) ores = getPhiRes(inputtracklets_[itrk],fullStubslistsTrk1[URStubidsTrk1[reg]].first);
+              if (URStubidsTrk1[reg] != -1) ores = getPhiRes(inputtracklets_[itrk],fullStubslistsTrk1[URStubidsTrk1[reg]]);
               if (URStubidsTrk1[reg] == -1 || nres < ores)
               {
                 URStubidsTrk1[reg] = stcount;
@@ -229,9 +229,9 @@ public:
             {
               int i = stubsTrk2[stcount].first;
               int reg = (i>0&&i<10)*(i-1) + (i>10)*(i-5) - (i<0)*i;
-              double nres = getPhiRes(inputtracklets_[jtrk],fullStubslistsTrk2[stcount].first);
+              double nres = getPhiRes(inputtracklets_[jtrk],fullStubslistsTrk2[stcount]);
               double ores;
-              if (URStubidsTrk2[reg] != -1) ores = getPhiRes(inputtracklets_[jtrk],fullStubslistsTrk2[URStubidsTrk2[reg]].first);
+              if (URStubidsTrk2[reg] != -1) ores = getPhiRes(inputtracklets_[jtrk],fullStubslistsTrk2[URStubidsTrk2[reg]]);
               if (URStubidsTrk2[reg] == -1 || nres < ores)
               {
                 URStubidsTrk2[reg] = stcount;
@@ -469,16 +469,16 @@ public:
   
 private:
 
-  double getPhiRes(Tracklet* curTracklet, Stub* curStub)
+  double getPhiRes(Tracklet* curTracklet, std::pair<L1TStub*, Stub*> curStub)
   {
     double phiproj;
     double stubphi;
     double phires;
     // Get phi position of stub
-    stubphi = curStub->stubphi();
+    stubphi = curStub.first->phi();
     // Get region that the stub is in (Layer 1->6, Disk 1->5)
-    int Layer = curStub->layer().value() + 1;
-    int Disk = curStub->disk().value();
+    int Layer = curStub.second->layer().value() + 1;
+    int Disk = curStub.second->disk().value();
     // Get phi projection of tracklet
     int seedindex = curTracklet->seedIndex();
     // If this stub is a seed stub, set projection=phi, so that res=0

@@ -224,8 +224,6 @@ public:
 	stub.first->setAllStubIndex(count);
 	stub.second->setAllStubIndex(count);
 
-	stub.first->setAllStubAddressTE(count);
-
 	for (unsigned int l=0;l<allstubs_.size();l++){
 	  allstubs_[l]->addStub(stub);
 	}
@@ -603,8 +601,7 @@ public:
 	for(unsigned int i=0;i<stubinputs_[j]->nStubs();i++){
 	  std::pair<Stub*,L1TStub*> stub=stubinputs_[j]->getStub(i);
 
-	  if(stub.first->stubr() < rmindiskl3overlapvm)
-	    continue;
+	  if(stub.second->r() < rmindiskl3overlapvm) continue;
 	  
 	  int iphiRaw=stub.first->iphivmRaw();
 	  bool insert=false;
