@@ -268,11 +268,9 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
   wiresFile = iConfig.getParameter<edm::FileInPath> ("wiresFile");
 
   DTCLinkFile = iConfig.getParameter<edm::FileInPath> ("DTCLinkFile");
-  moduleCablingFile = iConfig.getParameter<edm::FileInPath> ("moduleCablingFile"
+  moduleCablingFile = iConfig.getParameter<edm::FileInPath> ("moduleCablingFile");
 
   DTCLinkLayerDiskFile = iConfig.getParameter<edm::FileInPath> ("DTCLinkLayerDiskFile");
-
-);
 
 
   // --------------------------------------------------------------------------------

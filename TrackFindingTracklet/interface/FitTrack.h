@@ -169,10 +169,12 @@ class FitTrack:public ProcessBase{
   }
 
 
-
+#ifndef USEHYBRID
   void trackFitNew(Tracklet* tracklet, std::vector<std::pair<Stub*,L1TStub*>> &, std::vector<std::pair<int,int>> &){
+#endif
 
 #ifdef USEHYBRID
+  void trackFitNew(Tracklet* tracklet, std::vector<std::pair<Stub*,L1TStub*>> &trackstublist, std::vector<std::pair<int,int>> &stubidslist){
    if (doKF) {
 
     // From full match lists, collect all the stubs associated with the tracklet seed

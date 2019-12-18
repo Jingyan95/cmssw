@@ -568,8 +568,8 @@ public:
 	FPGAWord fpgaphi=barrel?proj->fpgaphiproj(layer_):proj->fpgaphiprojdisk(disk_);
 	FPGAWord fpgarz=barrel?proj->fpgazproj(layer_):proj->fpgarprojdisk(disk_);
 
-	int disk=disk_;
-	if (proj->t()<0.0) disk=-disk_;
+	//int disk=disk_;
+	//if (proj->t()<0.0) disk=-disk_;
 	
 	assert(!fpgaphi.atExtreme());
 
