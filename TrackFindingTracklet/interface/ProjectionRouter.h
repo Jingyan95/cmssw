@@ -230,7 +230,7 @@ public:
 	    (rindex<<(nphiderbits_))+
 	    phiderindex;
 	  
-	  int ibendproj=bendTable(disk_,bendindex);
+	  int ibendproj=bendTable(abs(disk_)-1,bendindex);
 
 	  tracklet->setBendIndex(ibendproj,disk_);
 
@@ -258,18 +258,12 @@ public:
     }
   }
 
-
-  double bendDisk_PR(double r, int disk, double rinv) {
+  double bend(double r, double rinv) {
     
     double dr=0.18;
-    double z = zmean[disk - 1];
     
-    if (((disk ==1 || disk ==2) && r<=diskSpacingCut[0]) || ((disk==3 || disk==4) && r<=diskSpacingCut[1]) || (disk==5 && r<=diskSpacingCut[2])){
-      dr = 0.4;
-    }
+    double delta=r*dr*0.5*rinv;
     
-    double CF= r/z;
-    double delta=r*dr*0.5*rinv*CF; 
     double bend=-delta/0.009;
     if (r<55.0) bend=-delta/0.01;
     
@@ -277,12 +271,8 @@ public:
     
   }
   
-  
-  //add disk as arg to pass to bend func
-  int bendTable(int disk, int bendindex) {
-    
-    int diskindex= abs(disk)-1;
-    
+  int bendTable(int diskindex,int bendindex) {
+
     static vector<int> bendtable[5];
 
     static bool first=true;
@@ -314,7 +304,7 @@ public:
 	  
 	      double rinv=-phider*(2.0*t);
 
-	      double bendproj=0.5*bendDisk_PR(rproj,disk,rinv);
+	      double bendproj=0.5*bend(rproj,rinv);
 
 	    
 	      int ibendproj=2.0*bendproj+15.5;

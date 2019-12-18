@@ -192,16 +192,10 @@ public:
 	    unsigned int nvmbitsouter=nbits(nvmouter);
 	    int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
 	    int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
-	   
-	    FPGAWord z=innerstub.first->z(); 
-	    int znbits=z.nbits();
-	    int iz=abs(z.value());
-	    int izbin=iz*8/(1<<(znbits-1));
-	   
-	   
-	    int index = (izbin<<(outerphibits_+innerphibits_))+(iphiinnerbin<<outerphibits_)+iphiouterbin;
-
-
+	      
+	      
+	    int index = (iphiinnerbin<<outerphibits_)+iphiouterbin;
+	    
 	    assert(index<(int)phitable_.size());		
 	    
 	      
@@ -322,16 +316,10 @@ public:
 	      unsigned int nvmbitsouter=nbits(nvmouter);
 	      int iphiinnerbin=innerstub.first->iphivmFineBins(nvmbitsinner,innerphibits_);
 	      int iphiouterbin=outerstub.first->iphivmFineBins(nvmbitsouter,outerphibits_);
-
-	      //Setting up z bits and bin 
-	      FPGAWord z=innerstub.first->z(); //using inner z
-	      int znbits=z.nbits();
-	      int iz=abs(z.value());
-	      int izbin=iz*8/(1<<(znbits-1));
-
-	      int index = (izbin<<(innerphibits_+outerphibits_))+(iphiinnerbin<<outerphibits_)+iphiouterbin;
 	      
-	      
+	      int index = (iphiinnerbin<<outerphibits_)+iphiouterbin;
+
+
 	      assert(index<(int)phitable_.size());		
 
 	      
@@ -539,62 +527,59 @@ public:
 	vmbendouter.push_back(false);
       }
 
-      for (unsigned int izinner=0;izinner<8; izinner++){
-	double zinner=0+izinner*15; 
+      for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
+	phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
+	phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
+	for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
+	  phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
+	  phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
 
-	for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
-	  phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
-	  phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
-	  for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
-	    phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
-	    phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
-
-	    double bendinnermin=20.0;
-	    double bendinnermax=-20.0;
-	    double bendoutermin=20.0;
-	    double bendoutermax=-20.0;
-	    double rinvmin=1.0; 
-	    for(int i1=0;i1<2;i1++) {
-	      for(int i2=0;i2<2;i2++) {
-		double zouter= zinner*router/rinner;
-		double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
-		double abendinner=bendBarrel_TE(zinner,layer1_,rinv1); 
-		double abendouter=bendBarrel_TE(zouter,layer2_,rinv1);
-		if (abendinner<bendinnermin) bendinnermin=abendinner;
-		if (abendinner>bendinnermax) bendinnermax=abendinner;
-		if (abendouter<bendoutermin) bendoutermin=abendouter;
-		if (abendouter>bendoutermax) bendoutermax=abendouter;
-		if (fabs(rinv1)<rinvmin) {
-		  rinvmin=fabs(rinv1);
-		}
+          double bendinnermin=20.0;
+          double bendinnermax=-20.0;
+          double bendoutermin=20.0;
+          double bendoutermax=-20.0;
+          double rinvmin=1.0; 
+          for(int i1=0;i1<2;i1++) {
+            for(int i2=0;i2<2;i2++) {
+              double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
+              double abendinner=bend(rinner,rinv1); 
+              double abendouter=bend(router,rinv1);
+              if (abendinner<bendinnermin) bendinnermin=abendinner;
+              if (abendinner>bendinnermax) bendinnermax=abendinner;
+              if (abendouter<bendoutermin) bendoutermin=abendouter;
+              if (abendouter>bendoutermax) bendoutermax=abendouter;
+              if (fabs(rinv1)<rinvmin) {
+                rinvmin=fabs(rinv1);
+              }
 		      
-	      }
-	    }
+            }
+          }
 
-	    phitable_.push_back(rinvmin<rinvcutte);
+          phitable_.push_back(rinvmin<rinvcutte);
 
-	    int nbins1=8;
-	    if (layer1_>=4) nbins1=16;
-	    for(int ibend=0;ibend<nbins1;ibend++) {
-	      double bend=Stub::benddecode(ibend,layer1_<=3); 
-	      bool passinner=bend-bendinnermin>-bendcutbarrelTE&&bend-bendinnermax<bendcutbarrelTE;	    
-	      if (passinner) vmbendinner[ibend]=true;
-	      pttableinner_.push_back(passinner);
+	  int nbins1=8;
+	  if (layer1_>=4) nbins1=16;
+	  for(int ibend=0;ibend<nbins1;ibend++) {
+	    double bend=Stub::benddecode(ibend,layer1_<=3); 
 	    
-	    }
-	  
-	    int nbins2=8;
-	    if (layer2_>=4) nbins2=16;
-	    for(int ibend=0;ibend<nbins2;ibend++) {
-	      double bend=Stub::benddecode(ibend,layer2_<=3); 
-	      bool passouter=bend-bendoutermin>-bendcutbarrelTE&&bend-bendoutermax<bendcutbarrelTE;
-	      if (passouter) vmbendouter[ibend]=true;
-	      pttableouter_.push_back(passouter);
+	    bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;	    
+	    if (passinner) vmbendinner[ibend]=true;
+	    pttableinner_.push_back(passinner);
 	    
-	    }
-
 	  }
-	}
+	  
+	  int nbins2=8;
+	  if (layer2_>=4) nbins2=16;
+	  for(int ibend=0;ibend<nbins2;ibend++) {
+	    double bend=Stub::benddecode(ibend,layer2_<=3); 
+	    
+	    bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	    if (passouter) vmbendouter[ibend]=true;
+	    pttableouter_.push_back(passouter);
+	    
+	  }
+
+        }
       }
 
       innervmstubs_->setbendtable(vmbendinner);
@@ -657,8 +642,8 @@ public:
 		for(int i3=0;i3<2;i3++) {
 		  double rinner=router[i3]*zmean[disk1_-1]/zmean[disk2_-1];
 		  double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router[i3]);
-		  double abendinner=bendDisk_TE(rinner,disk1_,rinv1);
-		  double abendouter=bendDisk_TE(router[i3],disk2_,rinv1);
+		  double abendinner=bend(rinner,rinv1);
+		  double abendouter=bend(router[i3],rinv1);
 		  if (abendinner<bendinnermin) bendinnermin=abendinner;
 		  if (abendinner>bendinnermax) bendinnermax=abendinner;
 		  if (abendouter<bendoutermin) bendoutermin=abendouter;
@@ -676,7 +661,7 @@ public:
 	    for(int ibend=0;ibend<8;ibend++) {
 	      double bend=Stub::benddecode(ibend,true); 
 	      
-	      bool passinner=bend-bendinnermin>-bendcutdiskTE&&bend-bendinnermax<bendcutdiskTE;	    
+	      bool passinner=bend-bendinnermin>-bendcutdisk&&bend-bendinnermax<bendcutdisk;	    
 	      if (passinner) vmbendinner[ibend]=true;
 	      pttableinner_.push_back(passinner);
 	      
@@ -685,7 +670,7 @@ public:
 	    for(int ibend=0;ibend<8;ibend++) {
 	      double bend=Stub::benddecode(ibend,true); 
 	      
-	      bool passouter=bend-bendoutermin>-bendcutdiskTE&&bend-bendoutermax<bendcutdiskTE;
+	      bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
 	      if (passouter) vmbendouter[ibend]=true;
 	      pttableouter_.push_back(passouter);
 	    
@@ -716,6 +701,7 @@ public:
 
       double phiinner[2];
       double phiouter[2];
+      double router[2];
 
 
       std::vector<bool> vmbendinner;
@@ -727,69 +713,62 @@ public:
       }
       
 
-      //router[0]=rmean[layer1_-1]+5; //Approximate but probably good enough for LUT
-      //router[1]=rmean[layer1_]+10; //Approximate but probably good enough for LUT
-   
-      for (unsigned int izinner=0;izinner<8; izinner++){
-	double zinner=0+izinner*15;
-
-	for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
-	  phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
-	  phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
-	  for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
-	    phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
-	    phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
+      router[0]=rmean[layer1_-1]+5; //Approximate but probably good enough for LUT
+      router[1]=rmean[layer1_]+10; //Approximate but probably good enough for LUT
+      for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
+	phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
+	phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
+	for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
+	  phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
+	  phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
 	  
-	    double bendinnermin=20.0;
-	    double bendinnermax=-20.0;
-	    double bendoutermin=20.0;
-	    double bendoutermax=-20.0;
-	    double rinvmin=1.0; 
-	    for(int i1=0;i1<2;i1++) {
-	      for(int i2=0;i2<2;i2++) {
-		for(int i3=0;i3<2;i3++) {
-		  double rinner=rmean[layer1_-1];
-		  double zouter=zmean[disk2_-1];
-		  double router=zouter*rinner/zinner;
-		  double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
-		  double abendinner=bendBarrel_TE(zinner,layer1_,rinv1);
-		  double abendouter=bendDisk_TE(router,disk2_,rinv1);
-		  if (abendinner<bendinnermin) bendinnermin=abendinner;
-		  if (abendinner>bendinnermax) bendinnermax=abendinner;
-		  if (abendouter<bendoutermin) bendoutermin=abendouter;
-		  if (abendouter>bendoutermax) bendoutermax=abendouter;
-		  if (fabs(rinv1)<rinvmin) {
-		    rinvmin=fabs(rinv1);
-		  }
+	  double bendinnermin=20.0;
+	  double bendinnermax=-20.0;
+	  double bendoutermin=20.0;
+	  double bendoutermax=-20.0;
+	  double rinvmin=1.0; 
+	  for(int i1=0;i1<2;i1++) {
+	    for(int i2=0;i2<2;i2++) {
+	      for(int i3=0;i3<2;i3++) {
+		double rinner=rmean[layer1_-1];
+		double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router[i3]);
+		double abendinner=bend(rinner,rinv1);
+		double abendouter=bend(router[i3],rinv1);
+		if (abendinner<bendinnermin) bendinnermin=abendinner;
+		if (abendinner>bendinnermax) bendinnermax=abendinner;
+		if (abendouter<bendoutermin) bendoutermin=abendouter;
+		if (abendouter>bendoutermax) bendoutermax=abendouter;
+		if (fabs(rinv1)<rinvmin) {
+		  rinvmin=fabs(rinv1);
 		}
 	      }
 	    }
-	    
-
-	    (izinner!=0)? phitable_.push_back(rinvmin<rinvcutte):phitable_.push_back(false);
-	  
-	    for(int ibend=0;ibend<8;ibend++) {
-	      double bend=Stub::benddecode(ibend,true); 
-	      bool passinner=(izinner!=0)?bend-bendinnermin>-bendcutbarrelTE&&bend-bendinnermax<bendcutbarrelTE:false;
-	    
-	      if (passinner) vmbendinner[ibend]=true;
-	      pttableinner_.push_back(passinner);
-	    
-	    }
-
-	    for(int ibend=0;ibend<8;ibend++) {
-	      double bend=Stub::benddecode(ibend,true); 
-	    
-	      bool passouter=(izinner!=0)?bend-bendoutermin>-bendcutdiskTE&&bend-bendoutermax<bendcutdiskTE:false;
-	      if (passouter) vmbendouter[ibend]=true;
-	      pttableouter_.push_back(passouter);
-	    
-	    }
-
 	  }
+	    
+	  phitable_.push_back(rinvmin<rinvcutte);
+
+	  
+	  for(int ibend=0;ibend<8;ibend++) {
+	    double bend=Stub::benddecode(ibend,true); 
+	    
+	    bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;	    
+	    if (passinner) vmbendinner[ibend]=true;
+	    pttableinner_.push_back(passinner);
+	    
+	  }
+
+	  for(int ibend=0;ibend<8;ibend++) {
+	    double bend=Stub::benddecode(ibend,true); 
+	    
+	    bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	    if (passouter) vmbendouter[ibend]=true;
+	    pttableouter_.push_back(passouter);
+	    
+	  }
+
 	}
-      
       }
+    
     
       innervmstubs_->setbendtable(vmbendinner);
       outervmstubs_->setbendtable(vmbendouter);
@@ -812,52 +791,18 @@ public:
     
   }
 
-  double bendDisk_TE(double r, int disk, double rinv) {
+  double bend(double r, double rinv) {
+
     double dr=0.18;
-    double z = zmean[disk - 1];
     
-    if (((disk ==1 || disk ==2) && r<=diskSpacingCut[0]) || ((disk==3 || disk==4) && r<=diskSpacingCut[1]) || (disk==5 && r<=diskSpacingCut[2])){
-      dr = 0.4;
-    }
-
-    double CF= r/z;
-    double delta=r*dr*0.5*rinv*CF;
-    double bend=delta/(0.009);
-    if (r<55.0) bend=delta/(0.01);
-    return bend;
-      
-  }
-
-
-  double bendBarrel_TE(double z, int layer, double rinv) {
-
-    double dr= 0.18;
-    double CF= 1;
-    double r=rmean[layer-1];
-    
-    if ((layer==1 && z<=barrelSpacingCut[3]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[4]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
-      dr = 0.26; 
-    
-    } 
-    else if ((layer==1 && barrelSpacingCut[2]<=z && z<=barrelSpacingCut[5]) || (layer==2 && barrelSpacingCut[4]<=z && z<=barrelSpacingCut[5])){
-      dr = 0.4;
-     
-    } 
-    else if ((layer==2 && z<=barrelSpacingCut[1]) || (layer==3 && z<=barrelSpacingCut[3])){
-      dr = 0.16; 
-    }
-    if ((layer==1 && barrelSpacingCut[0]<=z && z<=barrelSpacingCut[5]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[5]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
-      CF = cosModuleTilt*(z/r) + sinModuleTilt;
-
-    }
-
     double delta=r*dr*0.5*rinv;
-    double bend=delta/(0.009*CF);
-    if (r<55.0) bend=delta/(0.01*CF);
+
+    double bend=delta/0.009;
+    if (r<55.0) bend=delta/0.01;
+
     return bend;
+    
   }
-
-
 
   void writeTETable() {
 
