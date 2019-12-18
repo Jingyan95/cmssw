@@ -21,36 +21,34 @@ class InputLinkMemory:public MemoryBase{
 
 public:
 
-  InputLinkMemory(string name, unsigned int iSector, 
-		double phimin, double phimax):
-    MemoryBase(name,iSector){
+ InputLinkMemory(string name, unsigned int iSector, 
+		 double phimin, double phimax):
+  MemoryBase(name,iSector){
     phimin_=phimin;
     phimax_=phimax;
+    
+    string subname=name.substr(5,7);
 
-    indexphi_ = {0,0,0,0,0};
+    phiregion_=subname[3]-'A';
+    phiregionoverlap_=-1;
 
-      string subname=name.substr(5,7);
+    if (phiregion_>8) {
+      if (subname[3]=='X') phiregionoverlap_=0;
+      if (subname[3]=='Y') phiregionoverlap_=1;
+      if (subname[3]=='Z') phiregionoverlap_=2;
+      if (subname[3]=='W') phiregionoverlap_=3;
+      if (subname[3]=='Q') phiregionoverlap_=4;
+      if (subname[3]=='R') phiregionoverlap_=5;
+      if (subname[3]=='S') phiregionoverlap_=6;
+      if (subname[3]=='T') phiregionoverlap_=7;
+      if (phiregionoverlap_!=-1) phiregion_=-1;
+    }
 
-      phiregion_=subname[3]-'A';
-      phiregionoverlap_=-1;
-
-      if (phiregion_>8) {
-	if (subname[3]=='X') phiregionoverlap_=0;
-	if (subname[3]=='Y') phiregionoverlap_=1;
-	if (subname[3]=='Z') phiregionoverlap_=2;
-	if (subname[3]=='W') phiregionoverlap_=3;
-	if (subname[3]=='Q') phiregionoverlap_=4;
-	if (subname[3]=='R') phiregionoverlap_=5;
-	if (subname[3]=='S') phiregionoverlap_=6;
-	if (subname[3]=='T') phiregionoverlap_=7;
-	if (phiregionoverlap_!=-1) phiregion_=-1;
-      }
-
-      string subnamelayer=getName().substr(3,2);
-      layerdisk_=subnamelayer[1]-'0';
-
-      isLayer_=subnamelayer[0]=='L';
-      isDisk_=subnamelayer[0]=='D';
+    string subnamelayer=getName().substr(3,2);
+    layerdisk_=subnamelayer[1]-'0';
+    
+    isLayer_=subnamelayer[0]=='L';
+    isDisk_=subnamelayer[0]=='D';
 
     
   }
@@ -69,24 +67,6 @@ public:
       first=false;
     }
     
-    //cout << getName()<<" addStub "<<stub.layer().value()+1<<" "<<al1stub.phi()<<" "<<al1stub.z()<<endl;
-    
-    if (stub.layer().value()!=-1) {
-
-      FPGAWord r=stub.r();
-      FPGAWord bend=stub.bend();
-      int bendbin=bend.value();
-      //cout << "bend:"<<bend.value()<<" "<<bend.nbits()<<" "<<bendbin<<endl;
-      int rbin=(r.value()+(1<<(r.nbits()-1)))>>(r.nbits()-3);
-      
-      int iphicorr=phiCorrLayers[stub.layer().value()].getphiCorrValue(bendbin,rbin);
-
-      stub.setPhiCorr(iphicorr);
-
-    }
-    
-    unsigned int asindex = 0;
-    int iphivmRaw=stub.iphivmRaw();
     
        
     if (stub.layer().value()==-1 && isLayer() ) return false; 
@@ -96,6 +76,23 @@ public:
     } else {
       if (abs(stub.disk().value())!=layerdisk()) return false;
     }
+
+
+    if (stub.layer().value()!=-1) {
+
+      FPGAWord r=stub.r();
+      FPGAWord bend=stub.bend();
+      int bendbin=bend.value();
+      int rbin=(r.value()+(1<<(r.nbits()-1)))>>(r.nbits()-3);
+      
+      int iphicorr=phiCorrLayers[stub.layer().value()].getphiCorrValue(bendbin,rbin);
+
+      stub.setPhiCorr(iphicorr);
+
+    }
+    
+    int iphivmRaw=stub.iphivmRaw();
+
     
     int phibin=-1;
     if (stub.layer().value()!=-1) {
@@ -119,34 +116,17 @@ public:
 
     assert(half[0]=='A' || half[0]=='B');
 
-
-    double sectorphi=al1stub.phi();
-    if (sectorphi<0.0) sectorphi+=2*M_PI;
-    
-    while (sectorphi>3*M_PI/NSector) {
-      sectorphi-=(2*M_PI/NSector);
-    }
-    
-    
     if (half[0]=='B' && iphivmRaw<=15) return false;
     if (half[0]=='A' && iphivmRaw>15) return false;
     
-
     
     if (debug1) {
       cout << "Will add stub in "<<getName()<<" phimin_ phimax_ "<<phimin_<<" "<<phimax_<<" "<<"iphiwmRaw = "<<iphivmRaw<<" phi="<<al1stub.phi()<<" z="<<al1stub.z()<<" r="<<al1stub.r()<<endl;
     }
     if (stubs_.size()<MAXSTUBSLINK) {
       L1TStub* l1stub=new L1TStub(al1stub);
-      //Stub* stub=new Stub(*l1stub,phimin_,phimax_);
       Stub* stubptr=new Stub(stub);
 
-      // set stub index only for those sent to VMRouterTE
-      if (isalpha(getName()[8])) {
-        l1stub->setAllStubIndex(asindex);
-        stubptr->setAllStubIndex(asindex);
-      }
-      
       std::pair<Stub*,L1TStub*> tmp(stubptr,l1stub);
       stubs_.push_back(tmp);
     }
@@ -155,45 +135,23 @@ public:
 
   unsigned int nStubs() const {return stubs_.size();}
 
-  vector<unsigned int> getASPhiIndices() const {return indexphi_;}
-
   Stub* getFPGAStub(unsigned int i) const {return stubs_[i].first;}
   L1TStub* getL1TStub(unsigned int i) const {return stubs_[i].second;}
   std::pair<Stub*,L1TStub*> getStub(unsigned int i) const {return stubs_[i];}
 
   void writeStubs(bool first)
   {
-    string fname="../data/MemPrints/InputStubs/InputStubs_";
-    fname+=getName();
-    fname+="_";
-    ostringstream oss;
-    oss << iSector_+1;
-    if (iSector_+1<10) fname+="0";
-    fname+=oss.str();
-    fname+=".dat";
-    if (first) {
-      bx_=0;
-      event_=1;
-      out_.open(fname.c_str());
-    }
-    else 
-      out_.open(fname.c_str(),std::ofstream::app);
 
-    out_ << "BX = "<<(bitset<3>)bx_ << " Event : " << event_ << endl;
-
+    openFile(first,"../data/MemPrints/InputStubs/InputStubs_");
+    
     for (unsigned int j=0;j<stubs_.size();j++){
-      assert(stubs_[j].first->isBarrel() or stubs_[j].first->isDisk());
-      string stub = stubs_[j].first->isBarrel() ? stubs_[j].first->str()
-        : stubs_[j].first->strdisk();
+      string stub = stubs_[j].first->str();
       if (j<16) out_ <<"0";
       out_ << hex << j << dec;
       out_ << " " << stub <<" "<<hexFormat(stub)<< endl;
     }
     out_.close();
 
-    bx_++;
-    event_++;
-    if (bx_>7) bx_=0;
   }
 	
   void writeInputStubs(bool first, bool w2, bool padded) {
@@ -663,8 +621,6 @@ public:
       delete stubs_[i].second;
     }
     stubs_.clear();
-    indexphi_.clear();
-    indexphi_.resize(5,0);
   }
 
   double phimin() const {return phimin_;}
@@ -684,9 +640,6 @@ private:
   double phimin_;
   double phimax_;
   vector<std::pair<Stub*,L1TStub*> > stubs_;
-
-  // index array for counting the number of stubs in each phi region for AS memories
-  vector<unsigned int> indexphi_;
 
   int phiregion_;
   int phiregionoverlap_;

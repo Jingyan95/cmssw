@@ -108,8 +108,8 @@ public:
       int sign=1;
       if (z<0.0) sign=-1;
 
-      double zmin=sign*(zmean[disk-1]-dzmax);
-      double zmax=sign*(zmean[disk-1]+dzmax);
+      double zmin=sign*(zmean[disk-1]-sign*dzmax);
+      double zmax=sign*(zmean[disk-1]+sign*dzmax);
 
       if ((z>zmax)||(z<zmin)) {
 	cout << "Error disk z, zmax, zmin: "<<z<<" "<<zmax<<" "<<zmin<<endl;
@@ -234,27 +234,22 @@ public:
   std::string str() const {
     
     std::ostringstream oss;
-    oss << r_.str()<<"|"
-        << z_.str()<<"|"<< phi_.str()<<"|"<<bend_.str();
-
+    if (layer_.value()!=-1) {
+      oss << r_.str()<<"|"
+	  << z_.str()<<"|"<< phi_.str()<<"|"<<bend_.str();
+    } else {
+      if (isPSmodule())
+	oss <<r_.str()<<"|"
+	    << z_.str()<<"|"<< phi_.str()<<"|"<<bend_.str();
+      else
+	oss << "000"<<r_.str()<<"|"
+	    << z_.str()<<"|"<< phi_.str()<<"|"<<alphanew_.str()<<"|"<<bend_.str();
+    }
+      
     return oss.str();
 
   }
-  std::string strdisk() const {
-   
-    std::ostringstream oss;
-    if (isPSmodule())
-      oss <<r_.str()<<"|"
-          << z_.str()<<"|"<< phi_.str()<<"|"<<bend_.str();
-    else
-      oss << "000"<<r_.str()<<"|"
-          << z_.str()<<"|"<< phi_.str()<<"|"<<alphanew_.str()<<"|"<<bend_.str();
-
-    return oss.str();
-
-  }
-
-
+  
   std::string strbare() const {
     
     std::ostringstream oss;
