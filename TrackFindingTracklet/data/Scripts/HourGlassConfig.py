@@ -12,11 +12,11 @@ d0max=3.0;
 tdisk=2.4
 tLLD =1.7
 
-#If true it will use a MatchProcessor to replace PRs, MEs, MC
-combinedMP=True
-
 #If true it will use a TrackletProcessor to replace TEs, TCs
 combinedTP=True
+
+#If true it will use a MatchProcessor to replace PRs, MEs, MC
+combinedMP=False
 
 # if true use L2L3 seeding
 extraseeding=True
