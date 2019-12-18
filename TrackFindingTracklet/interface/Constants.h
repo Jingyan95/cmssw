@@ -291,17 +291,9 @@ static const double ptcut=1.91; //Minimum pt
 static const double rinvcut=0.01*0.3*3.8/ptcut; //0.01 to convert to cm-1
 static const double ptcutte=1.6; //Minimum pt in TE
 static const double rinvcutte=0.01*0.3*3.8/ptcutte; //0.01 to convert to cm-1 in TE
-static const double bendcutbarrelTE=1.5; //parameter to compare bend and bendinner in TE
-static const double bendcutdiskTE=2.0;//for disk in TE
-static const double bendcutbarrelME=2.0; //parameter to compare projbend to calculated bend in ME
-static const double bendcutPSdiskME=1.5;
-static const double bendcut2SdiskME=1.5;
-static const double cosModuleTilt=0.886454;
-static const double sinModuleTilt=0.504148;
+static const double bendcut=1.5;
+static const double bendcutdisk=2.0;
 static const double z0cut=15.0;
-static const double diskSpacingCut[3]={63.7, 67.7, 87.5};
-static const double barrelSpacingCut[6]={15.0, 25.0, 31.5, 33.3, 70.0, 120.0};
-
 
 
 static const unsigned int NSector=9; 

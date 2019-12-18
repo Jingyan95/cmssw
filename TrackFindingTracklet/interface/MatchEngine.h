@@ -37,18 +37,15 @@ public:
       unsigned int nbits=3;
       if (layer_>=4) nbits=4;
       
-      for(unsigned int iz=0; iz<8;iz++){
-	double z=0+iz*15;
-	for(unsigned int irinv=0;irinv<32;irinv++){
-	  double rinv=(irinv-15.5)*(1<<(nbitsrinv-5))*krinvpars;
-	  double projbend=bendBarrel_ME(z,layer_,rinv);
-	  for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
-	    double stubbend=Stub::benddecode(ibend,layer_<=3);
-	    bool pass=fabs(stubbend-projbend)<bendcutbarrelME;
-	    table_.push_back(pass);
-	  }
+      for(unsigned int irinv=0;irinv<32;irinv++){
+	double rinv=(irinv-15.5)*(1<<(nbitsrinv-5))*krinvpars;
+	double projbend=bend(rmean[layer_-1],rinv);
+	for(unsigned int ibend=0;ibend<(unsigned int)(1<<nbits);ibend++){
+	  double stubbend=Stub::benddecode(ibend,layer_<=3);
+	  bool pass=fabs(stubbend-projbend)<2.0;
+	  table_.push_back(pass);
 	}
-      }  
+      }
 
       if (writeMETables){
 	ofstream out;
@@ -76,12 +73,12 @@ public:
 	double projbend=0.5*(iprojbend-15.0);
 	for(unsigned int ibend=0;ibend<8;ibend++){
 	  double stubbend=Stub::benddecode(ibend,true);
-	  bool pass=fabs(stubbend-projbend)<bendcutPSdiskME;
+	  bool pass=fabs(stubbend-projbend)<1.5;
 	  tablePS_.push_back(pass);
 	}
 	for(unsigned int ibend=0;ibend<16;ibend++){
 	  double stubbend=Stub::benddecode(ibend,false);
-	  bool pass=fabs(stubbend-projbend)<bendcut2SdiskME;
+	  bool pass=fabs(stubbend-projbend)<1.5;
 	  table2S_.push_back(pass);
 	}
       }
@@ -287,16 +284,7 @@ public:
 	
 	int nbits=isPSmodule?3:4;
 
-	//zbins
-
-        int izbits=nbitszL123;
-	if (layer_>=4) izbits=nbitszL456;
-
-	int iz= stub.first->z().value();
-	int izbin= (iz>>(izbits-4))&7;
-	   
-
-	unsigned int index=barrel?(izbin<<(nbits+5))+(projrinv<<nbits)+stub.first->bend().value():(projrinv<<nbits)+stub.first->bend().value();
+	unsigned int index=(projrinv<<nbits)+stub.first->bend().value();
 
 	//Check if stub z position consistent
 	int idrz=stubfinerz-projfinerzadj;
@@ -342,40 +330,19 @@ public:
     
   }
 
+ 
+  double bend(double r, double rinv) {
 
-  double bendBarrel_ME(double z, int layer, double rinv) {
-
-    double dr= 0.18 ;
-    double CF=1;
-    double r=rmean[layer-1];
-
-    if ((layer==1 && z<=barrelSpacingCut[3]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[4]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
-      
-      dr = 0.26; 
+    double dr=0.18;
     
-    } 
-    else if ((layer==1 && barrelSpacingCut[2]<=z && z<=barrelSpacingCut[5]) || (layer==2 && barrelSpacingCut[4]<=z && z<=barrelSpacingCut[5])){
-     
-      dr = 0.4;
-     
-    } 
-    else if ((layer==2 && z<=barrelSpacingCut[1]) || (layer==3 && z<=barrelSpacingCut[3])){
+    double delta=r*dr*0.5*rinv;
 
-	dr = 0.16; 
-     
-      }
-      if ((layer==1 && barrelSpacingCut[0]<=z && z<=barrelSpacingCut[5]) || (layer==2 && barrelSpacingCut[1]<=z && z<=barrelSpacingCut[5]) || (layer==3 && barrelSpacingCut[3]<=z && z<=barrelSpacingCut[5])){
-	
-	CF = cosModuleTilt*(z/r) + sinModuleTilt;
+    double bend=-delta/0.009;
+    if (r<55.0) bend=-delta/0.01;
 
-      }
-  
-
-      double delta=r*dr*0.5*rinv;
-      double bend=-delta/(0.009*CF);
-      if (r<55.0) bend=-delta/(0.01*CF);
-      return bend;
-      }
+    return bend;
+    
+  }
 
   
 private:
