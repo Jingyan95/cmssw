@@ -40,11 +40,7 @@ public:
     std::pair<Tracklet*,unsigned int> tmp(tracklet,allprojindex);
     //Check that order of TCID is correct
     if (tracklets_.size()>0) {
-      //if (tracklets_[tracklets_.size()-1].first->homeSector()==tracklet->homeSector()) {
-	//cout << getName()<<" "<<tracklets_[tracklets_.size()-1].first->TCID()<<" "<<tracklet->TCID()<<" "
-	//     <<tracklet->TCIndex()<<" "<<tracklet->trackletIndex()<<endl;
-	assert(tracklets_[tracklets_.size()-1].first->TCID()<=tracklet->TCID());
-	//}
+      assert(tracklets_[tracklets_.size()-1].first->TCID()<=tracklet->TCID());
     }
     tracklets_.push_back(tmp);
   }
