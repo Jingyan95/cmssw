@@ -69,17 +69,6 @@ class HybridFit{
           if (printDebugKF) cout << "Will create disk stub with : ";
         }
 
-       /* edm::ESHandle<TrackerGeometry> trackerGeometryHandle;
-          iSetup.get<TrackerDigiGeometryRecord>().get( trackerGeometryHandle );
-
-          const TrackerGeometry*  trackerGeometry = trackerGeometryHandle.product();
-  */
-  /*        edm::ESHandle<TrackerTopology> trackerTopologyHandle;
-          iSetup.get<TrackerTopologyRcd>().get(trackerTopologyHandle);/
-          const TrackerTopology*  trackerTopology = trackerTopologyHandle.product();
-  */        
-
-
         if (printDebugKF) cout <<kfphi<<" "<<kfr<<" "<<kfz<<" "<<kfbend<<" "<<kflayer<<" "<<isBarrel<<" "<<psmodule<<" "<<endl;
         TMTT::Stub* TMTTstubptr = new TMTT::Stub(kfphi, kfr, kfz, kfbend, kflayer, psmodule, isBarrel, iphi, -alpha, &settings, nullptr, L1stubID, kf_phi_sec);
         TMTTstubs.push_back(TMTTstubptr);
@@ -116,7 +105,7 @@ class HybridFit{
       mBin = max(min(mBin, int(settings.houghNbinsPt()-1)), 0); // protect precision issues.
       std::pair<unsigned int, unsigned int> celllocation(mBin,1);
 
-  // Get range in z of tracks covered by this sector at chosen radius from beam-line
+      // Get range in z of tracks covered by this sector at chosen radius from beam-line
 
       const vector<double> etaRegions = settings.etaRegions();
       const float chosenRofZ = settings.chosenRofZ();
@@ -170,7 +159,7 @@ class HybridFit{
       int id0fit   = trk.d0() / kd0pars;
       int ichi2fit = trk.chi2() / 16;  // CHECK THIS (but not used to make TTTrack)
 
-      if(trk.accepted()){
+      if (trk.accepted()) {
 
         const vector<const TMTT::Stub*>& stubsFromFit = trk.getStubs();
         vector<L1TStub*> l1stubsFromFit;
@@ -188,12 +177,15 @@ class HybridFit{
 	tracklet->setFitPars(rinvfit,phi0fit,trk.d0(),trk.tanLambda(),trk.z0(),trk.chi2(),
 			     rinvfit,phi0fit,trk.d0(),trk.tanLambda(),trk.z0(),trk.chi2(),
 			     irinvfit,iphi0fit,id0fit,itanlfit,iz0fit,ichi2fit,l1stubsFromFit);
-       //cout<<" KF fit d0 is "<<trk.d0()<<"\n";
-      } else {
-       if (printDebugKF) cout << "FitTrack:KF rejected track"<<endl;
+      }
+      else {
+	if (printDebugKF) cout << "FitTrack:KF rejected track"<<endl;
       }
 
-      for (const TMTT::Stub* s : TMTTstubs) delete s; // Clean up.
+      for (const TMTT::Stub* s : TMTTstubs) {
+	delete s;
+      }
+      
     }
 
   private:

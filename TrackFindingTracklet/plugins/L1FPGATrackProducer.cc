@@ -1020,6 +1020,11 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
   iEvent.put( std::move(L1TkTracksForOutput), "Level1TTTracks");
 
+  for (unsigned int k=0;k<NSector;k++) {
+    sectors[k]->clean();
+  }
+  
+
 } /// End of produce()
 
 
