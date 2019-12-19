@@ -165,6 +165,7 @@ private:
   std::vector<int>*   m_trk_lhits;
   std::vector<int>*   m_trk_dhits;
   std::vector<int>*   m_trk_seed;
+  std::vector<unsigned int>*   m_trk_phiSector;
   std::vector<int>*   m_trk_genuine;
   std::vector<int>*   m_trk_loose;
   std::vector<int>*   m_trk_unknown;
@@ -352,6 +353,7 @@ void L1TrackNtupleMaker::beginJob()
   m_trk_lhits = new std::vector<int>;
   m_trk_dhits = new std::vector<int>;
   m_trk_seed    = new std::vector<int>;
+  m_trk_phiSector    = new std::vector<unsigned int>;
   m_trk_genuine       = new std::vector<int>;
   m_trk_loose         = new std::vector<int>;
   m_trk_unknown       = new std::vector<int>;
@@ -456,6 +458,7 @@ void L1TrackNtupleMaker::beginJob()
     eventTree->Branch("trk_lhits", &m_trk_lhits);
     eventTree->Branch("trk_dhits", &m_trk_dhits);
     if (SaveTracklet) eventTree->Branch("trk_seed",    &m_trk_seed);
+    eventTree->Branch("trk_phiSector", &m_trk_phiSector);
     eventTree->Branch("trk_genuine",      &m_trk_genuine);
     eventTree->Branch("trk_loose",        &m_trk_loose);
     eventTree->Branch("trk_unknown",      &m_trk_unknown);
@@ -591,6 +594,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
     m_trk_lhits->clear();
     m_trk_dhits->clear();
     m_trk_seed->clear();
+    m_trk_phiSector->clear();
     m_trk_genuine->clear();
     m_trk_loose->clear();
     m_trk_unknown->clear();
@@ -927,6 +931,8 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
       int tmp_trk_seed = 0;
       if (SaveTracklet) tmp_trk_seed = (int) iterL1Track->getWedge();
 
+      unsigned int tmp_trk_phiSector = iterL1Track->getSector();
+
       /*
       int tmp_trk_nPSstub = 0;
       if (SaveTracklet) {
@@ -1032,6 +1038,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
       m_trk_dhits->push_back(tmp_trk_dhits);
       m_trk_lhits->push_back(tmp_trk_lhits);
       if (SaveTracklet) m_trk_seed->push_back(tmp_trk_seed);
+      m_trk_phiSector->push_back(tmp_trk_phiSector);
       m_trk_genuine->push_back(tmp_trk_genuine);
       m_trk_loose->push_back(tmp_trk_loose);
       m_trk_unknown->push_back(tmp_trk_unknown);

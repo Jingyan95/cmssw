@@ -30,12 +30,12 @@ Source_Files = cms.untracked.vstring(
 process.source = cms.Source("PoolSource", fileNames = Source_Files)
 
 
-# L1 tracking => floating-point version
+# L1 tracking => tracklet floating-point version
 #process.load("L1Trigger.TrackFindingTracklet.L1TrackletTracks_cff")
 #process.TTTracks = cms.Path(process.L1TrackletTracks)                         #run only the tracking (no MC truth associators)
 #process.TTTracksWithTruth = cms.Path(process.L1TrackletTracksWithAssociators) #run the tracking AND MC truth associators)
 
-# L1 tracking => emulation 
+# L1 tracking => hybrid emulation 
 process.load("L1Trigger.TrackFindingTracklet.L1TrackletEmulationTracks_cff")
 process.TTTracksEmulation = cms.Path(process.L1TrackletEmulationTracks)
 process.TTTracksEmulationWithTruth = cms.Path(process.L1TrackletEmulationTracksWithAssociators)
@@ -43,7 +43,7 @@ process.TTTracksEmulationWithTruth = cms.Path(process.L1TrackletEmulationTracksW
 
 # output module
 process.out = cms.OutputModule( "PoolOutputModule",
-                                fileName = cms.untracked.string("Tracklets.root"),
+                                fileName = cms.untracked.string("L1Tracks.root"),
                                 fastCloning = cms.untracked.bool( False ),
                                 outputCommands = cms.untracked.vstring('drop *',
                                                                        'keep *_TTTrack*_Level1TTTracks_*', 

@@ -122,6 +122,8 @@ TFileDirectory Histos::bookInputData() {
   // N.B. Histograms of the kinematics and production vertex of tracking particles
   // are booked in bookTrackCands(), since they are used to study the tracking efficiency.
 
+  hisNumEvents_ = inputDir.make<TH1F>("NumEvents",";; No. of events",1,-0.5,0.5);
+
   // Count stubs & tracking particles.
 
   profNumStubs_        = inputDir.make<TProfile>("NumStubs","; Category; No. stubs in tracker",4,0.5,4.5);
@@ -261,6 +263,8 @@ TFileDirectory Histos::bookInputData() {
 void Histos::fillInputData(const InputData& inputData) {
   const vector<const Stub*>& vStubs = inputData.getStubs();
   const vector<TP>&          vTPs   = inputData.getTPs();
+
+  hisNumEvents_->Fill(0.);
 
   // Count stubs.
   unsigned int nStubsGenuine = 0;
@@ -1110,12 +1114,12 @@ TFileDirectory Histos::bookTrackCands(string tName) {
   hisPSLayersPerTrueTrack_[tName] = inputDir.make<TH1F>(addn("PSLayersPerTrueTrack"),";No. of PS layers with stubs per genuine track;",20,-0.5,19.5);
 
   if (TMTT) {
-    hisNumStubsPerLink_[tName] = inputDir.make<TH1F>(addn("NumStubsPerLink"), "; Mean #stubs per HT output opto-link;", 50,-0.5,199.5);
-    hisNumStubsVsLink_[tName] = inputDir.make<TH2F>(addn("NumStubsVsLink"), "; HT output opto-link; No. stubs/event", 36, -0.5, 35.5, 20,-0.5,199.5);
-    profMeanStubsPerLink_[tName] = inputDir.make<TProfile>(addn("MeanStubsPerLink"), "; Mean #stubs per HT output opto-link;", 36,-0.5,35.5);
-    hisNumTrksPerLink_[tName] = inputDir.make<TH1F>(addn("NumTrksPerLink"), "; Mean #tracks per HT output opto-link;", 50,-0.5,49.5);
-    hisNumTrksVsLink_[tName] = inputDir.make<TH2F>(addn("NumTrksVsLink"), "; HT output opto-link; No. tracks/event", 72, -0.5, 71.5, 20,-0.5,49.5);
-    profMeanTrksPerLink_[tName] = inputDir.make<TProfile>(addn("MeanTrksPerLink"), "; Mean #tracks per HT output opto-link;", 36,-0.5,35.5);
+    hisNumStubsPerLink_[tName] = inputDir.make<TH1F>(addn("NumStubsPerLink"), "; Mean #stubs per MHT output opto-link;", 50,-0.5,199.5);
+    hisNumStubsVsLink_[tName] = inputDir.make<TH2F>(addn("NumStubsVsLink"), "; MHT output opto-link; No. stubs/event", 36, -0.5, 35.5, 20,-0.5,199.5);
+    profMeanStubsPerLink_[tName] = inputDir.make<TProfile>(addn("MeanStubsPerLink"), "; Mean #stubs per MHT output opto-link;", 36,-0.5,35.5);
+    hisNumTrksPerLink_[tName] = inputDir.make<TH1F>(addn("NumTrksPerLink"), "; Mean #tracks per MHT output opto-link;", 50,-0.5,49.5);
+    hisNumTrksVsLink_[tName] = inputDir.make<TH2F>(addn("NumTrksVsLink"), "; MHT output opto-link; No. tracks/event", 72, -0.5, 71.5, 20,-0.5,49.5);
+    profMeanTrksPerLink_[tName] = inputDir.make<TProfile>(addn("MeanTrksPerLink"), "; Mean #tracks per MHT output opto-link;", 36,-0.5,35.5);
   }
 
   if (TMTT) {
@@ -1304,27 +1308,27 @@ void Histos::fillTrackCands(const InputData& inputData, const vector<L1track3D>&
   // Plot number of tracks & number of stubs per output HT opto-link.
 
   if (TMTT && not withRZfilter) {
+    static bool firstMess = true;
     const unsigned int numPhiSecPerNon = numPhiSectors_/numPhiNonants;
     // Hard-wired bodge
-    const unsigned int nLinks = (settings_->busySectorMbinRanges().size() - 1) * numPhiSecPerNon;
+    const unsigned int nLinks = 16; // Hard-wired. Check
 
     for (unsigned int iPhiNon = 0; iPhiNon < numPhiNonants; iPhiNon++) {
       // Each nonant has a separate set of links.
-
-      vector<unsigned int> stubsToLinkCount(nLinks, 0);
+      vector<unsigned int> stubsToLinkCount(nLinks, 0); // Must use vectors to count links with zero entries.
       vector<unsigned int> trksToLinkCount(nLinks, 0);
       for (const L1track3D& trk : tracks) {
-	unsigned int iNonantTrk = floor((trk.iPhiSec())*numPhiNonants/(numPhiSectors_)); // phi nonant number
-	if (iPhiNon == iNonantTrk) {
-	  unsigned int link = trk.optoLinkID();
-	  if (link < nLinks) {
-  	    stubsToLinkCount[link] += trk.getNumStubs();
+        unsigned int iNonantTrk = floor((trk.iPhiSec())*numPhiNonants/(numPhiSectors_)); // phi nonant number
+        if (iPhiNon == iNonantTrk) {
+          unsigned int link = trk.optoLinkID();
+          if (link < nLinks) {
+            stubsToLinkCount[link] += trk.getNumStubs();
             trksToLinkCount[link] += 1;
-          } else {
-            // Bug -- array too small ...
-            //cout<<"MESS UP "<<link<<endl;
+          } else if (firstMess) {
+	    firstMess = false;
+	    cout<<endl<<"===== HISTOS MESS UP: Increase size of nLinks ===== "<<link<<endl<<endl;
           }
-	}
+        }
       }
 
       for (unsigned int link = 0; link < nLinks; link++) {
@@ -1342,6 +1346,7 @@ void Histos::fillTrackCands(const InputData& inputData, const vector<L1track3D>&
       }
     }
   }
+
 
   // Plot q/pt spectrum of track candidates, and number of stubs/tracks
   for (const L1track3D& trk : tracks) {
@@ -1424,35 +1429,42 @@ void Histos::fillTrackCands(const InputData& inputData, const vector<L1track3D>&
 
   for (const TP& tp: vTPs) {
 
-    bool tpRecoed = false;
-    for (unsigned int iEtaReg = 0; iEtaReg < numEtaRegions_; iEtaReg++) {
-      bool tpRecoedInEtaSec = false;
-      for (unsigned int iPhiSec = 0; iPhiSec < numPhiSectors_; iPhiSec++) {
-
-	vector<const L1track3D*> matchedTrks;
-        for (const L1track3D& trk : tracks) {  
-	  if (trk.iPhiSec() == iPhiSec && trk.iEtaReg() == iEtaReg) {
-	    const TP* tpAssoc = trk.getMatchedTP();
-	    if (tpAssoc != nullptr) {
-	      if (tpAssoc->index() == tp.index()) matchedTrks.push_back(&trk);
-	    }
-	  }
-	}
-
-	// Count them
-	unsigned int nTrk = matchedTrks.size(); 
-        if (nTrk > 0) {
-	  tpRecoed = true;            // This TP was reconstructed at least once in tracker.
-	  tpRecoedInEtaSec = true;    // This TP was reconstructed at least once in this eta sector.
-          nSecsMatchingTPs += 1;      // Increment sum by no. of sectors this TP was reconstructed in
-  	  nTrksMatchingTPs += nTrk;   // Increment sum by no. of tracks this TP was reconstructed as
-	  if (TMTT) {
-            profDupTracksVsEta_[tName]->Fill(fabs(tp.eta()), nTrk - 1); // Study duplication of tracks within an individual HT array.
-            profDupTracksVsInvPt_[tName]->Fill(fabs(tp.qOverPt()), nTrk - 1); // Study duplication of tracks within an individual HT array.
-	  }
-        }
+    vector<const L1track3D*> matchedTrks;
+    for (const L1track3D& trk : tracks) {
+      const TP* tpAssoc = trk.getMatchedTP();
+      if (tpAssoc != nullptr) {
+        if (tpAssoc->index() == tp.index()) matchedTrks.push_back(&trk);
       }
-      if (tpRecoedInEtaSec) nEtaSecsMatchingTPs++; // Increment each time TP found in an eta sector.
+    }
+    unsigned int nTrk = matchedTrks.size();
+
+    bool tpRecoed = false;
+
+    if (nTrk > 0) {
+      tpRecoed = true;            // This TP was reconstructed at least once in tracker.
+      nTrksMatchingTPs += nTrk;   // Increment sum by no. of tracks this TP was reconstructed as
+
+      set<unsigned int> iEtaRegRecoed;
+      for (const L1track3D* trk : matchedTrks) iEtaRegRecoed.insert(trk->iEtaReg());
+      nEtaSecsMatchingTPs = iEtaRegRecoed.size();
+
+      set< pair<unsigned int, unsigned int> > iSecRecoed;
+      for (const L1track3D* trk : matchedTrks) iSecRecoed.insert({trk->iPhiSec(), trk->iEtaReg()});
+      nSecsMatchingTPs = iSecRecoed.size();
+
+
+      if (TMTT) {
+	for (const auto& p : iSecRecoed) {
+	  unsigned int nTrkInSec = 0;
+	  for (const L1track3D* trk : matchedTrks) {
+	    if (trk->iPhiSec() == p.first && trk->iEtaReg() == p.second) nTrkInSec++; 
+	  }
+	  if (nTrkInSec > 0) {
+  	    profDupTracksVsEta_[tName]->Fill(fabs(tp.eta()), nTrkInSec - 1); // Study duplication of tracks within an individual HT array.
+	    profDupTracksVsInvPt_[tName]->Fill(fabs(tp.qOverPt()), nTrkInSec - 1); // Study duplication of tracks within an individual HT array.
+	  }
+	} 
+      }
     }
 
     if (tpRecoed) {
@@ -2107,6 +2119,8 @@ map<string, TFileDirectory> Histos::bookTrackFitting() {
 
     hisFitChi2Matched_[fitName]    = inputDir.make<TH1F>(addn("FitChi2Matched"), ";#chi^{2};", nBinsChi2, chi2Bins );
     hisFitChi2DofMatched_[fitName] = inputDir.make<TH1F>(addn("FitChi2DofMatched"), ";#chi^{2}/DOF;", nBinsChi2, chi2dofBins );
+    hisFitChi2DofRphiMatched_[fitName] = inputDir.make<TH1F>(addn("FitChi2DofRphiMatched"), ";#chi^{2}rphi;", nBinsChi2, chi2Bins );
+    hisFitChi2DofRzMatched_[fitName]   = inputDir.make<TH1F>(addn("FitChi2DofRzMatched"), ";#chi^{2}rz/DOF;", nBinsChi2, chi2Bins );
     if (settings_->kalmanAddBeamConstr() && fitName.find("KF5") != string::npos) { // Histograms of chi2 with beam-spot constraint only make sense for 5 param fit.
       hisFitBeamChi2Matched_[fitName]    = inputDir.make<TH1F>(addn("FitBeamChi2Matched"), "; Beam constr #chi^{2};", nBinsChi2, chi2Bins);
       hisFitBeamChi2DofMatched_[fitName] = inputDir.make<TH1F>(addn("FitBeamChi2DofMatched"), ";Beam constr #chi^{2}/DOF;", nBinsChi2, chi2dofBins );
@@ -2125,6 +2139,8 @@ map<string, TFileDirectory> Histos::bookTrackFitting() {
   
     hisFitChi2Unmatched_[fitName]    = inputDir.make<TH1F>(addn("FitChi2Unmatched"), ";#chi^{2};", nBinsChi2, chi2Bins );
     hisFitChi2DofUnmatched_[fitName] = inputDir.make<TH1F>(addn("FitChi2DofUnmatched"), ";#chi^{2}/DOF;", nBinsChi2, chi2dofBins );
+    hisFitChi2DofRphiUnmatched_[fitName] = inputDir.make<TH1F>(addn("FitChi2DofRphiUnmatched"), ";#chi^{2}rphi/DOF;", nBinsChi2, chi2Bins );
+    hisFitChi2DofRzUnmatched_[fitName]   = inputDir.make<TH1F>(addn("FitChi2DofRzUnmatched"), ";#chi^{2}rz/DOF;", nBinsChi2, chi2Bins );
     if (settings_->kalmanAddBeamConstr() && fitName.find("KF5") != string::npos) { // Histograms of chi2 with beam-spot constraint only make sense for 5 param fit.
       hisFitBeamChi2Unmatched_[fitName]    = inputDir.make<TH1F>(addn("FitBeamChi2Unmatched"), "; Beam constr #Chi^{2};", nBinsChi2, chi2Bins );
       hisFitBeamChi2DofUnmatched_[fitName] = inputDir.make<TH1F>(addn("FitBeamChi2DofUnmatched"), "; Beam constr #Chi^{2}/DOF;", nBinsChi2, chi2dofBins );
@@ -2387,6 +2403,8 @@ void Histos::fillTrackFitting( const InputData& inputData, const map<string,vect
  
 	hisFitChi2Matched_[fitName]->Fill( fitTrk.chi2() );
 	hisFitChi2DofMatched_[fitName]->Fill( fitTrk.chi2dof() );
+	hisFitChi2DofRphiMatched_[fitName]->Fill( fitTrk.chi2rphi() / fitTrk.numDOFrphi());
+	hisFitChi2DofRzMatched_[fitName]->Fill( fitTrk.chi2rz() / fitTrk.numDOFrz());
 	if (settings_->kalmanAddBeamConstr() && fitName.find("KF5") != string::npos) { // Histograms of chi2 with beam-spot constraint only make sense for 5 param fit.
 	  hisFitBeamChi2Matched_[fitName]->Fill( fitTrk.chi2_bcon() );
 	  hisFitBeamChi2DofMatched_[fitName]->Fill( fitTrk.chi2dof_bcon() );
@@ -2443,6 +2461,8 @@ void Histos::fillTrackFitting( const InputData& inputData, const map<string,vect
  
 	hisFitChi2Unmatched_[fitName]->Fill( fitTrk.chi2() );
 	hisFitChi2DofUnmatched_[fitName]->Fill( fitTrk.chi2dof() );
+	hisFitChi2DofRphiUnmatched_[fitName]->Fill( fitTrk.chi2rphi() / fitTrk.numDOFrphi());
+	hisFitChi2DofRzUnmatched_[fitName]->Fill( fitTrk.chi2rz() / fitTrk.numDOFrz());
 	if (settings_->kalmanAddBeamConstr() && fitName.find("KF5") != string::npos) { // Histograms of chi2 with beam-spot constraint only make sense for 5 param fit.
 	  hisFitBeamChi2Unmatched_[fitName]->Fill( fitTrk.chi2_bcon() );
 	  hisFitBeamChi2DofUnmatched_[fitName]->Fill( fitTrk.chi2dof_bcon() );
@@ -3054,7 +3074,10 @@ void Histos::endJobAnalysis() {
   // Don't bother producing summary if user didn't request histograms via TFileService in their cfg.
   if ( ! this->enabled() ) return;
 
-  if (settings_->hybrid()) {
+  // Protection when running in wierd mixed hybrid-TMTT modes.
+  bool wierdMixedMode = (hisRecoTPinvptForEff_.find("TRACKLET") == hisRecoTPinvptForEff_.end());
+
+  if (settings_->hybrid() && not wierdMixedMode) {
 
     // Produce plots of tracking efficieny after tracklet pattern reco.
     this->plotTrackletSeedEfficiency();
@@ -3144,7 +3167,7 @@ void Histos::endJobAnalysis() {
   }
   cout<<endl;
 
-  if (settings_->hybrid()) {
+  if (settings_->hybrid() && not wierdMixedMode) {
     //--- Print summary of tracklet pattern reco
     this->printTrackletSeedFindingPerformance();
     this->printTrackPerformance("TRACKLET");
