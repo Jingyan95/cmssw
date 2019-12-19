@@ -1039,10 +1039,6 @@ class FitTrack:public ProcessBase{
     if(debug1 && fullmatch[i]->nMatches()!=0) cout<<"orderedMatches: "<<fullmatch[i]->getName()<<" "<< fullmatch[i]->nMatches()<<"\n";
 
     indexArray.push_back(0);
-    for (unsigned int j=0;j<fullmatch[i]->nMatches();j++){
-      //cout<<"Name tracklet:"<<fullmatch[i]->getName()<<" "<<fullmatch[i]->getFPGATracklet(j)<<endl;
-      assert(iSector_==fullmatch[i]->getFPGATracklet(j)->homeSector());
-    }
    }
 
    int bestIndex=-1;

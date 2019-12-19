@@ -714,10 +714,7 @@ public:
 
       if (oldTracklet!=0) {
 	//allow equal here since we can have more than one cadidate match per tracklet projection
-	if (iSector_==tracklet->homeSector()&&
-	    iSector_==oldTracklet->homeSector()) {
-	  assert(oldTracklet->TCID()<=tracklet->TCID());
-	}
+	assert(oldTracklet->TCID()<=tracklet->TCID());
       }
       oldTracklet=tracklet;
       
@@ -856,7 +853,6 @@ public:
 		  (layer==0&&disk==3&&fullmatches_[l]->getName().substr(3,4)=="D3D4")||
 		  (layer==1&&disk==1&&fullmatches_[l]->getName().substr(3,4)=="L1D1")||
 		  (layer==2&&disk==1&&fullmatches_[l]->getName().substr(3,4)=="L2D1")){
-		assert(tracklet->homeSector()==iSector_);
 		if (debug1) {
 		  cout << getName()<<" adding match to "<<fullmatches_[l]->getName()<<endl;
 		}
@@ -882,7 +878,6 @@ public:
 		  (iSeed==9&&fullmatches_[l]->getName().substr(3,6)=="L5L6L4")||
 		  (iSeed==10&&fullmatches_[l]->getName().substr(3,6)=="L2L3D1")||
 		  (iSeed==11&&fullmatches_[l]->getName().substr(3,6)=="D1D2L2")){
-		assert(tracklet->homeSector()==iSector_);
 		if (debug1) {
 		  cout << getName()<<" adding match to "<<fullmatches_[l]->getName()<<endl;
 		}
@@ -1094,7 +1089,6 @@ public:
 		  (layer==1&&disk==1&&fullmatches_[l]->getName().substr(3,4)=="L1D1")||
 		  (layer==2&&disk==1&&fullmatches_[l]->getName().substr(3,4)=="L2D1")||
 		  (layer==2&&disk==0&&fullmatches_[l]->getName().substr(3,4)=="L2L3")){
-		assert(tracklet->homeSector()==iSector_);
 		if (debug1) {
 		  cout << getName()<<" adding match to "<<fullmatches_[l]->getName()<<endl;
 		}
@@ -1121,7 +1115,6 @@ public:
 		  (iSeed==9&&fullmatches_[l]->getName().substr(3,6)=="L5L6L4")||
 		  (iSeed==10&&fullmatches_[l]->getName().substr(3,6)=="L2L3D1")||
 		  (iSeed==11&&fullmatches_[l]->getName().substr(3,6)=="D1D2L2")){
-		assert(tracklet->homeSector()==iSector_);
 		if (debug1) {
 		  cout << getName()<<" adding match to "<<fullmatches_[l]->getName()<<endl;
 		}

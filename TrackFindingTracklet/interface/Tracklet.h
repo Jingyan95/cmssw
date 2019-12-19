@@ -24,7 +24,6 @@ public:
 
   Tracklet(L1TStub* innerStub, L1TStub* middleStub, L1TStub* outerStub,
 	       Stub* innerFPGAStub, Stub* middleFPGAStub, Stub* outerFPGAStub,
-	       unsigned int homeSector,
 	       double phioffset,
 	       double rinv, double phi0, double d0, double z0, double t,
 	       double rinvapprox, double phi0approx, double d0approx,
@@ -50,8 +49,6 @@ public:
     
     //cout << "New Tracklet"<<endl;
 
-    homeSector_=homeSector;
-    
     overlap_=overlap;
     disk_=disk;
     assert(!(disk&&overlap));
@@ -1852,8 +1849,6 @@ public:
     return iTC;
   }
   
-  unsigned int homeSector() const {return homeSector_;}
-  
   unsigned int PSseed() {
     return ((layer()==1)||(disk()!=0))?1:0;
   }
@@ -1901,8 +1896,6 @@ private:
   bool overlap_;
   bool triplet_;
 
-  unsigned int homeSector_;
-  
   double phioffset_;
 
   Stub* innerFPGAStub_;

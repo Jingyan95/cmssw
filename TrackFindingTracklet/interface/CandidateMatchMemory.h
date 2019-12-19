@@ -45,12 +45,10 @@ public:
 
     //Check for consistency
     for(unsigned int i=0;i<matches_.size();i++){
-      if (tracklet.first->homeSector()==matches_[i].first.first->homeSector()) {
-	if (tracklet.first->TCID()<matches_[i].first.first->TCID()) {
-	  cout << "In "<<getName()<<" adding tracklet "<<tracklet.first<<" with lower TCID : "
-	       <<tracklet.first->TCID()<<" than earlier TCID "<<matches_[i].first.first->TCID()<<endl;
-	  assert(0);
-	}
+      if (tracklet.first->TCID()<matches_[i].first.first->TCID()) {
+	cout << "In "<<getName()<<" adding tracklet "<<tracklet.first<<" with lower TCID : "
+	     <<tracklet.first->TCID()<<" than earlier TCID "<<matches_[i].first.first->TCID()<<endl;
+	assert(0);
       }
     }
     

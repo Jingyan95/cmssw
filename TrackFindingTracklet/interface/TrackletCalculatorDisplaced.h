@@ -1168,7 +1168,6 @@ public:
         
     Tracklet* tracklet=new Tracklet(innerStub,middleStub,outerStub,
 					    innerFPGAStub,middleFPGAStub,outerFPGAStub,
-					    iSector_,
 					    phioffset_,
 					    rinv,phi0,d0,z0,t,
 					    rinvapprox,phi0approx,d0approx,
@@ -1461,7 +1460,6 @@ public:
         
     Tracklet* tracklet=new Tracklet(innerStub,middleStub,outerStub,
 					    innerFPGAStub,middleFPGAStub,outerFPGAStub,
-					    iSector_,
 					    phioffset_,
 					    rinv,phi0,d0,z0,t,
 					    rinvapprox,phi0approx,d0approx,
@@ -1748,7 +1746,6 @@ public:
         
     Tracklet* tracklet=new Tracklet(innerStub,middleStub,outerStub,
 					    innerFPGAStub,middleFPGAStub,outerFPGAStub,
-					    iSector_,
 					    phioffset_,
 					    rinv,phi0,d0,z0,t,
 					    rinvapprox,phi0approx,d0approx,
