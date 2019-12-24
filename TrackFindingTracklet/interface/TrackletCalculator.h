@@ -796,8 +796,7 @@ public:
     
     int irinv,iphi0,it,iz0;
     LayerProjection layerprojs[4];
-    bool validproj[4];
-    int iphiproj[4],izproj[4],iphider[4],izder[4];
+    int iphiproj[4],izproj[4];
     bool validprojdisk[5];
     int iphiprojdisk[5],irprojdisk[5],iphiderdisk[5],irderdisk[5];
     
@@ -879,60 +878,69 @@ public:
     izproj[2]   = ITC->zL_2_final.get_ival();
     izproj[3]   = ITC->zL_3_final.get_ival();
 
-    layerprojs[0].init(lproj_[0],rproj_[0],
-		       ITC->phiL_0_final.get_ival(),ITC->zL_0_final.get_ival(),
-		       ITC->der_phiL_final.get_ival(),ITC->der_zL_final.get_ival(),
-		       phiproj[0],zproj[0],phider[0],zder[0],
-		       ITC->phiL_0_final.get_fval(),ITC->zL_0_final.get_fval(),
-		       ITC->der_phiL_final.get_fval(),ITC->der_zL_final.get_fval());
-    
     if (writeTC) {
       cout << "TC "<<layer_<<" "<<innerFPGAStub->iphivmRaw()<<" "<<outerFPGAStub->iphivmRaw();
     }
+
+
+    bool success = true;
+    if(!ITC->rinv_final.local_passes()){
+      if (debug1) 
+	cout << "TrackletCalculator::BarrelSeeding irinv too large: "
+	     <<ITC->rinv_final.get_fval()<<"("<<ITC->rinv_final.get_ival()<<")\n";
+      success = false;
+    }
+    if (!ITC->z0_final.local_passes()){
+      if (debug1) cout << "Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" in layer "<<layer_<<endl;
+      success = false;
+    }
+    success = success && ITC->valid_trackpar.passes();
     
+    if (!success) return false;
+
+    double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
+    int phicritapprox=iphi0-2*irinv;
+    bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
+         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
+    if (debug1)
+      if (keep && !keepapprox)
+        cout << "TrackletCalculator::barrelSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
+    if (!usephicritapprox) {
+      if (!keep) return false;
+    }
+    else {
+      if (!keepapprox) return false;
+    }
+        
     for(int i=0; i<4; ++i){
-      iphider[i] = ITC->der_phiL_final.get_ival();
-      izder[i]   = ITC->der_zL_final.get_ival();
 
-      validproj[i] = true;
-      if (izproj[i]<-(1<<(nbitszprojL123-1))) validproj[i]=false;
-      if (izproj[i]>=(1<<(nbitszprojL123-1))) validproj[i]=false;
+      //reject projection if z is out of range
+      if (izproj[i]<-(1<<(nbitszprojL123-1))) continue;
+      if (izproj[i]>=(1<<(nbitszprojL123-1))) continue;
 
-      //this is left from the original....
-      if (iphiproj[i]>=(1<<nbitsphistubL456)-1) {
-	iphiproj[i]=(1<<nbitsphistubL456)-2; //-2 not to hit atExtreme
-	validproj[i] = false;
-      }
-
-      if (writeTC) {
-	if (validproj[i]) {
-	  cout <<" ["<<i<<"] "<<(iphiproj[i]>>15);
-	}
-      }
+      //reject projection if phi is out of range
+      if (iphiproj[i]>=(1<<nbitsphistubL456)-1) continue;
+      if (iphiproj[i]<=0) continue;
       
-      if (rproj_[i]<60.0) {
+      //Adjust bits for r and z projection depending on layer
+      if (lproj_[i]<=3) {
 	iphiproj[i]>>=(nbitsphistubL456-nbitsphistubL123);
-	if (iphiproj[i]>=(1<<nbitsphistubL123)-1) iphiproj[i]=(1<<nbitsphistubL123)-2; //-2 not to hit atExtreme
       }
       else {
 	izproj[i]>>=(nbitszprojL123-nbitszprojL456);
       }
 
-      if (iphiproj[i]<=0) {
-	iphiproj[i]=1;
-	validproj[i] = false;
-      }
-
-      if (rproj_[i]<60.0) {
-        if (iphider[i]<-(1<<(nbitsphiprojderL123-1))) iphider[i] = -(1<<(nbitsphiprojderL123-1));
-        if (iphider[i]>=(1<<(nbitsphiprojderL123-1))) iphider[i] = (1<<(nbitsphiprojderL123-1))-1;
-      }
-      else {
-        if (iphider[i]<-(1<<(nbitsphiprojderL456-1))) iphider[i] = -(1<<(nbitsphiprojderL456-1));
-        if (iphider[i]>=(1<<(nbitsphiprojderL456-1))) iphider[i] = (1<<(nbitsphiprojderL456-1))-1;
-      }
+      layerprojs[i].init(lproj_[i],rproj_[i],
+			 iphiproj[i],izproj[i],
+			 ITC->der_phiL_final.get_ival(),ITC->der_zL_final.get_ival(),
+			 phiproj[i],zproj[i],
+			 phider[i],zder[i],
+			 phiprojapprox[i],zprojapprox[i],
+			 ITC->der_phiL_final.get_fval(),ITC->der_zL_final.get_fval());
+      
     }
 
+    
     if (writeTC) {
       cout << endl;
     }
@@ -983,35 +991,6 @@ public:
     }
 
     
-    bool success = true;
-    if(!ITC->rinv_final.local_passes()){
-      if (debug1) 
-	cout << "TrackletCalculator::BarrelSeeding irinv too large: "
-	     <<ITC->rinv_final.get_fval()<<"("<<ITC->rinv_final.get_ival()<<")\n";
-      success = false;
-    }
-    if (!ITC->z0_final.local_passes()){
-      if (debug1) cout << "Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" in layer "<<layer_<<endl;
-      success = false;
-    }
-    success = success && ITC->valid_trackpar.passes();
-    
-    if (!success) return false;
-
-    double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
-    int phicritapprox=iphi0-2*irinv;
-    bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
-         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
-    if (debug1)
-      if (keep && !keepapprox)
-        cout << "TrackletCalculator::barrelSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
-    if (!usephicritapprox) {
-      if (!keep) return false;
-    }
-    else {
-      if (!keepapprox) return false;
-    }
-    
     
     if (writeTrackletPars) {
       static ofstream out("trackletpars.txt");
@@ -1031,11 +1010,6 @@ public:
 				    z0approx,tapprox,
 				    irinv,iphi0,0,iz0,it,
 				    layerprojs,
-				    //validproj,
-				    //iphiproj,izproj,iphider,izder,
-				    //phiproj,zproj,phider,zder,
-				    //phiprojapprox,zprojapprox,
-				    //phiderapprox,zderapprox,
 				    validprojdisk,
 				    iphiprojdisk,irprojdisk,
 				    iphiderdisk,irderdisk,
@@ -1273,8 +1247,7 @@ public:
     //now binary
     
     int irinv,iphi0,it,iz0;
-    bool validproj[3];
-    int iphiproj[3],izproj[3],iphider[3],izder[3];
+    int iphiproj[3],izproj[3];
     
     bool validprojdisk[3];
     int iphiprojdisk[3],irprojdisk[3],iphiderdisk[3],irderdisk[3];
@@ -1338,41 +1311,62 @@ public:
     izproj[1]   = ITC->zL_1_final.get_ival();
     izproj[2]   = ITC->zL_2_final.get_ival();
 
+        bool success = true;
+    if(!ITC->rinv_final.local_passes()){
+     if (debug1) 
+	cout << "TrackletCalculator::DiskSeeding irinv too large: "<<ITC->rinv_final.get_fval()
+	     << " disk = "<<disk_<<" r1="<<r1<<endl;
+      success = false;
+    }
+    if (!ITC->z0_final.local_passes()) {
+      if (debug1)
+	cout << "Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" in disk "<<disk_<<endl;
+      success = false;
+    }
+    success = success && ITC->valid_trackpar.passes();
+   
+    if (!success) return false;
+
+    double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
+    int phicritapprox=iphi0-2*irinv;
+    bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
+         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
+    if (debug1)
+      if (keep && !keepapprox)
+        cout << "TrackletCalculator::diskSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
+    if (!usephicritapprox) {
+      if (!keep) return false;
+    }
+    else {
+      if (!keepapprox) return false;
+    }
+    
+    LayerProjection layerprojs[4];
+
+    
     for(int i=0; i<3; ++i){
-      iphider[i] = ITC->der_phiL_final.get_ival();
-      izder[i]   = ITC->der_zL_final.get_ival();
 
-      validproj[i] = true;
-      if (izproj[i]<-(1<<(nbitszprojL123-1))) validproj[i]=false;
-      if (izproj[i]>=(1<<(nbitszprojL123-1))) validproj[i]=false;
+      //Check is outside z range
+      if (izproj[i]<-(1<<(nbitszprojL123-1))) continue;
+      if (izproj[i]>=(1<<(nbitszprojL123-1))) continue;
 
-      //this is left from the original....
-      if (iphiproj[i]>=(1<<nbitsphistubL456)-1){
-	iphiproj[i]=(1<<nbitsphistubL456)-2; //-2 not to hit atExtreme
-	validproj[i] = false;
-      }
+      //Check if outside phi range
+      if (iphiproj[i]>=(1<<nbitsphistubL456)-1) continue;
+      if (iphiproj[i]<=0) continue;
 
-      if (rproj_[i]<60.0)
-	iphiproj[i]>>=(nbitsphistubL456-nbitsphistubL123);
-      else {
-	izproj[i]>>=(nbitszprojL123-nbitszprojL456);
-      }
+      //shift bits - allways in PS modules for disk seeding
+      iphiproj[i]>>=(nbitsphistubL456-nbitsphistubL123);
       
-      if (iphiproj[i]<=0) {
-	iphiproj[i]=1;
-	validproj[i] = false;
-      }
-
-      if (rproj_[i]<60.0) {
-        if (iphider[i]<-(1<<(nbitsphiprojderL123-1))) iphider[i] = -(1<<(nbitsphiprojderL123-1));
-        if (iphider[i]>=(1<<(nbitsphiprojderL123-1))) iphider[i] = (1<<(nbitsphiprojderL123-1))-1;
-      }
-      else {
-        if (iphider[i]<-(1<<(nbitsphiprojderL456-1))) iphider[i] = -(1<<(nbitsphiprojderL456-1));
-        if (iphider[i]>=(1<<(nbitsphiprojderL456-1))) iphider[i] = (1<<(nbitsphiprojderL456-1))-1;
-      }
+      layerprojs[i].init(i+1,rmean[i],
+			 iphiproj[i],izproj[i],
+			 ITC->der_phiL_final.get_ival(),ITC->der_zL_final.get_ival(),
+			 phiproj[i],zproj[i],
+			 phider[i],zder[i],
+			 phiprojapprox[i],zprojapprox[i],
+			 ITC->der_phiL_final.get_fval(),ITC->der_zL_final.get_fval());
     }
 
+ 
     iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
     iphiprojdisk[1] = ITC->phiD_1_final.get_ival();
     iphiprojdisk[2] = ITC->phiD_2_final.get_ival();
@@ -1409,36 +1403,6 @@ public:
       if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
     }
 
-    bool success = true;
-    if(!ITC->rinv_final.local_passes()){
-     if (debug1) 
-	cout << "TrackletCalculator::DiskSeeding irinv too large: "<<ITC->rinv_final.get_fval()
-	     << " disk = "<<disk_<<" r1="<<r1<<endl;
-      success = false;
-    }
-    if (!ITC->z0_final.local_passes()) {
-      if (debug1)
-	cout << "Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" in disk "<<disk_<<endl;
-      success = false;
-    }
-    success = success && ITC->valid_trackpar.passes();
-   
-    if (!success) return false;
-
-    double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
-    int phicritapprox=iphi0-2*irinv;
-    bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
-         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
-    if (debug1)
-      if (keep && !keepapprox)
-        cout << "TrackletCalculator::diskSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
-    if (!usephicritapprox) {
-      if (!keep) return false;
-    }
-    else {
-      if (!keepapprox) return false;
-    }
-    
     if (writeTrackletParsDisk) {
       static ofstream out("trackletparsdisk.txt");
       out <<"Trackpars         "<<disk_
@@ -1450,27 +1414,23 @@ public:
     }
 	    
     Tracklet* tracklet=new Tracklet(innerStub,NULL,outerStub,
-					    innerFPGAStub,NULL,outerFPGAStub,
-					    phioffset_,
-					    rinv,phi0,0.0,z0,t,
-					    rinvapprox,phi0approx,0.0,
-					    z0approx,tapprox,
-					    irinv,iphi0,0,iz0,it,
-					    validproj,
-					    iphiproj,izproj,iphider,izder,
-					    phiproj,zproj,phider,zder,
-					    phiprojapprox,zprojapprox,
-					    phiderapprox,zderapprox,
-					    validprojdisk,
-					    iphiprojdisk,irprojdisk,
-					    iphiderdisk,irderdisk,
-					    phiprojdisk,rprojdisk,
-					    phiderdisk,rderdisk,
-					    phiprojdiskapprox,
-					    rprojdiskapprox,
-					    phiderdiskapprox,
-					    rderdiskapprox,
-					    true);
+				    innerFPGAStub,NULL,outerFPGAStub,
+				    phioffset_,
+				    rinv,phi0,0.0,z0,t,
+				    rinvapprox,phi0approx,0.0,
+				    z0approx,tapprox,
+				    irinv,iphi0,0,iz0,it,
+				    layerprojs,
+				    validprojdisk,
+				    iphiprojdisk,irprojdisk,
+				    iphiderdisk,irderdisk,
+				    phiprojdisk,rprojdisk,
+				    phiderdisk,rderdisk,
+				    phiprojdiskapprox,
+				    rprojdiskapprox,
+				    phiderdiskapprox,
+				    rderdiskapprox,
+				    true);
     
     if (debug1) {
       cout << "Found tracklet in disk = "<<disk_<<" "<<tracklet
@@ -1784,34 +1744,6 @@ public:
     irprojdisk[2]   = ITC->rD_2_final.get_ival();
     irprojdisk[3]   = ITC->rD_3_final.get_ival();
 
-    for(int i=0; i<4; ++i){
-      iphiderdisk[i] = ITC->der_phiD_final.get_ival();
-      irderdisk[i]   = ITC->der_rD_final.get_ival();
-
-      validprojdisk[i]=true;
-
-      //"protection" from the original
-      if (iphiprojdisk[i]<=0) {
-        iphiprojdisk[i]=0;
-        validprojdisk[i]=false;
-      }
-      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
-        iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-        validprojdisk[i]=false;
-      }
-
-      if(irprojdisk[i]<=0 || irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ){
-	validprojdisk[i]=false;
-	irprojdisk[i] = 0;
-	iphiprojdisk[i] = 0;
-	iphiderdisk[i]  = 0;
-	irderdisk[i]    = 0;
-      }
-
-      if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
-      if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
-    }
-
     bool success = true;
     if(!ITC->t_final.local_passes()) {
       if (debug1) {
@@ -1862,6 +1794,64 @@ public:
     }
     
 
+    LayerProjection layerprojs[4];
+
+
+    for(int i=0; i<3; ++i){
+
+      //check that zproj is in range
+      if (izproj[i]<-(1<<(nbitszprojL123-1))) continue;
+      if (izproj[i]>=(1<<(nbitszprojL123-1))) continue;
+
+      //check that phiproj is in range
+      if (iphiproj[i]>=(1<<nbitsphistubL456)-1) continue;
+      if (iphiproj[i]<=0) continue;
+
+      //adjust bits for PS modules (no 2S modules in overlap seeds)
+      iphiproj[i]>>=(nbitsphistubL456-nbitsphistubL123);
+      
+      layerprojs[i].init(i+1,rmean[i],
+			 iphiproj[i],izproj[i],
+			 ITC->der_phiL_final.get_ival(),ITC->der_zL_final.get_ival(),
+			 phiproj[i],zproj[i],
+			 phider[i],zder[i],
+			 phiprojapprox[i],zprojapprox[i],
+			 ITC->der_phiL_final.get_fval(),ITC->der_zL_final.get_fval());
+      
+    }
+
+
+    
+    
+    for(int i=0; i<4; ++i){
+      iphiderdisk[i] = ITC->der_phiD_final.get_ival();
+      irderdisk[i]   = ITC->der_rD_final.get_ival();
+
+      validprojdisk[i]=true;
+
+      //"protection" from the original
+      if (iphiprojdisk[i]<=0) {
+        iphiprojdisk[i]=0;
+        validprojdisk[i]=false;
+      }
+      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
+        iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
+        validprojdisk[i]=false;
+      }
+
+      if(irprojdisk[i]<=0 || irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ){
+	validprojdisk[i]=false;
+	irprojdisk[i] = 0;
+	iphiprojdisk[i] = 0;
+	iphiderdisk[i]  = 0;
+	irderdisk[i]    = 0;
+      }
+
+      if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
+      if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
+    }
+
+
     if (writeTrackletParsOverlap) {
       static ofstream out("trackletparsoverlap.txt");
       out <<"Trackpars "<<disk_
@@ -1873,27 +1863,23 @@ public:
     }
 	      
     Tracklet* tracklet=new Tracklet(innerStub,NULL,outerStub,
-					    innerFPGAStub,NULL,outerFPGAStub,
-					    phioffset_,
-					    rinv,phi0,0.0,z0,t,
-					    rinvapprox,phi0approx,0.0,
-					    z0approx,tapprox,
-					    irinv,iphi0,0,iz0,it,
-					    validproj,
-					    iphiproj,izproj,iphider,izder,
-					    phiproj,zproj,phider,zder,
-					    phiprojapprox,zprojapprox,
-					    phiderapprox,zderapprox,
-					    validprojdisk,
-					    iphiprojdisk,irprojdisk,
-					    iphiderdisk,irderdisk,
-					    phiprojdisk,rprojdisk,
-					    phiderdisk,rderdisk,
-					    phiprojdiskapprox,
-					    rprojdiskapprox,
-					    phiderdiskapprox,
-					    rderdiskapprox,
-					    false,true);
+				    innerFPGAStub,NULL,outerFPGAStub,
+				    phioffset_,
+				    rinv,phi0,0.0,z0,t,
+				    rinvapprox,phi0approx,0.0,
+				    z0approx,tapprox,
+				    irinv,iphi0,0,iz0,it,
+				    layerprojs,
+				    validprojdisk,
+				    iphiprojdisk,irprojdisk,
+				    iphiderdisk,irderdisk,
+				    phiprojdisk,rprojdisk,
+				    phiderdisk,rderdisk,
+				    phiprojdiskapprox,
+				    rprojdiskapprox,
+				    phiderdiskapprox,
+				    rderdiskapprox,
+				    false,true);
     
     if (debug1) {
       cout << "Found tracklet in overlap = "<<layer_<<" "<<disk_
