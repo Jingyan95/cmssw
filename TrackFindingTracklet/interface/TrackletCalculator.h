@@ -795,6 +795,7 @@ public:
     //now binary
     
     int irinv,iphi0,it,iz0;
+    LayerProjection layerprojs[4];
     bool validproj[4];
     int iphiproj[4],izproj[4],iphider[4],izder[4];
     bool validprojdisk[5];
@@ -878,6 +879,13 @@ public:
     izproj[2]   = ITC->zL_2_final.get_ival();
     izproj[3]   = ITC->zL_3_final.get_ival();
 
+    layerprojs[0].init(lproj_[0],rproj_[0],
+		       ITC->phiL_0_final.get_ival(),ITC->zL_0_final.get_ival(),
+		       ITC->der_phiL_final.get_ival(),ITC->der_zL_final.get_ival(),
+		       phiproj[0],zproj[0],phider[0],zder[0],
+		       ITC->phiL_0_final.get_fval(),ITC->zL_0_final.get_fval(),
+		       ITC->der_phiL_final.get_fval(),ITC->der_zL_final.get_fval());
+    
     if (writeTC) {
       cout << "TC "<<layer_<<" "<<innerFPGAStub->iphivmRaw()<<" "<<outerFPGAStub->iphivmRaw();
     }
@@ -1016,26 +1024,28 @@ public:
     }	        
         
     Tracklet* tracklet=new Tracklet(innerStub,NULL,outerStub,
-					    innerFPGAStub,NULL,outerFPGAStub,
-					    phioffset_,
-					    rinv,phi0,0.0,z0,t,
-					    rinvapprox,phi0approx,0.0,
-					    z0approx,tapprox,
-					    irinv,iphi0,0,iz0,it,validproj,
-					    iphiproj,izproj,iphider,izder,
-					    phiproj,zproj,phider,zder,
-					    phiprojapprox,zprojapprox,
-					    phiderapprox,zderapprox,
-					    validprojdisk,
-					    iphiprojdisk,irprojdisk,
-					    iphiderdisk,irderdisk,
-					    phiprojdisk,rprojdisk,
-					    phiderdisk,rderdisk,
-					    phiprojdiskapprox,
-					    rprojdiskapprox,
-					    phiderdiskapprox,
-					    rderdiskapprox,
-					    false);
+				    innerFPGAStub,NULL,outerFPGAStub,
+				    phioffset_,
+				    rinv,phi0,0.0,z0,t,
+				    rinvapprox,phi0approx,0.0,
+				    z0approx,tapprox,
+				    irinv,iphi0,0,iz0,it,
+				    layerprojs,
+				    //validproj,
+				    //iphiproj,izproj,iphider,izder,
+				    //phiproj,zproj,phider,zder,
+				    //phiprojapprox,zprojapprox,
+				    //phiderapprox,zderapprox,
+				    validprojdisk,
+				    iphiprojdisk,irprojdisk,
+				    iphiderdisk,irderdisk,
+				    phiprojdisk,rprojdisk,
+				    phiderdisk,rderdisk,
+				    phiprojdiskapprox,
+				    rprojdiskapprox,
+				    phiderdiskapprox,
+				    rderdiskapprox,
+				    false);
     
     if (debug1) {
       cout << "TrackletCalculator "<<getName()<<" Found tracklet in layer = "<<layer_<<" "
