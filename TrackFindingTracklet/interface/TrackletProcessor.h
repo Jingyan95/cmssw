@@ -988,6 +988,7 @@ public:
     double phi2=outerStub->phi();
 
     LayerProjection layerprojs[4];
+    DiskProjection diskprojs[5];
     
     double rinv,phi0,t,z0;
     
@@ -1126,8 +1127,7 @@ public:
     
     int irinv,iphi0,it,iz0;
     int iphiproj[4],izproj[4];
-    bool validprojdisk[5];
-    int iphiprojdisk[5],irprojdisk[5],iphiderdisk[5],irderdisk[5];
+    int iphiprojdisk[5],irprojdisk[5];
     
     int ir1=innerFPGAStub->ir();
     int iphi1=innerFPGAStub->iphi();
@@ -1288,36 +1288,23 @@ public:
     irprojdisk[3]   = ITC->rD_3_final.get_ival();
     irprojdisk[4]   = ITC->rD_4_final.get_ival();
 
-    if(fabs(it * ITC->t_final.get_K())<1.0) {
-      for(int i=0; i<5; ++i) {
-	//do not bother with central tracks; the calculation there is wrong anyway.
-	validprojdisk[i]=false;
-      }
-    } else {
+    if(fabs(it * ITC->t_final.get_K())>1.0) {
       for(int i=0; i<5; ++i){
-	validprojdisk[i]=true;
-	iphiderdisk[i] = ITC->der_phiD_final.get_ival();
-	irderdisk[i]   = ITC->der_rD_final.get_ival();
-	//"protection" from the original
-	if (iphiprojdisk[i]<=0) {
-	  iphiprojdisk[i]=0;
-	  validprojdisk[i]=false;
-	}
-	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
-	  iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-	  validprojdisk[i]=false;
-	}
-	
-	if(irprojdisk[i]< 20. / ITC->rD_0_final.get_K() || irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ){
-	  validprojdisk[i]=false;
-	  irprojdisk[i] = 0;
-	  iphiprojdisk[i] = 0;
-	  iphiderdisk[i]  = 0;
-	  irderdisk[i]    = 0;
-	}
 
-        if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
-        if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
+	if (iphiprojdisk[i]<=0) continue;
+	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) continue;
+	
+	if(irprojdisk[i]< 20. / ITC->rD_0_final.get_K() ||
+	   irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ) continue;
+
+	diskprojs[i].init(i+1,rproj_[i],
+			   iphiprojdisk[i],irprojdisk[i],
+			   ITC->der_phiD_final.get_ival(),ITC->der_rD_final.get_ival(),
+			   phiprojdisk[i],rprojdisk[i],
+			   phiderdisk[i],rderdisk[i],
+			   phiprojdiskapprox[i],rprojdiskapprox[i],
+			   ITC->der_phiD_final.get_fval(),ITC->der_rD_final.get_fval());
+	
       }
     }
 
@@ -1342,15 +1329,7 @@ public:
 				    z0approx,tapprox,
 				    irinv,iphi0,0,iz0,it,
 				    layerprojs,
-				    validprojdisk,
-				    iphiprojdisk,irprojdisk,
-				    iphiderdisk,irderdisk,
-				    phiprojdisk,rprojdisk,
-				    phiderdisk,rderdisk,
-				    phiprojdiskapprox,
-				    rprojdiskapprox,
-				    phiderdiskapprox,
-				    rderdiskapprox,
+				    diskprojs,
 				    false);
     
     if (debug1) {
@@ -1451,6 +1430,7 @@ public:
     }
 
     LayerProjection layerprojs[3];
+    DiskProjection diskprojs[3];
     
     double rinv,phi0,t,z0;
     
@@ -1583,8 +1563,7 @@ public:
     int irinv,iphi0,it,iz0;
     int iphiproj[3],izproj[3];
     
-    bool validprojdisk[3];
-    int iphiprojdisk[3],irprojdisk[3],iphiderdisk[3],irderdisk[3];
+    int iphiprojdisk[3],irprojdisk[3];
 
     int ir1=innerFPGAStub->ir();
     int iphi1=innerFPGAStub->iphi();
@@ -1710,31 +1689,24 @@ public:
     irprojdisk[2]   = ITC->rD_2_final.get_ival();
 
     for(int i=0; i<3; ++i){
-      iphiderdisk[i] = ITC->der_phiD_final.get_ival();
-      irderdisk[i]   = ITC->der_rD_final.get_ival();
-      
-      validprojdisk[i]=true;
 
-      //"protection" from the original
-      if (iphiprojdisk[i]<=0) {
-        iphiprojdisk[i]=0;
-        validprojdisk[i]=false;
-      }
-      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
-        iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-        validprojdisk[i]=false;
-      }
-      
-      if(irprojdisk[i]<=0 || irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ){
-	validprojdisk[i]=false;
-	irprojdisk[i] = 0;
-	iphiprojdisk[i] = 0;
-	iphiderdisk[i]  = 0;
-	irderdisk[i]    = 0;
-      }
+      //check that phi projection in range
+      if (iphiprojdisk[i]<=0) continue;
+      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) continue;
 
-      if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
-      if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
+      //check that r projection in range
+      if(irprojdisk[i]<=0 ||
+	 irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ) continue;
+
+      diskprojs[i].init(i+1,rproj_[i],
+			iphiprojdisk[i],irprojdisk[i],
+			ITC->der_phiD_final.get_ival(),ITC->der_rD_final.get_ival(),
+			phiprojdisk[i],rprojdisk[i],
+			phiderdisk[i],rderdisk[i],
+			phiprojdiskapprox[i],rprojdiskapprox[i],
+			ITC->der_phiD_final.get_fval(),ITC->der_rD_final.get_fval());
+
+      
     }
 
     
@@ -1756,15 +1728,7 @@ public:
 				    z0approx,tapprox,
 				    irinv,iphi0,0,iz0,it,
 				    layerprojs,
-				    validprojdisk,
-				    iphiprojdisk,irprojdisk,
-				    iphiderdisk,irderdisk,
-				    phiprojdisk,rprojdisk,
-				    phiderdisk,rderdisk,
-				    phiprojdiskapprox,
-				    rprojdiskapprox,
-				    phiderdiskapprox,
-				    rderdiskapprox,
+				    diskprojs,
 				    true);
     
     if (debug1) {
@@ -1859,6 +1823,7 @@ public:
     }
 
     LayerProjection layerprojs[3];
+    DiskProjection diskprojs[4];
 
     double rinvapprox,phi0approx,tapprox,z0approx;
     double phiprojapprox[3],zprojapprox[3],phiderapprox[3],zderapprox[3];
@@ -1964,8 +1929,7 @@ public:
     int irinv,iphi0,it,iz0;
     int iphiproj[3],izproj[3];
     
-    bool validprojdisk[4];
-    int iphiprojdisk[4],irprojdisk[4],iphiderdisk[4],irderdisk[4];
+    int iphiprojdisk[4],irprojdisk[4];
     
     int ir2=innerFPGAStub->ir();
     int iphi2=innerFPGAStub->iphi();
@@ -2072,6 +2036,20 @@ public:
     }
 
 
+    double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
+    int phicritapprox=iphi0-2*irinv;
+    bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
+         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
+    if (debug1)
+      if (keep && !keepapprox)
+        cout << "TrackletProcessor::overlapSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
+    if (!usephicritapprox) {
+      if (!keep) return false;
+    }
+    else {
+      if (!keepapprox) return false;
+    }
+
     
     
     for(int i=0; i<3; ++i){
@@ -2108,46 +2086,27 @@ public:
     irprojdisk[3]   = ITC->rD_3_final.get_ival();
 
     for(int i=0; i<4; ++i){
-      iphiderdisk[i] = ITC->der_phiD_final.get_ival();
-      irderdisk[i]   = ITC->der_rD_final.get_ival();
 
-      validprojdisk[i]=true;
+      //check that phi projetion in range
+      if (iphiprojdisk[i]<=0) continue;
+      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) continue;
 
-      //"protection" from the original
-      if (iphiprojdisk[i]<=0) {
-        iphiprojdisk[i]=0;
-        validprojdisk[i]=false;
-      }
-      if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
-        iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-        validprojdisk[i]=false;
-      }
+      //check that r projetion in range
+      if(irprojdisk[i]<=0
+	 || irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ) continue;
 
-      if(irprojdisk[i]<=0 || irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ){
-	validprojdisk[i]=false;
-	irprojdisk[i] = 0;
-	iphiprojdisk[i] = 0;
-	iphiderdisk[i]  = 0;
-	irderdisk[i]    = 0;
-      }
-
-      if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
-      if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
+      
+      diskprojs[i].init(i+1,rproj_[i],
+			iphiprojdisk[i],irprojdisk[i],
+			ITC->der_phiD_final.get_ival(),ITC->der_rD_final.get_ival(),
+			phiprojdisk[i],rprojdisk[i],
+			phiderdisk[i],rderdisk[i],
+			phiprojdiskapprox[i],rprojdiskapprox[i],
+			ITC->der_phiD_final.get_fval(),ITC->der_rD_final.get_fval());
+      
+      
     }
 
-    double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
-    int phicritapprox=iphi0-2*irinv;
-    bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
-         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
-    if (debug1)
-      if (keep && !keepapprox)
-        cout << "TrackletProcessor::overlapSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
-    if (!usephicritapprox) {
-      if (!keep) return false;
-    }
-    else {
-      if (!keepapprox) return false;
-    }
     
 
     if (writeTrackletParsOverlap) {
@@ -2168,15 +2127,7 @@ public:
 				    z0approx,tapprox,
 				    irinv,iphi0,0,iz0,it,
 				    layerprojs,
-				    validprojdisk,
-				    iphiprojdisk,irprojdisk,
-				    iphiderdisk,irderdisk,
-				    phiprojdisk,rprojdisk,
-				    phiderdisk,rderdisk,
-				    phiprojdiskapprox,
-				    rprojdiskapprox,
-				    phiderdiskapprox,
-				    rderdiskapprox,
+				    diskprojs,
 				    false,true);
     
     if (debug1) {

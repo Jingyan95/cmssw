@@ -31,6 +31,430 @@ public:
 	   int irinv, int iphi0, int id0,
 	   int iz0, int it,
 	   LayerProjection layerprojs[4],
+	   DiskProjection diskprojs[4],
+	   bool disk, bool overlap=false){
+
+    
+    //cout << "New Tracklet"<<endl;
+
+    overlap_=overlap;
+    disk_=disk;
+    assert(!(disk&&overlap));
+    barrel_=(!disk)&&(!overlap);
+    triplet_ = false;
+
+    trackletIndex_=-1;
+    TCIndex_=-1;
+
+
+    phioffset_=phioffset;
+
+    assert(disk_||barrel_||overlap_);
+
+    if (barrel_ && middleStub==NULL) assert(innerStub->layer()<6);
+  
+    innerStub_=innerStub;
+    middleStub_=middleStub;
+    outerStub_=outerStub;
+    innerFPGAStub_=innerFPGAStub;
+    middleFPGAStub_=middleFPGAStub;
+    outerFPGAStub_=outerFPGAStub;
+    rinv_=rinv;
+    phi0_=phi0;
+    d0_=d0;
+    z0_=z0;
+    t_=t;
+    rinvapprox_=rinvapprox;
+    phi0approx_=phi0approx;
+    d0approx_=d0approx;
+    z0approx_=z0approx;
+    tapprox_=tapprox;
+
+    fpgarinv_.set(irinv,nbitsrinv,false,__LINE__,__FILE__); 
+    fpgaphi0_.set(iphi0,nbitsphi0,false,__LINE__,__FILE__); 
+    fpgad0_.set(id0,nbitsd0,false,__LINE__,__FILE__); 
+    fpgaz0_.set(iz0,nbitsz0,false,__LINE__,__FILE__);
+    fpgat_.set(it,nbitst,false,__LINE__,__FILE__);       
+
+    if (innerStub_) assert(innerStub_->layer()<6||innerStub_->disk()<5);
+    if (middleStub_) assert(middleStub_->layer()<6||middleStub_->disk()<5);
+    if (outerStub_) assert(outerStub_->layer()<6||outerStub_->disk()<5);
+
+    
+    for(unsigned int i = 0; i < 6; i++) rproj_[i]=0.;
+    for(unsigned int i = 0; i < 5; i++) zprojdisk_[i]=0.;
+
+    for(unsigned int i = 0; i < 4; i++) projlayer_[i]=0;
+    for(unsigned int i = 0; i < 5; i++) projdisk_[i]=0;
+
+
+    if (innerStub_->layer()==0 && middleStub_==NULL) { //L1L2XX
+      rproj_[0]=rmeanL3;
+      rproj_[1]=rmeanL4;
+      rproj_[2]=rmeanL5;
+      rproj_[3]=rmeanL6;
+      projlayer_[0]=3;
+      projlayer_[1]=4;
+      projlayer_[2]=5;
+      projlayer_[3]=6;
+    }
+
+    if (innerStub_->layer()==1 && middleStub_==NULL) { //L2L3XX
+      rproj_[0]=rmeanL1;
+      rproj_[1]=rmeanL4;
+      rproj_[2]=rmeanL5;
+      rproj_[3]=rmeanL6;
+      projlayer_[0]=1;
+      projlayer_[1]=4;
+      projlayer_[2]=5;
+      projlayer_[3]=6;
+    }
+    
+    if (innerStub_->layer()==1 && middleStub_!=NULL) {
+      triplet_ = true;
+      if(middleStub_->layer()==2){           //L3L4L2
+	rproj_[0]=rmeanL1;
+	rproj_[1]=rmeanL5;
+	rproj_[2]=rmeanL6;
+	projlayer_[0]=1;
+	projlayer_[1]=5;
+	projlayer_[2]=6;
+	projlayer_[3]=-1;
+	
+	int sign=1;
+	if (it<0) sign=-1;
+	zprojdisk_[0]=sign*zmeanD1;
+	zprojdisk_[1]=sign*zmeanD2;
+	projdisk_[0]=sign*1;
+	projdisk_[1]=sign*2;
+	projdisk_[2]=0;
+	projdisk_[3]=0;
+	projdisk_[4]=0;
+      }
+      else{                                  //D1D2L2
+	rproj_[0]=rmeanL1;
+	projlayer_[0]=1;
+	projlayer_[1]=-1;
+	projlayer_[2]=-1;
+	projlayer_[3]=-1;
+	
+	int sign=1;
+	if (it<0) sign=-1;
+	zprojdisk_[0]=sign*zmeanD3;
+	zprojdisk_[1]=sign*zmeanD4;
+	zprojdisk_[2]=sign*zmeanD5;
+	projdisk_[0]=sign*3;
+	projdisk_[1]=sign*4;
+	projdisk_[2]=sign*5;
+	projdisk_[3]=0;
+	projdisk_[4]=0;
+      }
+    }
+    
+    if (innerStub_->layer()==2 && middleStub_==NULL) { //L3L4XX
+      rproj_[0]=rmeanL1;
+      rproj_[1]=rmeanL2;
+      rproj_[2]=rmeanL5;
+      rproj_[3]=rmeanL6;
+      projlayer_[0]=1;
+      projlayer_[1]=2;
+      projlayer_[2]=5;
+      projlayer_[3]=6;
+    }
+    
+    if (innerStub_->layer()==3 && middleStub_!=NULL) { //L5L6L4
+      triplet_ = true;
+      rproj_[0]=rmeanL1;
+      rproj_[1]=rmeanL2;
+      rproj_[2]=rmeanL3;
+      rproj_[3]=rmeanL4;
+      projlayer_[0]=1;
+      projlayer_[1]=2;
+      projlayer_[2]=3;
+      projlayer_[3]=-1;
+    }
+
+    if (innerStub_->layer()==4 && middleStub_==NULL) { //L5L6XX
+      rproj_[0]=rmeanL1;
+      rproj_[1]=rmeanL2;
+      rproj_[2]=rmeanL3;
+      rproj_[3]=rmeanL4;
+      projlayer_[0]=1;
+      projlayer_[1]=2;
+      projlayer_[2]=3;
+      projlayer_[3]=4;
+    }
+
+    if(middleStub_==NULL){
+      if (innerStub_->layer()>999) {
+  
+	assert((innerStub->disk()==1)||(innerStub->disk()==3)||
+	       (innerStub->disk()==-1)||(innerStub->disk()==-3));
+	
+	rproj_[0]=rmeanL1;
+	rproj_[1]=rmeanL2;
+	projlayer_[0]=1;
+	projlayer_[1]=2;
+	projlayer_[2]=-1;
+	projlayer_[3]=-1;
+	
+	if (overlap_) {
+	  assert((innerStub->disk()==1)||(innerStub->disk()==-1));
+	  if (innerStub->disk()==1) {
+	    zprojdisk_[0]=zmeanD1;
+	    zprojdisk_[1]=zmeanD2;
+	    zprojdisk_[2]=zmeanD3;
+	    zprojdisk_[3]=zmeanD4;
+	    zprojdisk_[4]=zmeanD5;
+	  } else {
+	    zprojdisk_[0]=-zmeanD1;
+	    zprojdisk_[1]=-zmeanD2;
+	    zprojdisk_[2]=-zmeanD3;
+	    zprojdisk_[3]=-zmeanD4;
+	    zprojdisk_[4]=-zmeanD5;
+	    
+	  }
+	  projdisk_[0]=1;
+	  projdisk_[1]=2;
+	  projdisk_[2]=3;
+	  projdisk_[3]=4;
+	  projdisk_[4]=5;
+	} else {
+	  
+	  if (innerStub->disk()==1) {
+	    zprojdisk_[0]=zmeanD3;
+	    zprojdisk_[1]=zmeanD4;
+	    zprojdisk_[2]=zmeanD5;
+	    projdisk_[0]=3;
+	    projdisk_[1]=4;
+	    projdisk_[2]=5;
+	  }
+	  if (innerStub->disk()==3) {
+	    zprojdisk_[0]=zmeanD1;
+	    zprojdisk_[1]=zmeanD2;
+	    zprojdisk_[2]=zmeanD5;
+	    projdisk_[0]=1;
+	    projdisk_[1]=2;
+	    projdisk_[2]=5;
+	  }
+	  
+	  if (innerStub->disk()==-1) {
+	    zprojdisk_[0]=-zmeanD3;
+	    zprojdisk_[1]=-zmeanD4;
+	    zprojdisk_[2]=-zmeanD5;
+	    projdisk_[0]=-3;
+	    projdisk_[1]=-4;
+	    projdisk_[2]=-5;
+	  }
+	  if (innerStub->disk()==-3) {
+	    zprojdisk_[0]=-zmeanD1;
+	    zprojdisk_[1]=-zmeanD2;
+	    zprojdisk_[2]=-zmeanD5;
+	    projdisk_[0]=-1;
+	    projdisk_[1]=-2;
+	    projdisk_[2]=-5;
+	  } 
+	}
+	
+      } else {
+	int sign=1;
+	if (it<0) sign=-1;
+	
+	zprojdisk_[0]=sign*zmeanD1;
+	zprojdisk_[1]=sign*zmeanD2;
+	zprojdisk_[2]=sign*zmeanD3;
+	zprojdisk_[3]=sign*zmeanD4;
+	zprojdisk_[4]=sign*zmeanD5;
+	projdisk_[0]=sign*1;
+	projdisk_[1]=sign*2;
+	projdisk_[2]=sign*3;
+	projdisk_[3]=sign*4;
+	projdisk_[4]=sign*5;	
+
+      }
+    }
+    else{
+      if (innerStub_->layer()>999) { //L2L3D1
+	triplet_ = true;
+	
+	assert((innerStub->disk()==1)||(innerStub->disk()==-1));
+	
+	rproj_[0]=rmeanL1;
+	projlayer_[0]=1;
+	projlayer_[1]=-1;
+	projlayer_[2]=-1;
+	projlayer_[3]=-1;
+	
+	int sign=1;
+	if (it<0) sign=-1;
+	zprojdisk_[0]=sign*zmeanD2;
+	zprojdisk_[1]=sign*zmeanD3;
+	zprojdisk_[2]=sign*zmeanD4;
+	projdisk_[0]=sign*2;
+	projdisk_[1]=sign*3;
+	projdisk_[2]=sign*4;
+	projdisk_[3]=0;
+	projdisk_[4]=0;
+      }
+    }
+    
+    if(middleStub_==NULL){
+      if (barrel_) {
+	//barrel
+	for (int i=0;i<4;i++) {
+	  
+	  if (!layerprojs[i].valid()) continue;	  
+	  layerproj_[projlayer_[i]-1]=layerprojs[i];
+
+	}
+	//Now handle projections to the disks
+	for (int i=0;i<5;i++) {
+	  
+	  if (!diskprojs[i].valid()) continue;
+
+	  diskproj_[i]=diskprojs[i];
+	  /*
+	  diskproj_[i].init(i+1,
+			    zprojdisk_[i],
+			    iphiprojDisk[i],
+			    irprojDisk[i],
+			    iphiderDisk[i],
+			    irderDisk[i],
+			    phiprojDisk[i],
+			    rprojDisk[i],
+			    phiderDisk[i],
+			    rderDisk[i],
+			    phiprojapproxDisk[i],
+			    rprojapproxDisk[i],
+			    phiderapproxDisk[i],
+			    rderapproxDisk[i]);
+	  */ 
+	}
+      } 
+      
+      if (disk_) {
+	//disk stub 
+	for (int i=0;i<3;i++) {
+	  
+	  if (!diskprojs[i].valid()) continue;
+	  
+	  diskproj_[abs(projdisk_[i])-1]=diskprojs[i];
+
+	  /*
+	  diskproj_[abs(projdisk_[i])-1].init(projdisk_[i],
+					      zprojdisk_[i],
+					      iphiprojDisk[i],
+					      irprojDisk[i],
+					      iphiderDisk[i],
+					      irderDisk[i],
+					      phiprojDisk[i],
+					      rprojDisk[i],
+					      phiderDisk[i],
+					      rderDisk[i],
+					      phiprojapproxDisk[i],
+					      rprojapproxDisk[i],
+					      phiderapproxDisk[i],
+					      rderapproxDisk[i]); 
+	  */
+	  
+	}
+	for (int i=0;i<2;i++) {
+	  
+	  if (!layerprojs[i].valid()) continue;
+	  
+	  layerproj_[i]=layerprojs[i];
+
+	}
+      }
+      
+      if (overlap_) {
+	//projections to layers
+	for (int i=0;i<1;i++) {
+	  assert(rproj_[i]<60.0);
+	  
+	  if (!layerprojs[i].valid()) continue;
+	  
+	  layerproj_[i]=layerprojs[i];
+
+	}
+	//Now handle projections to the disks
+	for (int i=0;i<4;i++) {
+	  if (!diskprojs[i].valid()) continue;
+	  int offset=1;
+	  if (outerStub->layer()+1==2&&innerStub->layer()+1==3) offset=0;
+	  diskproj_[i+offset]=diskprojs[i];
+
+	  /*
+	  diskproj_[i+offset].init(i+offset+1,
+				   zprojdisk_[i],
+				   iphiprojDisk[i],
+				   irprojDisk[i],
+				   iphiderDisk[i],
+				   irderDisk[i],
+				   phiprojDisk[i],
+				   rprojDisk[i],
+				   phiderDisk[i],
+				   rderDisk[i],
+				   phiprojapproxDisk[i],
+				   rprojapproxDisk[i],
+				   phiderapproxDisk[i],
+				   rderapproxDisk[i]);  
+	  */
+	  
+	}
+      } 
+    }
+    else{
+      //triplet seeding
+      //barrel
+      for (int i=0;i<4;i++) {
+	
+	if (projlayer_[i] <0) continue;
+	if (!layerprojs[i].valid()) continue;
+	
+	layerproj_[projlayer_[i]-1]=layerprojs[i];
+
+      }
+      //Now handle projections to the disks
+      for (int i=0;i<5;i++) {
+	
+	if (projdisk_[i]==0) continue;
+	if (!diskprojs[i].valid()) continue;
+	
+	diskproj_[abs(projdisk_[i])-1]=diskprojs[i];
+
+	/*
+	diskproj_[abs(projdisk_[i])-1].init(projdisk_[i],
+					    zprojdisk_[i],
+					    iphiprojDisk[i],
+					    irprojDisk[i],
+					    iphiderDisk[i],
+					    irderDisk[i],
+					    phiprojDisk[i],
+					    rprojDisk[i],
+					    phiderDisk[i],
+					    rderDisk[i],
+					    phiprojapproxDisk[i],
+					    rprojapproxDisk[i],
+					    phiderapproxDisk[i],
+					    rderapproxDisk[i]); 
+	*/
+      }
+    }
+    
+    ichisqfit_.set(-1,8,false);
+    
+  }
+  
+  Tracklet(L1TStub* innerStub, L1TStub* middleStub, L1TStub* outerStub,
+	   Stub* innerFPGAStub, Stub* middleFPGAStub, Stub* outerFPGAStub,
+	   double phioffset,
+	   double rinv, double phi0, double d0, double z0, double t,
+	   double rinvapprox, double phi0approx, double d0approx,
+	   double z0approx, double tapprox,
+	   int irinv, int iphi0, int id0,
+	   int iz0, int it,
+	   LayerProjection layerprojs[4],
 	   bool validprojdisk[5],
 	   int iphiprojDisk[5], int irprojDisk[5],
 	   int iphiderDisk[5], int irderDisk[5],
@@ -309,25 +733,9 @@ public:
 	//barrel
 	for (int i=0;i<4;i++) {
 	  
-	  if (!layerprojs[i].valid()) continue;
-	  
+	  if (!layerprojs[i].valid()) continue;	  
 	  layerproj_[projlayer_[i]-1]=layerprojs[i];
-	  /*
-	  layerproj_[projlayer_[i]-1].init(projlayer_[i],
-					   rproj_[i],
-					   iphiproj[i],
-					   izproj[i],
-					   iphider[i],
-					   izder[i],
-					   phiproj[i],
-					   zproj[i],
-					   phider[i],
-					   zder[i],
-					   phiprojapprox[i],
-					   zprojapprox[i],
-					   phiderapprox[i],
-					   zderapprox[i]);    
-	  */
+
 	}
 	//Now handle projections to the disks
 	for (int i=0;i<5;i++) {
@@ -378,22 +786,7 @@ public:
 	  if (!layerprojs[i].valid()) continue;
 	  
 	  layerproj_[i]=layerprojs[i];
-	  /*
-	  layerproj_[i].init(i+1,
-			     rproj_[i],
-			     iphiproj[i],
-			     izproj[i],
-			     iphider[i],
-			     izder[i],
-			     phiproj[i],
-			     zproj[i],
-			     phider[i],
-			     zder[i],
-			     phiprojapprox[i],
-			     zprojapprox[i],
-			     phiderapprox[i],
-			     zderapprox[i]);    
-	  */
+
 	}
       }
       
@@ -405,22 +798,7 @@ public:
 	  if (!layerprojs[i].valid()) continue;
 	  
 	  layerproj_[i]=layerprojs[i];
-	  /*
-	  layerproj_[i].init(i+1,
-			     rproj_[i],
-			     iphiproj[i],
-			     izproj[i],
-			     iphider[i],
-			     izder[i],
-			     phiproj[i],
-			     zproj[i],
-			     phider[i],
-			     zder[i],
-			     phiprojapprox[i],
-			     zprojapprox[i],
-			     phiderapprox[i],
-			     zderapprox[i]);    
-	  */
+
 	}
 	//Now handle projections to the disks
 	for (int i=0;i<4;i++) {
@@ -454,22 +832,7 @@ public:
 	if (!layerprojs[i].valid()) continue;
 	
 	layerproj_[projlayer_[i]-1]=layerprojs[i];
-	/*
-	layerproj_[projlayer_[i]-1].init(projlayer_[i],
-					 rproj_[i],
-					 iphiproj[i],
-					 izproj[i],
-					 iphider[i],
-					 izder[i],
-					 phiproj[i],
-					 zproj[i],
-					 phider[i],
-					 zder[i],
-					 phiprojapprox[i],
-					 zprojapprox[i],
-					 phiderapprox[i],
-					 zderapprox[i]);    
-	*/
+
       }
       //Now handle projections to the disks
       for (int i=0;i<5;i++) {

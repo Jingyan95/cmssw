@@ -18,7 +18,7 @@ static const bool printDebugKF=false; // if true print lots of debugging stateme
 static const bool bookHistos=false; //set to true/false to turn on/off histogram booking internal to the tracking (class "HistImp")
 
 static unsigned int nHelixPar = 4; // 4 or 5 param helix fit.
-static bool hourglassExtended=false; // turn on displaced tracking, also edit L1TrackNtupleMaker_cfg.py (search for "Extended" on several lines)
+static bool hourglassExtended=true; // turn on displaced tracking, also edit L1TrackNtupleMaker_cfg.py (search for "Extended" on several lines)
 
 //Gemetry extensions -- used only by stand-alone code.
 static const std::string geomext=hourglassExtended?"hourglassExtended":"hourglass";  

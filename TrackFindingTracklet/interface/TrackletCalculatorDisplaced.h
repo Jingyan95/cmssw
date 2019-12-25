@@ -948,8 +948,6 @@ public:
     
     //assert(layer_==1||layer_==3||layer_==5);
 
-    LayerProjection layerprojs[4];
-    
     	  
     double r1=innerStub->r();
     double z1=innerStub->z();
@@ -967,6 +965,9 @@ public:
     if(layer_ == 5) take3 = 1;
     
     double rinv,phi0,d0,t,z0;
+
+    LayerProjection layerprojs[4];
+    DiskProjection diskprojs[5];    
     
     double phiproj[4],zproj[4],phider[4],zder[4];
     double phiprojdisk[5],rprojdisk[5],phiderdisk[5],rderdisk[5];
@@ -1038,7 +1039,6 @@ public:
     
     int irinv,iphi0,id0,it,iz0;
     int iphiproj[4],izproj[4],iphider[4],izder[4];
-    bool validprojdisk[5];
     int iphiprojdisk[5],irprojdisk[5],iphiderdisk[5],irderdisk[5];
       
     //store the binary results
@@ -1134,40 +1134,29 @@ public:
       
     }
 
-    if(fabs(it * kt)<1.0) {
-      for(int i=0; i<5; ++i) {
-	//do not bother with central tracks; the calculation there is wrong anyway.
-	validprojdisk[i]=false;
-      }
-    } else {
+    if(fabs(it * kt)>1.0) {
       for(unsigned int i=0; i<toZ_.size(); ++i){
-	validprojdisk[i]=true;
 
         iphiprojdisk[i] = phiprojdiskapprox[i] / kphiprojdisk;
         irprojdisk[i]   = rprojdiskapprox[i] / krprojdisk;
 
 	iphiderdisk[i] = phiderdiskapprox[i] / kphiderdisk;
 	irderdisk[i]   = rderdiskapprox[i] / krderdisk;
-	//"protection" from the original
-	if (iphiprojdisk[i]<=0) {
-	  iphiprojdisk[i]=0;
-	  validprojdisk[i]=false;
-	}
-	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
-	  iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-	  validprojdisk[i]=false;
-	}
-	
-	if(rprojdiskapprox[i]< 20. || rprojdiskapprox[i] > 120.){
-	  validprojdisk[i]=false;
-	  irprojdisk[i] = 0;
-	  iphiprojdisk[i] = 0;
-	  iphiderdisk[i]  = 0;
-	  irderdisk[i]    = 0;
-	}
 
-        if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
-        if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
+	//check phi projection in range
+	if (iphiprojdisk[i]<=0) continue;
+	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) continue;
+	
+	//check r projection in range
+	if(rprojdiskapprox[i]< 20. || rprojdiskapprox[i] > 120.) continue;
+
+	diskprojs[i].init(i+1,rproj_[i],
+			  iphiprojdisk[i],irprojdisk[i],
+			  iphiderdisk[i],irderdisk[i],
+			  phiprojdisk[i],rprojdisk[i],
+			  phiderdisk[i],rderdisk[i],
+			  phiprojdiskapprox[i],rprojdiskapprox[i],
+			  phiderdisk[i],rderdisk[i]);
       }
     }
 
@@ -1190,15 +1179,7 @@ public:
 				    z0approx,tapprox,
 				    irinv,iphi0,id0,iz0,it,
 				    layerprojs,
-				    validprojdisk,
-				    iphiprojdisk,irprojdisk,
-				    iphiderdisk,irderdisk,
-				    phiprojdisk,rprojdisk,
-				    phiderdisk,rderdisk,
-				    phiprojdiskapprox,
-				    rprojdiskapprox,
-				    phiderdiskapprox,
-				    rderdiskapprox,
+				    diskprojs,
 				    false);
     
     if (debug1) {
@@ -1341,7 +1322,6 @@ public:
     
     int irinv,iphi0,id0,it,iz0;
     int iphiproj[4],izproj[4],iphider[4],izder[4];
-    bool validprojdisk[5];
     int iphiprojdisk[5],irprojdisk[5],iphiderdisk[5],irderdisk[5];
       
     //store the binary results
@@ -1384,6 +1364,7 @@ public:
     }
 
     LayerProjection layerprojs[4];
+    DiskProjection diskprojs[5];
     
     for(unsigned int i=0; i<toR_.size(); ++i){
       iphiproj[i] = phiprojapprox[i] / kphiproj;
@@ -1429,14 +1410,8 @@ public:
       
     }
 
-    if(fabs(it * kt)<1.0) {
-      for(int i=0; i<5; ++i) {
-	//do not bother with central tracks; the calculation there is wrong anyway.
-	validprojdisk[i]=false;
-      }
-    } else {
+    if(fabs(it * kt)>1.0) {
       for(unsigned int i=0; i<toZ_.size(); ++i){
-	validprojdisk[i]=true;
 
         iphiprojdisk[i] = phiprojdiskapprox[i] / kphiprojdisk;
         irprojdisk[i]   = rprojdiskapprox[i] / krprojdisk;
@@ -1444,25 +1419,21 @@ public:
 	iphiderdisk[i] = phiderdiskapprox[i] / kphiderdisk;
 	irderdisk[i]   = rderdiskapprox[i] / krderdisk;
       
-	if (iphiprojdisk[i]<=0) {
-	  iphiprojdisk[i]=0;
-	  validprojdisk[i]=false;
-	}
-	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
-	  iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-	  validprojdisk[i]=false;
-	}
+	if (iphiprojdisk[i]<=0) continue;	
+	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) continue;
       
-	if(irprojdisk[i]< 20. / krprojdisk || irprojdisk[i] > 120. / krprojdisk ){
-	  validprojdisk[i]=false;
-	  irprojdisk[i] = 0;
-	  iphiprojdisk[i] = 0;
-	  iphiderdisk[i]  = 0;
-	  irderdisk[i]    = 0;
-	}
+	if(irprojdisk[i]< 20. / krprojdisk ||
+	   irprojdisk[i] > 120. / krprojdisk ) continue;
 
-        if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
-        if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
+	diskprojs[i].init(i+1,rproj_[i],
+			  iphiprojdisk[i],irprojdisk[i],
+			  iphiderdisk[i],irderdisk[i],
+			  phiprojdisk[i],rprojdisk[i],
+			  phiderdisk[i],rderdisk[i],
+			  phiprojdiskapprox[i],rprojdiskapprox[i],
+			  phiderdisk[i],rderdisk[i]);
+
+	
       }
     }
 
@@ -1485,15 +1456,7 @@ public:
 				    z0approx,tapprox,
 				    irinv,iphi0,id0,iz0,it,
 				    layerprojs,
-				    validprojdisk,
-				    iphiprojdisk,irprojdisk,
-				    iphiderdisk,irderdisk,
-				    phiprojdisk,rprojdisk,
-				    phiderdisk,rderdisk,
-				    phiprojdiskapprox,
-				    rprojdiskapprox,
-				    phiderdiskapprox,
-				    rderdiskapprox,
+				    diskprojs,
 				    false);
     
     if (debug1) {
@@ -1630,7 +1593,6 @@ public:
     
     int irinv,iphi0,id0,it,iz0;
     int iphiproj[4],izproj[4],iphider[4],izder[4];
-    bool validprojdisk[5];
     int iphiprojdisk[5],irprojdisk[5],iphiderdisk[5],irderdisk[5];
       
     //store the binary results
@@ -1640,7 +1602,42 @@ public:
     it    = tapprox / kt;
     iz0   = z0approx / kz0;
 
+    bool success = true;
+    if(fabs(rinvapprox)>rinvcut){
+      if (debug1) 
+	cout << "TrackletCalculator:: LLD Seeding irinv too large: "
+	     <<rinvapprox<<"("<<irinv<<")\n";
+      success = false;
+    }
+    if (fabs(z0approx)>1.8*z0cut) {
+      if (debug1) cout << "Failed tracklet z0 cut "<<z0approx<<endl;
+      success = false;
+    }
+    if (fabs(d0approx)>maxd0) {
+      if (debug1) cout << "Failed tracklet d0 cut "<<d0approx<<endl;
+      success = false;
+    }
+    
+    if (!success) return false;
+
+    double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
+    int phicritapprox=iphi0-2*irinv;
+    bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
+         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
+    if (debug1)
+      if (keep && !keepapprox)
+        cout << "TrackletCalculatorDisplaced::LLDSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
+    if (!usephicritapprox) {
+      if (!keep) return false;
+    }
+    else {
+      if (!keepapprox) return false;
+    }
+
+    
+    
     LayerProjection layerprojs[4];
+    DiskProjection diskprojs[5];
 
     
     for(unsigned int i=0; i<toR_.size(); ++i){
@@ -1684,74 +1681,35 @@ public:
       
     }
 
-    if(fabs(it * kt)<1.0) {
-      for(int i=0; i<5; ++i) {
-	//do not bother with central tracks; the calculation there is wrong anyway.
-	validprojdisk[i]=false;
-      }
-    } else {
+    if(fabs(it * kt)>1.0) {
       for(unsigned int i=0; i<toZ_.size(); ++i){
-	validprojdisk[i]=true;
 
         iphiprojdisk[i] = phiprojdiskapprox[i] / kphiprojdisk;
         irprojdisk[i]   = rprojdiskapprox[i] / krprojdisk;
 
 	iphiderdisk[i] = phiderdiskapprox[i] / kphiderdisk;
 	irderdisk[i]   = rderdiskapprox[i] / krderdisk;
-      
-	if (iphiprojdisk[i]<=0) {
-	  iphiprojdisk[i]=0;
-	  validprojdisk[i]=false;
-	}
-	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) {
-	  iphiprojdisk[i]=(1<<nbitsphistubL123)-1;
-	  validprojdisk[i]=false;
-	}
-      
-	if(irprojdisk[i]< 20. / krprojdisk || irprojdisk[i] > 120. / krprojdisk ){
-	  validprojdisk[i]=false;
-	  irprojdisk[i] = 0;
-	  iphiprojdisk[i] = 0;
-	  iphiderdisk[i]  = 0;
-	  irderdisk[i]    = 0;
-	}
 
-        if (iphiderdisk[i]<-(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = -(1<<(nbitsphiprojderL123-1));
-        if (iphiderdisk[i]>=(1<<(nbitsphiprojderL123-1))) iphiderdisk[i] = (1<<(nbitsphiprojderL123-1))-1;
+	//Check phi range of projection
+	if (iphiprojdisk[i]<=0) continue;
+	if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) continue;
+      
+	//Check r range of projection
+	if(irprojdisk[i]< 20. / krprojdisk ||
+	   irprojdisk[i] > 120. / krprojdisk ) continue;
+
+	diskprojs[i].init(i+1,rproj_[i],
+			  iphiprojdisk[i],irprojdisk[i],
+			  iphiderdisk[i],irderdisk[i],
+			  phiprojdisk[i],rprojdisk[i],
+			  phiderdisk[i],rderdisk[i],
+			  phiprojdiskapprox[i],rprojdiskapprox[i],
+			  phiderdisk[i],rderdisk[i]);
+
+	
       }
     }
 
-    bool success = true;
-    if(fabs(rinvapprox)>rinvcut){
-      if (debug1) 
-	cout << "TrackletCalculator:: LLD Seeding irinv too large: "
-	     <<rinvapprox<<"("<<irinv<<")\n";
-      success = false;
-    }
-    if (fabs(z0approx)>1.8*z0cut) {
-      if (debug1) cout << "Failed tracklet z0 cut "<<z0approx<<endl;
-      success = false;
-    }
-    if (fabs(d0approx)>maxd0) {
-      if (debug1) cout << "Failed tracklet d0 cut "<<d0approx<<endl;
-      success = false;
-    }
-    
-    if (!success) return false;
-
-    double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
-    int phicritapprox=iphi0-2*irinv;
-    bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
-         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
-    if (debug1)
-      if (keep && !keepapprox)
-        cout << "TrackletCalculatorDisplaced::LLDSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
-    if (!usephicritapprox) {
-      if (!keep) return false;
-    }
-    else {
-      if (!keepapprox) return false;
-    }
     
     if (writeTrackletPars) {
       static ofstream out("trackletpars.txt");
@@ -1771,15 +1729,7 @@ public:
 				    z0approx,tapprox,
 				    irinv,iphi0,id0,iz0,it,
 				    layerprojs,
-				    validprojdisk,
-				    iphiprojdisk,irprojdisk,
-				    iphiderdisk,irderdisk,
-				    phiprojdisk,rprojdisk,
-				    phiderdisk,rderdisk,
-				    phiprojdiskapprox,
-				    rprojdiskapprox,
-				    phiderdiskapprox,
-				    rderdiskapprox,
+				    diskprojs,
 				    false);
     
     if (debug1) {
