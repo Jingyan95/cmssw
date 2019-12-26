@@ -1004,10 +1004,10 @@ class FitTrack:public ProcessBase{
      return;
    }
      
-   tracklet->setFitPars(rinvfit,phi0fit,tfit,z0fit,chisqfit,
-     rinvfitexact,phi0fitexact,tfitexact,
-     z0fitexact,chisqfitexact,
-     irinvfit,iphi0fit,itfit,iz0fit,ichisqfit);
+   tracklet->setFitPars(rinvfit,phi0fit,0.0,tfit,z0fit,chisqfit,
+			rinvfitexact,phi0fitexact,0.0,tfitexact,
+			z0fitexact,chisqfitexact,
+			irinvfit,iphi0fit,0,itfit,iz0fit,ichisqfit);
 
   }
 

@@ -1009,13 +1009,11 @@ public:
     
   }
 
-  int nMatchesDisk(bool skipD5=false) {
+  int nMatchesDisk() {
 
     int nmatches=0;
     
-    int lastdisk=5;
-    if (skipD5) lastdisk--; 
-    for (int i=0;i<lastdisk;i++) {
+    for (int i=0;i<5;i++) {
       if (diskresid_[i].valid()) {
 	nmatches++;
       }
@@ -1364,42 +1362,6 @@ public:
 
   }
   
-  void setFitPars(double rinvfit, double phi0fit, double tfit,
-		  double z0fit, double chisqfit,
-		  double rinvfitexact, double phi0fitexact, double tfitexact,
-		  double z0fitexact, double chisqfitexact,
-		  int irinvfit, int iphi0fit, int itfit,
-		  int iz0fit, int ichisqfit,
-		  const vector<L1TStub*>& l1stubs = vector<L1TStub*>()){
-    
-    fitpars_.init(rinvfit,phi0fit,0.0,tfit,z0fit);
-    chisqfit_=chisqfit;
-
-    fitparsexact_.init(rinvfitexact,phi0fitexact,0.0,tfitexact,z0fitexact);
-    chisqfitexact_=chisqfitexact;
-    
-    if (irinvfit>(1<<14)) irinvfit=(1<<14);
-    if (irinvfit<=-(1<<14)) irinvfit=-(1<<14)+1;
-    fpgafitpars_.rinv().set(irinvfit,15,false,__LINE__,__FILE__);
-    fpgafitpars_.phi0().set(iphi0fit,19,false,__LINE__,__FILE__);
-    fpgafitpars_.d0().set(0,19,false,__LINE__,__FILE__);
-    fpgafitpars_.t().set(itfit,14,false,__LINE__,__FILE__);
-
-    if (iz0fit>=(1<<(nbitsz0-1))) {
-      iz0fit=(1<<(nbitsz0-1))-1; 
-    }
-
-    if (iz0fit<=-(1<<(nbitsz0-1))) {
-      iz0fit=1-(1<<(nbitsz0-1)); 
-    }
-
-    fpgafitpars_.z0().set(iz0fit,nbitsz0,false,__LINE__,__FILE__);
-    ichisqfit_.set(ichisqfit,8,true,__LINE__,__FILE__);
-
-    fpgatrack_=new Track(makeTrack(l1stubs));
-
-  }
-
 
   std::string trackfitstr() {
     std::ostringstream oss;
