@@ -558,7 +558,7 @@ public:
 	
 	if (phi<0) phi+=2*M_PI;
 	phi-=phioffset_;
-	
+
 	double dr=r-tracklet->rproj(layer_);
 	assert(fabs(dr)<drmax);
 
@@ -701,9 +701,9 @@ public:
 	
 	//check that stubs and projections in same half of detector
 	assert(stub->z()*tracklet->t()>0.0);
-	
-	int disk=disk_;
-	if (tracklet->t()<0) disk=-disk_;
+
+	int sign=(tracklet->t()>0.0)?1:-1;
+	int disk=sign*disk_;
 	assert(disk!=0);
 	  
 	//Perform integer calculations here
@@ -771,12 +771,12 @@ public:
 
 	if (phi<0) phi+=2*M_PI;
 	phi-=phioffset_;
-	  
-	double dz=z-tracklet->zprojdisk(disk);
+
+	double dz=z-sign*zmean[disk_-1];
 	
 	if(fabs(dz) > dzmax){
 	  cout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << tracklet->getISeed() << endl;
-	  cout << "stub "<<stub->z() <<" disk "<<disk<<" zproj "<<tracklet->zprojdisk(disk)<<" "<<dz<<endl;
+	  cout << "stub "<<stub->z() <<" disk "<<disk<<" "<<dz<<endl;
 	  assert(fabs(dz)<dzmax);
 	}	
 		  
@@ -865,7 +865,7 @@ public:
 
           if(fabs(dphi)>=0.25){
             cout<<"dphi "<<dphi<<"\n";
-            cout<<"Seed / ISeed "<<tracklet->seed()<<" "<<tracklet->getISeed()<<"\n";
+            cout<<"Seed / ISeed "<<tracklet->getISeed()<<"\n";
           }
           assert(fabs(dphi)<0.25);
           assert(fabs(dphiapprox)<0.25);

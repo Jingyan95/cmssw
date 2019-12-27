@@ -498,6 +498,39 @@ static const std::string RemovalType="ichi";
 
 static const bool fakefit=false; //if true, run a dummy fit, producing TTracks directly from output of tracklet pattern reco stage.
 
+//projection layers by seed index
+static const int projlayers[12][4] = {
+  {3, 4, 5, 6},  //0 L1L2
+  {1, 2, 5, 6},  //1 L3L4
+  {1, 2, 3, 4},  //2 L5L6    
+  {1, 2},  //3 D1D2    
+  {1, 2},  //4 D3D4    
+  {1, 2},  //5 L1D1    
+  {1, 2},  //6 L2D1    
+  {1, 4, 5, 6},  //7 L2L3
+  {1, 5, 6}, //8 L2L3L4
+  {1, 2, 3}, //9 L4L5L6
+  {1}, //10 L2L3D1
+  {} //11 D1D2L2
+};
+
+//projection disks by seed index
+static const int projdisks[12][5] = {
+  {1, 2, 3, 4, 5}, //0 L1L2
+  {1, 2, 3, 4, 5}, //1 L3L4
+  {1, 2, 3, 4, 5}, //2 L5L6
+  {3, 4, 5},       //3 D1D2    
+  {1, 2, 5},       //4 D3D4    
+  {1, 2, 3, 4, 5}, //5 L1D1    
+  {1, 2, 3, 4, 5}, //6 L2D1    
+  {1, 2, 3, 4, 5}, //7 L2L3    
+  {1, 2},          //8 L2L3L4
+  {},              //9 L4L5L6
+  {2, 3, 4},              //10 L2L3D1
+  {}               //11 D1D2L2
+};
+  
+  
 #endif
 
 

@@ -16,6 +16,7 @@
 #include "DiskProjection.h"
 #include "LayerResidual.h"
 #include "DiskResidual.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -76,223 +77,20 @@ public:
     if (middleStub_) assert(middleStub_->layer()<6||middleStub_->disk()<5);
     if (outerStub_) assert(outerStub_->layer()<6||outerStub_->disk()<5);
 
-    
-    for(unsigned int i = 0; i < 6; i++) rproj_[i]=0.;
-    for(unsigned int i = 0; i < 5; i++) zprojdisk_[i]=0.;
+    seedIndex_=calcSeedIndex();
 
-    for(unsigned int i = 0; i < 4; i++) projlayer_[i]=0;
-    for(unsigned int i = 0; i < 5; i++) projdisk_[i]=0;
+    triplet_=(seedIndex_>=8);
 
-
-    if (innerStub_->layer()==0 && middleStub_==NULL) { //L1L2XX
-      rproj_[0]=rmeanL3;
-      rproj_[1]=rmeanL4;
-      rproj_[2]=rmeanL5;
-      rproj_[3]=rmeanL6;
-      projlayer_[0]=3;
-      projlayer_[1]=4;
-      projlayer_[2]=5;
-      projlayer_[3]=6;
+    //fill projection layers
+    for(unsigned int i=0;i<4;i++) {
+      projlayer_[i]=projlayers[seedIndex_][i];
     }
 
-    if (innerStub_->layer()==1 && middleStub_==NULL) { //L2L3XX
-      rproj_[0]=rmeanL1;
-      rproj_[1]=rmeanL4;
-      rproj_[2]=rmeanL5;
-      rproj_[3]=rmeanL6;
-      projlayer_[0]=1;
-      projlayer_[1]=4;
-      projlayer_[2]=5;
-      projlayer_[3]=6;
-    }
-    
-    if (innerStub_->layer()==1 && middleStub_!=NULL) {
-      triplet_ = true;
-      if(middleStub_->layer()==2){           //L3L4L2
-	rproj_[0]=rmeanL1;
-	rproj_[1]=rmeanL5;
-	rproj_[2]=rmeanL6;
-	projlayer_[0]=1;
-	projlayer_[1]=5;
-	projlayer_[2]=6;
-	projlayer_[3]=-1;
-	
-	int sign=1;
-	if (it<0) sign=-1;
-	zprojdisk_[0]=sign*zmeanD1;
-	zprojdisk_[1]=sign*zmeanD2;
-	projdisk_[0]=sign*1;
-	projdisk_[1]=sign*2;
-	projdisk_[2]=0;
-	projdisk_[3]=0;
-	projdisk_[4]=0;
-      }
-      else{                                  //D1D2L2
-	rproj_[0]=rmeanL1;
-	projlayer_[0]=1;
-	projlayer_[1]=-1;
-	projlayer_[2]=-1;
-	projlayer_[3]=-1;
-	
-	int sign=1;
-	if (it<0) sign=-1;
-	zprojdisk_[0]=sign*zmeanD3;
-	zprojdisk_[1]=sign*zmeanD4;
-	zprojdisk_[2]=sign*zmeanD5;
-	projdisk_[0]=sign*3;
-	projdisk_[1]=sign*4;
-	projdisk_[2]=sign*5;
-	projdisk_[3]=0;
-	projdisk_[4]=0;
-      }
-    }
-    
-    if (innerStub_->layer()==2 && middleStub_==NULL) { //L3L4XX
-      rproj_[0]=rmeanL1;
-      rproj_[1]=rmeanL2;
-      rproj_[2]=rmeanL5;
-      rproj_[3]=rmeanL6;
-      projlayer_[0]=1;
-      projlayer_[1]=2;
-      projlayer_[2]=5;
-      projlayer_[3]=6;
-    }
-    
-    if (innerStub_->layer()==3 && middleStub_!=NULL) { //L5L6L4
-      triplet_ = true;
-      rproj_[0]=rmeanL1;
-      rproj_[1]=rmeanL2;
-      rproj_[2]=rmeanL3;
-      rproj_[3]=rmeanL4;
-      projlayer_[0]=1;
-      projlayer_[1]=2;
-      projlayer_[2]=3;
-      projlayer_[3]=-1;
+    //fill projection disks
+    for(unsigned int i=0;i<5;i++) {
+      projdisk_[i]=projdisks[seedIndex_][i];
     }
 
-    if (innerStub_->layer()==4 && middleStub_==NULL) { //L5L6XX
-      rproj_[0]=rmeanL1;
-      rproj_[1]=rmeanL2;
-      rproj_[2]=rmeanL3;
-      rproj_[3]=rmeanL4;
-      projlayer_[0]=1;
-      projlayer_[1]=2;
-      projlayer_[2]=3;
-      projlayer_[3]=4;
-    }
-
-    if(middleStub_==NULL){
-      if (innerStub_->layer()>999) {
-  
-	assert((innerStub->disk()==1)||(innerStub->disk()==3)||
-	       (innerStub->disk()==-1)||(innerStub->disk()==-3));
-	
-	rproj_[0]=rmeanL1;
-	rproj_[1]=rmeanL2;
-	projlayer_[0]=1;
-	projlayer_[1]=2;
-	projlayer_[2]=-1;
-	projlayer_[3]=-1;
-	
-	if (overlap_) {
-	  assert((innerStub->disk()==1)||(innerStub->disk()==-1));
-	  if (innerStub->disk()==1) {
-	    zprojdisk_[0]=zmeanD1;
-	    zprojdisk_[1]=zmeanD2;
-	    zprojdisk_[2]=zmeanD3;
-	    zprojdisk_[3]=zmeanD4;
-	    zprojdisk_[4]=zmeanD5;
-	  } else {
-	    zprojdisk_[0]=-zmeanD1;
-	    zprojdisk_[1]=-zmeanD2;
-	    zprojdisk_[2]=-zmeanD3;
-	    zprojdisk_[3]=-zmeanD4;
-	    zprojdisk_[4]=-zmeanD5;
-	    
-	  }
-	  projdisk_[0]=1;
-	  projdisk_[1]=2;
-	  projdisk_[2]=3;
-	  projdisk_[3]=4;
-	  projdisk_[4]=5;
-	} else {
-	  
-	  if (innerStub->disk()==1) {
-	    zprojdisk_[0]=zmeanD3;
-	    zprojdisk_[1]=zmeanD4;
-	    zprojdisk_[2]=zmeanD5;
-	    projdisk_[0]=3;
-	    projdisk_[1]=4;
-	    projdisk_[2]=5;
-	  }
-	  if (innerStub->disk()==3) {
-	    zprojdisk_[0]=zmeanD1;
-	    zprojdisk_[1]=zmeanD2;
-	    zprojdisk_[2]=zmeanD5;
-	    projdisk_[0]=1;
-	    projdisk_[1]=2;
-	    projdisk_[2]=5;
-	  }
-	  
-	  if (innerStub->disk()==-1) {
-	    zprojdisk_[0]=-zmeanD3;
-	    zprojdisk_[1]=-zmeanD4;
-	    zprojdisk_[2]=-zmeanD5;
-	    projdisk_[0]=-3;
-	    projdisk_[1]=-4;
-	    projdisk_[2]=-5;
-	  }
-	  if (innerStub->disk()==-3) {
-	    zprojdisk_[0]=-zmeanD1;
-	    zprojdisk_[1]=-zmeanD2;
-	    zprojdisk_[2]=-zmeanD5;
-	    projdisk_[0]=-1;
-	    projdisk_[1]=-2;
-	    projdisk_[2]=-5;
-	  } 
-	}
-	
-      } else {
-	int sign=1;
-	if (it<0) sign=-1;
-	
-	zprojdisk_[0]=sign*zmeanD1;
-	zprojdisk_[1]=sign*zmeanD2;
-	zprojdisk_[2]=sign*zmeanD3;
-	zprojdisk_[3]=sign*zmeanD4;
-	zprojdisk_[4]=sign*zmeanD5;
-	projdisk_[0]=sign*1;
-	projdisk_[1]=sign*2;
-	projdisk_[2]=sign*3;
-	projdisk_[3]=sign*4;
-	projdisk_[4]=sign*5;	
-
-      }
-    }
-    else{
-      if (innerStub_->layer()>999) { //L2L3D1
-	triplet_ = true;
-	
-	assert((innerStub->disk()==1)||(innerStub->disk()==-1));
-	
-	rproj_[0]=rmeanL1;
-	projlayer_[0]=1;
-	projlayer_[1]=-1;
-	projlayer_[2]=-1;
-	projlayer_[3]=-1;
-	
-	int sign=1;
-	if (it<0) sign=-1;
-	zprojdisk_[0]=sign*zmeanD2;
-	zprojdisk_[1]=sign*zmeanD3;
-	zprojdisk_[2]=sign*zmeanD4;
-	projdisk_[0]=sign*2;
-	projdisk_[1]=sign*3;
-	projdisk_[2]=sign*4;
-	projdisk_[3]=0;
-	projdisk_[4]=0;
-      }
-    }
     
     if(middleStub_==NULL){
       if (barrel_) {
@@ -309,22 +107,7 @@ public:
 	  if (!diskprojs[i].valid()) continue;
 
 	  diskproj_[i]=diskprojs[i];
-	  /*
-	  diskproj_[i].init(i+1,
-			    zprojdisk_[i],
-			    iphiprojDisk[i],
-			    irprojDisk[i],
-			    iphiderDisk[i],
-			    irderDisk[i],
-			    phiprojDisk[i],
-			    rprojDisk[i],
-			    phiderDisk[i],
-			    rderDisk[i],
-			    phiprojapproxDisk[i],
-			    rprojapproxDisk[i],
-			    phiderapproxDisk[i],
-			    rderapproxDisk[i]);
-	  */ 
+
 	}
       } 
       
@@ -336,23 +119,6 @@ public:
 	  
 	  diskproj_[abs(projdisk_[i])-1]=diskprojs[i];
 
-	  /*
-	  diskproj_[abs(projdisk_[i])-1].init(projdisk_[i],
-					      zprojdisk_[i],
-					      iphiprojDisk[i],
-					      irprojDisk[i],
-					      iphiderDisk[i],
-					      irderDisk[i],
-					      phiprojDisk[i],
-					      rprojDisk[i],
-					      phiderDisk[i],
-					      rderDisk[i],
-					      phiprojapproxDisk[i],
-					      rprojapproxDisk[i],
-					      phiderapproxDisk[i],
-					      rderapproxDisk[i]); 
-	  */
-	  
 	}
 	for (int i=0;i<2;i++) {
 	  
@@ -366,7 +132,6 @@ public:
       if (overlap_) {
 	//projections to layers
 	for (int i=0;i<1;i++) {
-	  assert(rproj_[i]<60.0);
 	  
 	  if (!layerprojs[i].valid()) continue;
 	  
@@ -379,23 +144,6 @@ public:
 	  int offset=1;
 	  if (outerStub->layer()+1==2&&innerStub->layer()+1==3) offset=0;
 	  diskproj_[i+offset]=diskprojs[i];
-
-	  /*
-	  diskproj_[i+offset].init(i+offset+1,
-				   zprojdisk_[i],
-				   iphiprojDisk[i],
-				   irprojDisk[i],
-				   iphiderDisk[i],
-				   irderDisk[i],
-				   phiprojDisk[i],
-				   rprojDisk[i],
-				   phiderDisk[i],
-				   rderDisk[i],
-				   phiprojapproxDisk[i],
-				   rprojapproxDisk[i],
-				   phiderapproxDisk[i],
-				   rderapproxDisk[i]);  
-	  */
 	  
 	}
       } 
@@ -419,26 +167,11 @@ public:
 	
 	diskproj_[abs(projdisk_[i])-1]=diskprojs[i];
 
-	/*
-	diskproj_[abs(projdisk_[i])-1].init(projdisk_[i],
-					    zprojdisk_[i],
-					    iphiprojDisk[i],
-					    irprojDisk[i],
-					    iphiderDisk[i],
-					    irderDisk[i],
-					    phiprojDisk[i],
-					    rprojDisk[i],
-					    phiderDisk[i],
-					    rderDisk[i],
-					    phiprojapproxDisk[i],
-					    rprojapproxDisk[i],
-					    phiderapproxDisk[i],
-					    rderapproxDisk[i]); 
-	*/
       }
     }
     
     ichisqfit_.set(-1,8,false);
+
     
   }
   
@@ -614,7 +347,7 @@ public:
     oss << index.str()
 	<<"|"<< layerproj_[layer-1].fpgazbin1projvm().str() 
         <<"|"<< layerproj_[layer-1].fpgazbin2projvm().str()
-	<<"|"<<layerproj_[layer-1].fpgafinezvm().str()
+	<<"|"<< layerproj_[layer-1].fpgafinezvm().str()
 	<<"|"<< tmp.str()<<"|"<<PSseed();
     return oss.str();
 
@@ -861,19 +594,6 @@ public:
   double zstubdisk(int disk) {
     assert(abs(disk)>=1&&abs(disk)<=5);
     return diskresid_[abs(disk)-1].zstub();
-  }
-
-
-  double zprojdisk(int disk) const {
-    if (!disk_ && !triplet_) return zprojdisk_[abs(disk)-1];
-    for (int i=0;i<3;i++) {
-      if (projdisk_[i]==disk) {
-	return zprojdisk_[i];
-      }
-    }
-    assert(0);
-    return 0.0;
-    
   }
 
   void setBendIndex(int bendIndex,int disk) {
@@ -1174,6 +894,7 @@ public:
 	
 	//check disk
 	if(i==3 && layerresid_[0].valid() && innerFPGAStub_->layer().value()==1) continue; // Don't add D4 if track has L1 stub
+	if (i>=5) continue; //i=[0..4] for disks
 	if(diskresid_[i].valid()) {
 	  // two extra bits to indicate if the matched stub is local or from neighbor
 	  int location = 1;  // local
@@ -1596,23 +1317,6 @@ public:
     return innerStub_->layer()+21;
   }
 
-  int seed() const {
-    // Returns integer code for tracklet seed.
-    // Barrel: L1L2=1, L2L3=2, L3L4=3, L5L6=6
-    // Disk: D1D2=11, D3D4=13 (+/- for forward/backward disk)
-    // Overlap: L1D1=21, L2D1=22 (+/- for forward/backward disk)
-    if(barrel_) return innerStub_->layer()+1;
-    if(disk_) {
-        if(innerStub_->disk() < 0) return innerStub_->disk()-10;
-        else return innerStub_->disk()+10;
-    }
-    if(overlap_) {
-        if(innerStub_->disk() < 0) return -21-outerStub_->layer();
-        else return 21+outerStub_->layer();
-    }
-    return 0;
-  }
-
   bool isBarrel() const { 
     return barrel_;
   }
@@ -1623,10 +1327,6 @@ public:
 
   int isDisk() const { 
     return disk_;
-  }
-
-  double eta() const {
-    return asinh(trackparsapprox_.t());
   }
 
   bool foundTrack(L1SimTrack simtrk){
@@ -1673,8 +1373,13 @@ public:
   unsigned int PSseed() {
     return ((layer()==1)||(disk()!=0))?1:0;
   }
-  
+
   unsigned int seedIndex() const {
+    return seedIndex_;
+  }
+
+  
+  unsigned int calcSeedIndex() const {
   
     int seedindex=-1;
     int seedlayer=layer();
@@ -1690,6 +1395,8 @@ public:
     if (seedlayer==2&&abs(seeddisk)==0) seedindex=7;  //L2L3
     if (middleFPGAStub_&&seedlayer==2&&seeddisk==0) seedindex = 8; // L3L4L2
     if (middleFPGAStub_&&seedlayer==4&&seeddisk==0) seedindex = 9; // L5L6L4
+    assert(innerFPGAStub_!=0);
+    assert(outerFPGAStub_!=0);
     if (middleFPGAStub_&&seedlayer==2&&abs(seeddisk)==1) {
       int l1 = (innerFPGAStub_ && innerFPGAStub_->isBarrel()) ? innerStub_->layer()+1 : 999,
           l2 = (middleFPGAStub_ && middleFPGAStub_->isBarrel()) ? middleStub_->layer()+1 : 999,
@@ -1731,6 +1438,8 @@ private:
   int trackletIndex_;
   int TCIndex_;
 
+  unsigned int seedIndex_;
+
   //Tracklet track parameters  
 
   TrackPars<FPGAWord> fpgapars_;
@@ -1739,13 +1448,8 @@ private:
   
   TrackPars<double> trackparsapprox_;
 
-  double rproj_[6];
-  double zprojdisk_[5];
-
   int      projlayer_[4];
   int      projdisk_[5];
-
-
 
   //Track  parameters from track fit
 
@@ -1765,7 +1469,7 @@ private:
   DiskProjection diskproj_[5];
 
   LayerResidual layerresid_[6];
-  DiskResidual diskresid_[6];
+  DiskResidual diskresid_[5];
 
   
 };
