@@ -133,6 +133,7 @@ protected:
   edm::Service<TFileService> fs_;
 
   // Histograms of input data.
+  TH1F*     hisNumEvents_;
   TProfile* profNumStubs_;
   TH1F* hisStubsVsEta_;
   TH1F* hisStubsVsR_;
@@ -412,6 +413,8 @@ protected:
 
   map<string, TH1F*> hisFitChi2Matched_;
   map<string, TH1F*> hisFitChi2DofMatched_;
+  map<string, TH1F*> hisFitChi2DofRphiMatched_;
+  map<string, TH1F*> hisFitChi2DofRzMatched_;
   map<string, TH1F*> hisFitBeamChi2Matched_;
   map<string, TH1F*> hisFitBeamChi2DofMatched_;
   map<string, TProfile*> profFitChi2VsEtaMatched_;
@@ -425,6 +428,8 @@ protected:
 
   map<string, TH1F*> hisFitChi2Unmatched_;
   map<string, TH1F*> hisFitChi2DofUnmatched_;
+  map<string, TH1F*> hisFitChi2DofRphiUnmatched_;
+  map<string, TH1F*> hisFitChi2DofRzUnmatched_;
   map<string, TH1F*> hisFitBeamChi2Unmatched_;
   map<string, TH1F*> hisFitBeamChi2DofUnmatched_;
   map<string, TProfile*> profFitChi2VsEtaUnmatched_;

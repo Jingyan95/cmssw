@@ -1,6 +1,7 @@
 #include <L1Trigger/TrackFindingTMTT/interface/Settings.h>
 #include "FWCore/Utilities/interface/Exception.h"
 #include <set>
+#include <cmath>
 
 namespace TMTT {
 
@@ -25,7 +26,7 @@ Settings::Settings() {
   kalmanMaxNumStubs_=6;
   numPhiNonants_=9;
   numPhiSectors_=9;
-  etaRegions_ = {-2.4,-2.16,-1.95,-1.7,-1.43,-1.16,-0.89,-0.61,-0.31,0.0,0.31,0.61,0.89,1.16,1.43,1.7,1.95,2.16,2.4}; // Used by KF
+  etaRegions_ = {-2.4,-2.08,-1.68,-1.26,-0.90,-0.62,-0.41,-0.20,0.0,0.20,0.41,0.62,0.90,1.26,1.68,2.08,2.4}; // Used by KF
   kalmanRemove2PScut_=true;
   killScenario_=0;
   kalmanMaxSkipLayersHard_=1; // On "hard" input tracks
@@ -33,12 +34,12 @@ Settings::Settings() {
   kalmanMaxStubsEasy_=10;  // Max. #stubs an input track can have to be defined "easy"
   kalmanMaxStubsPerLayer_=4; // To save resources, consider at most this many stubs per layer per track.
   kalmanDebugLevel_=0;
-  //  kalmanDebugLevel_=2; // Good for debugging
+  //kalmanDebugLevel_=2; // Good for debugging
   enableDigitize_=false;
   houghMinPt_=2.0;
-  chosenRofPhi_=55.0;
+  chosenRofPhi_=67.240;
   chosenRofZ_=50.0;
-  houghNbinsPt_=18;
+  houghNbinsPt_=48; // Mini HT bins in 2 GeV HT array
   handleStripsPhiSec_=1;
   useApproxB_=true;
   kalmanHOtilted_=true; 
@@ -51,7 +52,7 @@ Settings::Settings() {
   handleStripsEtaSec_=false;
   kalmanFillInternalHists_=false;
   kalmanMultiScattTerm_=0.00075;
-  kalmanMultiScattFactor_=0.0;
+  kalmanChi2RphiScale_ = 8;
   //
   // Cfg params & constants required only for HYBRID tracking (as taken from DB for TMTT).
   //
@@ -67,6 +68,18 @@ Settings::Settings() {
   zMaxNonTilted_[3] = 33.9; 
 
   bField_=3.81120228767395;
+
+  // Stub digitization params for hybrid (copied from TrackFindingTMTT/interface/HLS/KFconstants.h
+  double rMult_hybrid   = 1. / 0.02929688;
+  double phiSMult_hybrid = 1. / (7.828293e-6 * 8);
+  double zMult_hybrid = rMult_hybrid / 2; // In KF VHDL, z/r mult = 1/2, whereas in HLS, they are identical.
+  // Number of bits copied from TrackFindingTMTT/interface/HLS/KFstub.h (BR1, BPHI, BZ)
+  rtBits_   = 12;
+  phiSBits_ = 14;
+  zBits_    = 14;
+  rtRange_   = pow(2,rtBits_)/rMult_hybrid;
+  phiSRange_ = pow(2,phiSBits_)/phiSMult_hybrid;
+  zRange_    = pow(2,zBits_)/zMult_hybrid;
 
   if (hybrid_) {
     if (not useApproxB_) {
@@ -127,7 +140,6 @@ Settings::Settings(const edm::ParameterSet& iConfig) :
   //=== Optional stub digitization.
 
   enableDigitize_         ( stubDigitize_.getParameter<bool>                  ( "EnableDigitize"         ) ),
-  firmwareType_           ( stubDigitize_.getParameter<unsigned int>          ( "FirmwareType"           ) ),
 
   //--- Parameters available in MP board.
   phiSectorBits_          ( stubDigitize_.getParameter<unsigned int>          ( "PhiSectorBits"          ) ),
@@ -279,7 +291,7 @@ Settings::Settings(const edm::ParameterSet& iConfig) :
   kalmanMaxStubsEasy_      ( trackFitSettings_.getParameter<unsigned>         ( "KalmanMaxStubsEasy"     ) ),
   kalmanMaxStubsPerLayer_  ( trackFitSettings_.getParameter<unsigned>         ( "KalmanMaxStubsPerLayer" ) ),
   kalmanMultiScattTerm_    ( trackFitSettings_.getParameter<double>           ( "KalmanMultiScattTerm"   ) ),
-  kalmanMultiScattFactor_  ( trackFitSettings_.getParameter<double>           ( "KalmanMultiScattFactor" ) ),
+  kalmanChi2RphiScale_     ( trackFitSettings_.getParameter<unsigned>         ( "KalmanChi2RphiScale"    ) ),
   kalmanHOtilted_          ( trackFitSettings_.getParameter<bool>             ( "KalmanHOtilted"         ) ),
   kalmanHOhelixExp_        ( trackFitSettings_.getParameter<bool>             ( "KalmanHOhelixExp"       ) ),
   kalmanHOalpha_           ( trackFitSettings_.getParameter<unsigned int>     ( "KalmanHOalpha"          ) ),
@@ -322,6 +334,7 @@ Settings::Settings(const edm::ParameterSet& iConfig) :
   kf_tanlambdaRange_      (trackDigi_.getParameter<double>                    ( "KF_tanlambdaRange"      ) ),
   kf_chisquaredBits_      (trackDigi_.getParameter<unsigned int>              ( "KF_chisquaredBits"      ) ),
   kf_chisquaredRange_     (trackDigi_.getParameter<double>                    ( "KF_chisquaredRange"     ) ),
+  kf_chisquaredBinEdges_  (trackDigi_.getParameter<vector<double> >           ( "KF_chisquaredBinEdges"  ) ),
   //
   other_skipTrackDigi_    (trackDigi_.getParameter<bool>                      ( "Other_skipTrackDigi"    ) ),
 
@@ -428,8 +441,6 @@ Settings::Settings(const edm::ParameterSet& iConfig) :
 
   // Check Kalman fit params.
   if (kalmanMaxNumStubs_ < kalmanMinNumStubs_) throw cms::Exception("Settings.cc: Invalid cfg parameters - KalmanMaxNumStubs is less than KalmanMaxNumStubs.");
-
-  if (firmwareType_ != 1) throw cms::Exception("Settings.cc: Invalid cfg parameter - unknown FirmwareType.");
 }
 
 

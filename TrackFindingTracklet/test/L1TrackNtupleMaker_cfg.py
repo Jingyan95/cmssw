@@ -12,7 +12,7 @@ process = cms.Process("L1TrackNtuple")
 ############################################################
 
 GEOMETRY = "D21"
-#GEOMETRY = "D41" # <== to run on D41 samples, please change flag "geomTDR" to *false* in ../interface/FPGAConstants.hh 
+#GEOMETRY = "D41" # <== to run on D41 samples, please change flag "geomTkTDR" to *false* in ../interface/FPGAConstants.hh 
 
 # Specify L1 tracking algo ('HYBRID', 'HYBRID_DISPLACED', 'TMTT','HYBRID_FLOAT', 'TRACKLET_FLOAT'),
 # (where HYBRID & HYBRID_DISPLACED both run either Tracklet or Hybrid emulation, 
@@ -43,6 +43,10 @@ elif GEOMETRY == "D21":
     print "using geometry " + GEOMETRY + " (tilted)"
     process.load('Configuration.Geometry.GeometryExtended2023D21Reco_cff')
     process.load('Configuration.Geometry.GeometryExtended2023D21_cff')
+elif GEOMETRY == "D35": 
+    print "using geometry " + GEOMETRY + " (tilted)"
+    process.load('Configuration.Geometry.GeometryExtended2023D35Reco_cff')
+    process.load('Configuration.Geometry.GeometryExtended2023D35_cff')
 elif GEOMETRY == "D41": 
     print "using geometry " + GEOMETRY + " (tilted)"
     process.load('Configuration.Geometry.GeometryExtended2023D41Reco_cff')
@@ -79,6 +83,13 @@ elif GEOMETRY == "D21": # Tilted barrel T6 tracker
   #inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/SingleMuPt2to100/PU0.txt')
   #inputMC = getTxtFile('L1Trigger/TrackFindingTMTT/test/MCsamples/1040/RelVal/DisplacedSingleMuPt2to100/PU0.txt')
 
+elif GEOMETRY == "D35":
+    inputMC = ['/store/relval/CMSSW_10_4_0_mtd5/RelValTTbar_Tauola_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200-v1/20000/FE88E939-4FA1-D74F-AF49-64FA18C48E95.root',
+                   '/store/relval/CMSSW_10_4_0_mtd5/RelValTTbar_Tauola_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200-v1/20000/F87B6779-F3C4-304B-9654-598BEECCE111.root',
+                   '/store/relval/CMSSW_10_4_0_mtd5/RelValTTbar_Tauola_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200-v1/20000/F2587CD3-1504-4448-AD9C-02F75AF24979.root',
+                '/store/relval/CMSSW_10_4_0_mtd5/RelValTTbar_Tauola_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200-v1/20000/F16E8148-60AF-D54B-9115-31B1A2CE3DEA.root',
+                '/store/relval/CMSSW_10_4_0_mtd5/RelValTTbar_Tauola_14TeV/GEN-SIM-DIGI-RAW/PU25ns_103X_upgrade2023_realistic_v2_2023D35PU200-v1/20000/EEB2A415-3CD6-4E4C-8546-2EC7545F0769.root']
+        
 elif GEOMETRY == "D41":
     inputMC = ['/store/mc/PhaseIITDRSpring19DR/TTbar_14TeV_TuneCP5_Pythia8/GEN-SIM-DIGI-RAW/PU200_106X_upgrade2023_realistic_v3_ext1-v3/60000/FFB5D0CA-208F-6040-A9BF-3F5354D0AA59.root']
 
@@ -99,6 +110,7 @@ process.source = cms.Source("PoolSource",
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string('TTbar_PU200_hybrid.root'), closeFileFast = cms.untracked.bool(True))
 
+process.Timing = cms.Service("Timing", summaryOnly = cms.untracked.bool(True))
 
 ############################################################
 # L1 tracking

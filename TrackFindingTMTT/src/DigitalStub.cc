@@ -5,18 +5,76 @@
 
 namespace TMTT {
 
-//=== Note configuration parameters.
+//=== Simplified version of DigitalStub for use with KF in Hybrid tracking.
+
+DigitalStub::DigitalStub(const Settings* settings, double r, double phi, double z, unsigned int iPhiSec) :
+  ranInit_(true),
+  ranMakeGPinput_(true),
+  ranMakeHTinput_(true),
+  ranMakeSForTFinput_("KF"),
+  phiSBits_      (settings->phiSBits()),      // No. of bits to store phiS coord.
+  phiSRange_     (settings->phiSRange()),     // Range of phiS coord. in radians.
+  rtBits_        (settings->rtBits()),        // No. of bits to store rT coord.
+  rtRange_       (settings->rtRange()),       // Range of rT coord. in cm.
+  zBits_         (settings->zBits()),         // No. of bits to store z coord.
+  zRange_        (settings->zRange()),        // Range of z coord in cm.
+  phiSMult_ (pow(2, phiSBits_)/phiSRange_),
+  rtMult_   (pow(2, rtBits_  )/rtRange_),
+  zMult_    (pow(2, zBits_   )/zRange_),
+ // Radius from beamline with respect to which stub r coord. is measured.
+  numPhiSectors_ (settings->numPhiSectors()),
+  numPhiNonants_ (9),
+  phiSectorWidth_(2.*M_PI / float(numPhiSectors_)), 
+  chosenRofPhi_  (settings->chosenRofPhi())
+{
+  // Centre of this sector in phi. (Nonant 0 is centred on x-axis).
+  double phiCentreSec0 = -M_PI/float(numPhiNonants_) + M_PI/float(numPhiSectors_);
+  double phiSectorCentre = phiSectorWidth_ * float(iPhiSec) + phiCentreSec0; 
+
+  r_orig_   = r;
+  phi_orig_ = phi;
+  z_orig_   = z;
+
+  rt_orig_   = r_orig_ - chosenRofPhi_;
+  phiS_orig_ = reco::deltaPhi(phi_orig_, phiSectorCentre); 
+
+  // Digitize
+  iDigi_Rt_   = floor(rt_orig_*rtMult_);
+  iDigi_PhiS_ = floor(phiS_orig_*phiSMult_);
+  iDigi_Z_    = floor(z_orig_*zMult_);
+  iDigi_Z_KF_ = iDigi_Z_;
+
+  /*
+
+  // SKIP UNTIL HYBRID DIGITISATION PARAMS IMPLEMENTED 
+
+  // Undigitize
+  r_    = (iDigi_R_ + 0.5)/rtMult_;  
+  phiS_ = (iDigi_PhiS_ + 0.5)/phiSMult_;
+  phi_  = reco::deltaPhi(phiS_, -phiSectorRef); // N.B. phi_ measured w.r.t sector here, but w.r.t. 
+  z_    = (iDigi_Z_ + 0.5)/zMult_; 
+
+  // Check that stub coords. are within assumed digitization range.
+  this->checkInRange();
+
+  // Check that digitization followed by undigitization doesn't change results too much.
+  this->checkAccuracy();
+
+  */
+}
+
+
+//=== Note configuration parameters (for use with TMTT tracking).
 
 DigitalStub::DigitalStub(const Settings* settings) :
 
-  // To checkn that DigitalStub is correctly initialized.
+  // To check that DigitalStub is correctly initialized.
   ranInit_(false),
   ranMakeGPinput_(false),
   ranMakeHTinput_(false),
   ranMakeSForTFinput_(""),
 
   // Digitization configuration parameters
-  iFirmwareType_ (settings->firmwareType()),  // Firmware type
   phiSectorBits_ (settings->phiSectorBits()), // No. of bits to store phi sector number
   //--- Parameters available in HT board.
   phiSBits_      (settings->phiSBits()),      // No. of bits to store phiS coord.
@@ -345,7 +403,7 @@ void DigitalStub::quickMakeHTinput(int iPhiSec) {
 void DigitalStub::checkInRange() const {
   // All ranges are centred at zero, except for rho, which is +ve-definate.
   if (fabs(phiS_orig_) >= 0.5*phiSRange_)   throw cms::Exception("DigitalStub: Stub phiS is out of assumed digitization range.")<<" |phiS| = " <<fabs(phiS_orig_) <<" > "<<0.5*phiSRange_<<endl;  
-  if (fabs(rt_orig_)   >= 0.5*rtRange_)     throw cms::Exception("DigitalStub: Stub rT is out of assumed digitization range.")  <<" |rt| = "   <<fabs(rt_orig_)   <<" > "<<0.5*rtRange_  <<endl;  
+  if (fabs(rt_orig_)   >= 0.5*rtRange_)     throw cms::Exception("DigitalStub: Stub rT is out of assumed digitization range.")  <<" |rt| = "   <<fabs(rt_orig_)   <<" > "<<0.5*rtRange_  <<endl; 
   if (fabs(z_orig_)    >= 0.5*zRange_)      throw cms::Exception("DigitalStub: Stub z is out of assumed digitization range.")   <<" |z| = "    <<fabs(z_orig_)   <<" > "<<0.5*zRange_  <<endl;  
   if (fabs(phiO_orig_)   >= 0.5*phiORange_) throw cms::Exception("DigitalStub: Stub phiO is out of assumed digitization range.")<<" |phiO| = " <<fabs(phiO_orig_)<<" > "<<0.5*phiORange_  <<endl;  
   if (fabs(bend_orig_)   >= 0.5*bendRange_) throw cms::Exception("DigitalStub: Stub bend is out of assumed digitization range.")<<" |bend| = " <<fabs(bend_orig_)<<" > "<<0.5*bendRange_  <<endl;  
@@ -363,7 +421,7 @@ void DigitalStub::checkAccuracy() const {
   static unsigned int nErr = 0;
   const  unsigned int maxErr = 20; // Print error message only this number of times.
   if (nErr < maxErr) {
-    if (fabs(TA) > 0.001 || fabs(TB) > 0.3 || (fabs(TC) > 0.25 && iFirmwareType_ != 8) || fabs(TD) > 0.005 || fabs(TE) > 0.01) {
+    if (fabs(TA) > 0.001 || fabs(TB) > 0.3 || fabs(TC) > 0.25 || fabs(TD) > 0.005 || fabs(TE) > 0.01) {
       nErr++;
       cout<<"WARNING: DigitalStub lost precision: "<<TA<<" "<<TB<<" "<<TC<<" "<<TD<<" "<<TE<<endl;
     }

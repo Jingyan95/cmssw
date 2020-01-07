@@ -58,7 +58,7 @@ public:
   double               bendResolution()          const   {return bendResolution_;}        
   // Additional contribution to bend resolution from its encoding into a reduced number of bits.
   // This number is the assumed resolution relative to the naive guess of its value.
-  // It is ignored in BendResReduced = False.
+  // It is ignored in DegradeBendRes = 0.
   double               bendResolutionExtra()     const   {return bendResolutionExtra_;}        
   // Order stubs by bend in DTC, such that highest Pt stubs are transmitted first.
   bool                 orderStubsByBend()        const   {return orderStubsByBend_;}
@@ -66,7 +66,6 @@ public:
   //=== Optional stub digitization configuration
 
   bool                 enableDigitize()          const   {return enableDigitize_;}
-  unsigned int         firmwareType()            const   {return firmwareType_;}
   //--- Parameters available in MP board.
   unsigned int         phiSectorBits()           const   {return phiSectorBits_;}
   unsigned int         phiSBits()                const   {return phiSBits_;}
@@ -157,7 +156,8 @@ public:
   bool                 busyInputSectorKill()     const   {return busyInputSectorKill_;}
   unsigned int         busyInputSectorNumStubs() const   {return busyInputSectorNumStubs_;}
   // Multiplex the outputs from several HTs onto a single pair of output optical links?
-  // Options: 0 = disable Mux; 1 = Dec. 2016 Mux; 2 = Mar 2018 Mux (transverse HT readout by m-bin). 
+  // Options: 0 = disable Mux; 1 = Dec. 2016 Mux; 2 = Mar 2018 Mux (transverse HT readout by m-bin); 
+  // 3 = Sept 2019 Mux (transverse HT readout by m-bin) 
   unsigned int         muxOutputsHT()            const   {return muxOutputsHT_;}
   // Is specified eta sector enabled?
   bool                 isHTRPhiEtaRegWhitelisted(unsigned const iEtaReg) const;
@@ -314,8 +314,8 @@ public:
   unsigned int         kalmanMaxStubsPerLayer()         const { return kalmanMaxStubsPerLayer_;}
   // Multiple scattering term - inflate hit phi errors by this divided by Pt
   double               kalmanMultiScattTerm()           const { return kalmanMultiScattTerm_;}
-  // Multiple scattering factor -- buggy so don't use!
-  double               kalmanMultiScattFactor()         const { return kalmanMultiScattFactor_;}
+  // Scale down chi2 in r-phi plane by this factor to improve electron performance.
+  unsigned int         kalmanChi2RphiScale()            const { return kalmanChi2RphiScale_;}
   //--- Enable Higher order corrections
   // Treat z uncertainty in tilted barrel modules correctly.
   bool                kalmanHOtilted()                  const {return kalmanHOtilted_;}
@@ -376,6 +376,7 @@ public:
   double              kf_tanlambdaRange()        const {return kf_tanlambdaRange_;}
   unsigned int        kf_chisquaredBits()        const {return kf_chisquaredBits_;}
   double              kf_chisquaredRange()       const {return kf_chisquaredRange_;}
+  vector<double>      kf_chisquaredBinEdges()    const {return kf_chisquaredBinEdges_;}
   // Skip track digitisation when fitted is not SimpleLR or KF?
   bool                other_skipTrackDigi()      const {return other_skipTrackDigi_;}
 
@@ -471,7 +472,6 @@ private:
 
   // Optional stub digitization.
   bool                 enableDigitize_;
-  unsigned int         firmwareType_;
   unsigned int         phiSectorBits_;
   unsigned int         phiSBits_;
   double               phiSRange_;
@@ -479,10 +479,6 @@ private:
   double               rtRange_;
   unsigned int         zBits_;
   double               zRange_;
-  unsigned int         dPhiBits_;
-  double               dPhiRange_;
-  unsigned int         rhoBits_;
-  double               rhoRange_;
   unsigned int         phiOBits_;
   double               phiORange_;
   unsigned int         bendBits_;
@@ -621,7 +617,7 @@ private:
   unsigned int         kalmanMaxStubsEasy_;
   unsigned int         kalmanMaxStubsPerLayer_;
   double               kalmanMultiScattTerm_; 
-  double               kalmanMultiScattFactor_; 
+  unsigned int         kalmanChi2RphiScale_;
   bool                 kalmanHOtilted_;
   bool                 kalmanHOhelixExp_;
   unsigned int         kalmanHOalpha_;
@@ -664,6 +660,7 @@ private:
   double               kf_tanlambdaRange_;
   unsigned int         kf_chisquaredBits_;
   double               kf_chisquaredRange_;
+  vector<double>       kf_chisquaredBinEdges_;
   //
   bool                 other_skipTrackDigi_;
 

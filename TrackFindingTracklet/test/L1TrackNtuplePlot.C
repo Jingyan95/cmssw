@@ -43,10 +43,9 @@ void makeResidualIntervalPlot( TString type, TString dir, TString variable, TH1F
 // Main script
 // ----------------------------------------------------------------------------------------------------------------
 
-
 void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0, int TP_select_pdgid=0, int TP_select_eventid=0, 
 		       bool useTightCuts=false, bool useDeadRegion=false, 
-		       float TP_minPt=2.0, float TP_maxPt=100.0, float TP_maxEta=2.4, float TP_maxDxy=1.0, float TP_maxD0=1.0) {
+		       float TP_minPt=2.0, float TP_maxPt=100.0, float TP_maxEta=2.4, float TP_maxDxy=1.0, float TP_maxD0=1.0, bool doDetailedPlots=false) {
 
   // type:              this is the input file you want to process (minus ".root" extension)
   // TP_select_pdgid:   if non-zero, only select TPs with a given PDG ID
@@ -54,8 +53,12 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   // TP_minPt:          only look at TPs with pt > X GeV
   // TP_maxPt:          only look at TPs with pt < X GeV
   // TP_maxEta:         only look at TPs with |eta| < X
+  // doDetailedPlots:   includes extra plots, such as  performance vs d0.
 
   // TP_select_injet: only look at TPs that are within a jet with pt > 30 GeV (==1) or within a jet with pt > 100 GeV (==2), >200 GeV (==3) or all TPs (==0)
+
+  //--  N.B. For standard displaced tracking plots, set TP_minPt=3.0, TP_maxEta=2.0, TP_maxDxy=10.0,
+  //--  TO_maxD0=10.0, doDetailedPlots=true. (Efficiency plots vs eta also usually made for d0 < 5).
  
 
   gROOT->SetBatch();
@@ -83,7 +86,6 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
     L1Tk_maxChi2dof = L1Tk_TIGHT_maxChi2dof;
   }
   
-  bool doDetailedPlots = false; //turn on to make full set of plots
   bool doGausFit = false;       //do gaussian fit for resolution vs eta/pt plots
   bool doLooseMatch = false;    //looser MC truth matching
 
@@ -166,6 +168,7 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   vector<float>* trk_chi2;
   vector<int>*   trk_nstub;
   vector<int>*   trk_seed;
+  vector<unsigned int>*   trk_phiSector;
   vector<int>*   trk_injet;
   vector<int>*   trk_injet_highpt;
   vector<int>*   trk_injet_vhighpt;
@@ -204,6 +207,7 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   TBranch* b_trk_phi; 
   TBranch* b_trk_chi2; 
   TBranch* b_trk_nstub; 
+  TBranch* b_trk_phiSector;
   TBranch* b_trk_seed; 
   TBranch* b_trk_injet;
   TBranch* b_trk_injet_highpt;
@@ -242,7 +246,8 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   trk_eta = 0; 
   trk_phi = 0; 
   trk_chi2 = 0; 
-  trk_nstub = 0; 
+  trk_nstub = 0;
+  trk_phiSector = 0;
   trk_seed = 0; 
   trk_injet = 0;
   trk_injet_highpt = 0;
@@ -305,6 +310,7 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   tree->SetBranchAddress("trk_phi",  &trk_phi,  &b_trk_phi);
   tree->SetBranchAddress("trk_chi2", &trk_chi2, &b_trk_chi2);
   tree->SetBranchAddress("trk_nstub",   &trk_nstub,   &b_trk_nstub);
+  tree->SetBranchAddress("trk_phiSector",   &trk_phiSector,   &b_trk_phiSector);
   if (ReadTracklet) tree->SetBranchAddress("trk_seed",    &trk_seed,    &b_trk_seed);
   tree->SetBranchAddress("trk_fake",    &trk_fake,    &b_trk_fake);
   tree->SetBranchAddress("trk_genuine", &trk_genuine, &b_trk_genuine);
@@ -728,6 +734,11 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   TH1F* h_ntrk_genuine_pt3  = new TH1F("ntrk_genuine_pt3",  ";# genuine tracks (p_{T} > 3 GeV) / event; Events",  300, 0, 300.0);
   TH1F* h_ntrk_genuine_pt10 = new TH1F("ntrk_genuine_pt10", ";# genuine tracks (p_{T} > 10 GeV) / event; Events", 100, 0, 100.0);
 
+  // Max N tracks from a sector per event
+  TH1F* h_ntrkPerSector_pt2 = new TH1F("ntrkPerSector_pt2",  ";Max. # tracks from a sector (p_{T} > 2 GeV) / event; Events",  50, 0, 100.0);
+  TH1F* h_ntrkPerSector_pt3 = new TH1F("ntrkPerSector_pt3",  ";Max. # tracks from a sector (p_{T} > 3 GeV) / event; Events",  50, 0, 100.0);
+  TH1F* h_ntrkPerSector_pt4 = new TH1F("ntrkPerSector_pt4", ";Max. # tracks from a sector (p_{T} > 10 GeV) / event; Events", 50, 0, 100.0);
+
 
 
   // ----------------------------------------------------------------------------------------------------------------
@@ -780,6 +791,10 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
     int ntrkevt_genuine_pt3 = 0;
     int ntrkevt_genuine_pt10 = 0;
 
+    vector<unsigned int> nTrksPerSector_pt2(9, 0);
+    vector<unsigned int> nTrksPerSector_pt3(9, 0);
+    vector<unsigned int> nTrksPerSector_pt4(9, 0);
+
     for (int it=0; it<(int)trk_pt->size(); it++) {
 
       // only look at tracks in (ttbar) jets ?
@@ -791,6 +806,11 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
 
       if (fabs(trk_eta->at(it)) > TP_maxEta) continue;
       if (trk_pt->at(it) < TP_minPt) continue;
+
+      if (trk_pt->at(it) > 2.0) ++nTrksPerSector_pt2.at(trk_phiSector->at(it));
+      if (trk_pt->at(it) > 3.0) ++nTrksPerSector_pt3.at(trk_phiSector->at(it));
+      if (trk_pt->at(it) > 4.0) ++nTrksPerSector_pt4.at(trk_phiSector->at(it));
+
 
       if (trk_pt->at(it) > 2.0) {
 	ntrk_pt2++;
@@ -826,6 +846,9 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
     h_ntrk_genuine_pt3->Fill(ntrkevt_genuine_pt3);
     h_ntrk_genuine_pt10->Fill(ntrkevt_genuine_pt10);
 
+    h_ntrkPerSector_pt2->Fill( *std::max_element(nTrksPerSector_pt2.begin(),nTrksPerSector_pt2.end()) );
+    h_ntrkPerSector_pt3->Fill( *std::max_element(nTrksPerSector_pt3.begin(),nTrksPerSector_pt3.end()) );
+    h_ntrkPerSector_pt4->Fill( *std::max_element(nTrksPerSector_pt4.begin(),nTrksPerSector_pt4.end()) );
 
     // ----------------------------------------------------------------------------------------------------------------
     // tracking particle loop
@@ -2910,6 +2933,45 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   h_ntrk_pt3->Write();
   h_ntrk_pt10->Write();
 
+  h_ntrkPerSector_pt2->Write();
+  h_ntrkPerSector_pt3->Write();
+  h_ntrkPerSector_pt4->Write();
+
+  h_ntrkPerSector_pt2->Scale(1.0/nevt);
+  h_ntrkPerSector_pt3->Scale(1.0/nevt);
+  h_ntrkPerSector_pt4->Scale(1.0/nevt);
+
+  h_ntrkPerSector_pt2->GetYaxis()->SetTitle("Fraction of events");
+  h_ntrkPerSector_pt2->GetXaxis()->SetTitle("Max number of transmitted tracks per #phi sector");
+
+  h_ntrkPerSector_pt2->SetLineColor(4);
+  h_ntrkPerSector_pt3->SetLineColor(2);
+  h_ntrkPerSector_pt4->SetLineColor(8);
+
+  max = h_ntrkPerSector_pt2->GetMaximum();
+  h_ntrkPerSector_pt2->SetAxisRange(0.00001,max*5,"Y");  
+  h_ntrkPerSector_pt2->SetAxisRange(0.,100,"X");  
+
+  h_ntrkPerSector_pt2->Draw("hist");
+  h_ntrkPerSector_pt3->Draw("same,hist");
+  h_ntrkPerSector_pt4->Draw("same,hist");
+  gPad->SetLogy();
+
+  TLegend* l = new TLegend(0.6,0.55,0.85,0.85);
+  l->SetFillStyle(0);
+  l->SetBorderSize(0);
+  l->SetTextSize(0.04);
+  l->AddEntry(h_ntrkPerSector_pt2,"p_{T}^{track} > 2 GeV","l");
+  l->AddEntry(h_ntrkPerSector_pt3,"p_{T}^{track} > 3 GeV","l");
+  l->AddEntry(h_ntrkPerSector_pt4,"p_{T}^{track} > 4 GeV","l");
+  l->SetTextFont(42);
+  l->Draw();  
+
+  c.SaveAs(DIR+type+"_trackRatePerPhiSector_log.pdf");
+  gPad->SetLogy(0);
+
+
+
   h_ntrk_genuine_pt2->Write();
   h_ntrk_genuine_pt3->Write();
   h_ntrk_genuine_pt10->Write();
@@ -2943,7 +3005,7 @@ void L1TrackNtuplePlot(TString type, TString treeName="", int TP_select_injet=0,
   if (fabs(N)>0) cout << "efficiency for 1.75 < |eta| < "<<std::min(TP_maxEta, 2.5f)<<" = " << k/N*100.0 << " +- " << 1.0/N*sqrt(k*(1.0 - k/N))*100.0 << endl;
   N = (float) n_all_eta1p0 + n_all_eta1p75 + n_all_eta2p5;
   k = (float) n_match_eta1p0 + n_match_eta1p75 + n_match_eta2p5;
-  if (fabs(N)>0) cout << "combined efficiency for |eta| < "<<std::min(TP_maxEta, 2.5f)<<" = " << k/N*100.0 << " +- " << 1.0/N*sqrt(k*(1.0 - k/N))*100.0 << endl << endl;
+  if (fabs(N)>0) cout << "combined efficiency for |eta| < "<<std::min(TP_maxEta, 2.5f)<<" = " << k/N*100.0 << " +- " << 1.0/N*sqrt(k*(1.0 - k/N))*100.0 << " = " << k << "/" << N << endl << endl;
 
   k = (float)n_match_ptg2;
   N = (float)n_all_ptg2;

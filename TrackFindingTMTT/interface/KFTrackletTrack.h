@@ -34,20 +34,21 @@ class KFTrackletTrack{
 public:
 
   // Store a new fitted track, specifying the input Hough transform track, the stubs used for the fit,
+  // bit-encoded hit layers,
   // the fitted helix parameters & chi2,
   // and the number of helix parameters being fitted (=5 if d0 is fitted, or =4 if d0 is not fitted).
   // Also specify phi sector and eta region used by track-finding code that this track was in.
   // And if track fit declared this to be a valid track (enough stubs left on track after fit etc.).
-  KFTrackletTrack(const L1track3D& l1track3D, const vector<const Stub*>& stubs,
-                float qOverPt, float d0, float phi0, float z0, float tanLambda,
-                float chi2, unsigned int nHelixParam,
-                unsigned int iPhiSec, unsigned int iEtaReg, bool accepted = true) :
-    
-    l1track3D_(l1track3D), stubs_(stubs),
+  KFTrackletTrack(const L1track3D& l1track3D, const vector<const Stub*>& stubs, 
+		  unsigned int hitPattern,
+                  float qOverPt, float d0, float phi0, float z0, float tanLambda,
+                  float chi2rphi, float chi2rz, unsigned int nHelixParam,
+                  unsigned int iPhiSec, unsigned int iEtaReg, bool accepted = true) :
+    l1track3D_(l1track3D), stubs_(stubs), hitPattern_(hitPattern),
     qOverPt_(qOverPt), d0_(d0), phi0_(phi0), z0_(z0), tanLambda_(tanLambda),
-    chi2_(chi2), 
-    done_bcon_(false), qOverPt_bcon_(qOverPt), d0_bcon_(d0), phi0_bcon_(phi0), chi2_bcon_(chi2),
-    nHelixParam_(nHelixParam),
+    chi2rphi_(chi2rphi), chi2rz_(chi2rz), 
+    done_bcon_(false), qOverPt_bcon_(qOverPt), d0_bcon_(d0), phi0_bcon_(phi0), 
+    chi2rphi_bcon_(chi2rphi), nHelixParam_(nHelixParam),
     iPhiSec_(iPhiSec), iEtaReg_(iEtaReg), optoLinkID_(l1track3D.optoLinkID()), accepted_(accepted),
     nSkippedLayers_(0), numUpdateCalls_(0), numIterations_(0)
   {
@@ -64,8 +65,9 @@ public:
   ~KFTrackletTrack() {}
 
   //--- Optionally set track helix params & chi2 if beam-spot constraint is used (for 5-parameter fit).
-  void setBeamConstr(float qOverPt_bcon, float phi0_bcon, float chi2_bcon) {
-    done_bcon_ = true;  qOverPt_bcon_ = qOverPt_bcon;  d0_bcon_ = 0.0, phi0_bcon_ = phi0_bcon;  chi2_bcon_ = chi2_bcon;
+  void setBeamConstr(float qOverPt_bcon, float phi0_bcon, float chi2rphi_bcon) {
+    done_bcon_ = true;  qOverPt_bcon_ = qOverPt_bcon;  d0_bcon_ = 0.0, phi0_bcon_ = phi0_bcon;  
+    chi2rphi_bcon_ = chi2rphi_bcon;
   }
 
   //--- Set/get additional info about fitted track that is specific to individual track fit algorithms (KF, LR, chi2)
@@ -93,6 +95,8 @@ public:
   // Get number of stubs deleted from track candidate by fitter (because they had large residuals)
   unsigned int             getNumKilledStubs()        const  {return l1track3D_.getNumStubs() - this->getNumStubs();}
 
+  // Get bit-encoded hit pattern (where layer number assigned by increasing distance from origin, according to layers track expected to cross).
+  unsigned int                getHitPattern()         const  {return hitPattern_;}
 
 
   //--- Get the fitted track helix parameters.
@@ -132,18 +136,22 @@ public:
   // Get the number of helix parameters being fitted (=5 if d0 is fitted or =4 if d0 is not fitted).
   float   nHelixParam()  const  {return nHelixParam_;}
 
-
-
   // Get the fit degrees of freedom, chi2 & chi2/DOF
-  unsigned int numDOF()  const  {return 2*this->getNumStubs() - nHelixParam_;}
-  float   chi2()         const  {return chi2_;}
-  float   chi2dof()      const  {return chi2_/this->numDOF();}
+  unsigned int numDOF()      const  {return 2*this->getNumStubs() - nHelixParam_;}
+  unsigned int numDOFrphi()  const  {return this->getNumStubs() - (nHelixParam_ - 2);}
+  unsigned int numDOFrz(  )  const  {return this->getNumStubs() - 2;}
+  float   chi2rphi()     const  {return chi2rphi_;}
+  float   chi2rz()       const  {return chi2rz_;}
+  float   chi2()         const  {return chi2rphi_ + chi2rz_;}
+  float   chi2dof()      const  {return (this->chi2())/this->numDOF();}
 
   //--- Ditto, but if beam-spot constraint is applied.
   //--- If constraint not applied (e.g. 4 param fit) then these are identical to unconstrained values.
-  unsigned int numDOF_bcon()  const  {return (this->numDOF() - 1);}
-  float   chi2_bcon()         const  {return chi2_bcon_;}
-  float   chi2dof_bcon()      const  {return chi2_bcon_/this->numDOF_bcon();}
+  unsigned int numDOF_bcon()      const  {return (this->numDOF() - 1);}
+  unsigned int numDOFrphi_bcon()  const  {return (this->numDOFrphi() - 1);}
+  float   chi2rphi_bcon()     const  {return chi2rphi_bcon_;}
+  float   chi2_bcon()         const  {return chi2rphi_bcon_ + chi2rz_;}
+  float   chi2dof_bcon()      const  {return (this->chi2_bcon())/this->numDOF_bcon();}
 
   //--- Get phi sector and eta region used by track finding code that this track is in.
   unsigned int iPhiSec() const  {return iPhiSec_;}
@@ -190,20 +198,24 @@ private:
   vector<const Stub*>   stubs_;
   unsigned int          nLayers_;
 
+  //--- Bit-encoded hit pattern (where layer number assigned by increasing distance from origin, according to layers track expected to cross).
+  unsigned int          hitPattern_;
+
   //--- The fitted helix parameters and fit chi-squared.
   float qOverPt_;
   float d0_;
   float phi0_;
   float z0_;
   float tanLambda_;
-  float chi2_;
+  float chi2rphi_;
+  float chi2rz_;
 
   //--- Ditto with beam-spot constraint applied in case of 5-parameter fit, plus boolean to indicate
   bool  done_bcon_;
   float qOverPt_bcon_;
   float d0_bcon_;
   float phi0_bcon_;
-  float chi2_bcon_;
+  float chi2rphi_bcon_;
 
   //--- The number of helix parameters being fitted (=5 if d0 is fitted or =4 if d0 is not fitted).
   unsigned int nHelixParam_;

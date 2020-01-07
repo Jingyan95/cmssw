@@ -427,10 +427,10 @@ public:
     if (ibend==-3||ibend==-4) return 9;
     if (ibend==-5||ibend==-6) return 10;
     if (ibend==-7||ibend==-8) return 11;
-    if (ibend==-9||ibend==-9) return 12;
-    if (ibend==-11||ibend==-10) return 13;
-    if (ibend==-13||ibend==-12) return 14;
-    if (ibend<=-14) return 15;
+    if (ibend==-9||ibend==-10) return 12;
+    if (ibend==-11||ibend==-12) return 13;
+    if (ibend==-13||ibend==-14) return 14;
+    if (ibend<=-15) return 15;
 
     cout << "bend ibend : "<<bend<<" "<<ibend<<endl;
     

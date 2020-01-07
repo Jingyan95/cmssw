@@ -58,6 +58,7 @@ public:
     middleFPGAStub_=middleFPGAStub;
     outerFPGAStub_=outerFPGAStub;
 
+<<<<<<< HEAD
     trackpars_.init(rinv,phi0,d0,t,z0);
 
     trackparsapprox_.init(rinvapprox,phi0approx,d0approx,tapprox,z0approx);
@@ -68,6 +69,9 @@ public:
     fpgapars_.z0().set(iz0,nbitsz0,false,__LINE__,__FILE__);
     fpgapars_.t().set(it,nbitst,false,__LINE__,__FILE__);       
 
+=======
+    fpgatrack_ = NULL;
+>>>>>>> 80df499d46a5bd33e2918f7d1229d6ffca0b1e44
     
     if (innerStub_) assert(innerStub_->layer()<6||innerStub_->disk()<5);
     if (middleStub_) assert(middleStub_->layer()<6||middleStub_->disk()<5);
@@ -115,6 +119,8 @@ public:
   
 
   ~Tracklet() {
+
+    delete fpgatrack_;
 
   }
 
@@ -1017,10 +1023,59 @@ public:
     fpgafitpars_.z0().set(iz0fit,nbitsz0,false,__LINE__,__FILE__);
     ichisqfit_.set(ichisqfit,8,true,__LINE__,__FILE__);
 
+    delete fpgatrack_;
     fpgatrack_=new Track(makeTrack(l1stubs));
 
   }
   
+<<<<<<< HEAD
+=======
+  void setFitPars(double rinvfit, double phi0fit, double tfit,
+		  double z0fit, double chisqfit,
+		  double rinvfitexact, double phi0fitexact, double tfitexact,
+		  double z0fitexact, double chisqfitexact,
+		  int irinvfit, int iphi0fit, int itfit,
+		  int iz0fit, int ichisqfit,
+		  const vector<L1TStub*>& l1stubs = vector<L1TStub*>()){
+    
+    rinvfit_=rinvfit;
+    phi0fit_=phi0fit;
+    d0fit_=0;
+    tfit_=tfit;
+    z0fit_=z0fit;
+    chisqfit_=chisqfit;
+
+    rinvfitexact_=rinvfitexact;
+    phi0fitexact_=phi0fitexact;
+    d0fitexact_=0;
+    tfitexact_=tfitexact;
+    z0fitexact_=z0fitexact;
+    chisqfitexact_=chisqfitexact;
+    
+    if (irinvfit>(1<<14)) irinvfit=(1<<14);
+    if (irinvfit<=-(1<<14)) irinvfit=-(1<<14)+1;
+    irinvfit_.set(irinvfit,15,false,__LINE__,__FILE__);
+    iphi0fit_.set(iphi0fit,19,false,__LINE__,__FILE__);
+    id0fit_.set(0,19,false,__LINE__,__FILE__);
+    itfit_.set(itfit,14,false,__LINE__,__FILE__);
+
+    if (iz0fit>=(1<<(nbitsz0-1))) {
+      iz0fit=(1<<(nbitsz0-1))-1; 
+    }
+
+    if (iz0fit<=-(1<<(nbitsz0-1))) {
+      iz0fit=1-(1<<(nbitsz0-1)); 
+    }
+
+    iz0fit_.set(iz0fit,nbitsz0,false,__LINE__,__FILE__);
+    ichisqfit_.set(ichisqfit,8,true,__LINE__,__FILE__);
+
+    delete fpgatrack_;
+    fpgatrack_=new Track(makeTrack(l1stubs));
+
+  }
+
+>>>>>>> 80df499d46a5bd33e2918f7d1229d6ffca0b1e44
 
   std::string trackfitstr() {
     std::ostringstream oss;

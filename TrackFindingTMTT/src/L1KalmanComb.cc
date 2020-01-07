@@ -148,11 +148,76 @@ void L1KalmanComb::printStubs( std::ostream &os, std::vector<const Stub *> &stub
 }
 
 
+//=== Get Kalman layer mapping (i.e. layer order in which stubs should be processed) 
+
+unsigned int L1KalmanComb::getKalmanLayer(unsigned int iEtaReg, unsigned int layerIDreduced, bool barrel) const {
+
+  // index across is GP encoded layer ID (where barrel layers=1,2,7,5,4,3 & endcap wheels=3,4,5,6,7 & 0 never occurs)
+  // index down is eta reg
+  // element is kalman layer, where 7 is invalid
+
+  // If stub with given GP encoded layer ID can have different KF layer ID depending on whether it
+  // is barrel or endcap, then in layerMap, the the barrel case is assumed.
+  // The endcap case is fixed by hand later in this function.
+
+
+  const unsigned int nEta = 16;
+  const unsigned int nGPlayID = 7;
+
+  if (nEta != numEtaRegions_) throw cms::Exception("ERROR L1KalmanComb::getKalmanLayer hardwired value of nEta differs from NumEtaRegions cfg param");
+
+  static const unsigned layerMap[nEta/2][nGPlayID+1] = 
+    { 
+      { 7,  0,  1,  5,  4,  3,  7,  2 },
+      { 7,  0,  1,  5,  4,  3,  7,  2 },
+      { 7,  0,  1,  5,  4,  3,  7,  2 },
+      { 7,  0,  1,  5,  4,  3,  7,  2 },
+      { 7,  0,  1,  5,  4,  3,  7,  2 },
+      { 7,  0,  1,  3,  4,  2,  6,  2 },
+      { 7,  0,  1,  1,  2,  3,  4,  5 },
+      { 7,  0,  7,  1,  2,  3,  4,  5 },
+    };
+
+  unsigned int kfEtaReg;  // KF VHDL eta sector def: small in barrel & large in endcap.
+  if (iEtaReg < numEtaRegions_/2) {
+    kfEtaReg = numEtaRegions_/2 - 1 - iEtaReg;
+  } else {
+    kfEtaReg = iEtaReg - numEtaRegions_/2;
+  }
+
+  unsigned int kalmanLayer = layerMap[kfEtaReg][layerIDreduced];
+
+  // Fixes to endcap stubs.
+
+  if ( not barrel ) {
+			
+    switch ( kfEtaReg ) {
+    case 4:
+      if (layerIDreduced==3) kalmanLayer = 4;
+      if (layerIDreduced==4) kalmanLayer = 5;
+      if (layerIDreduced==5) kalmanLayer = 6;
+      break;
+    case 5:
+      if (layerIDreduced==5) kalmanLayer = 5;
+      if (layerIDreduced==7) kalmanLayer = 6;
+      break;
+    default:
+      break;
+    }
+			
+  }
+
+  return kalmanLayer;
+
+}
+
 
 
 L1KalmanComb::L1KalmanComb(const Settings* settings, const uint nPar, const string &fitterName, const uint nMeas ) : TrackFitGeneric(settings, fitterName ){
   nPar_ = nPar;
   nMeas_ = nMeas;
+  numEtaRegions_ = settings->numEtaRegions();
+
   hymin = vector<double>( nPar_, -1 );
   hymax = vector<double>( nPar_,  1 );
   hymin[0] = -0.05;
@@ -383,20 +448,20 @@ L1fittedTrack L1KalmanComb::fit(const L1track3D& l1track3D){
     // Get track helix params.
     std::map<std::string, double> trackParams = getTrackParams(cand);
 
-    L1fittedTrack returnTrk(getSettings(), l1track3D, cand->stubs(), trackParams["qOverPt"], trackParams["d0"], trackParams["phi0"], trackParams["z0"], trackParams["t"], cand->chi2(), nPar_, true);
+    L1fittedTrack returnTrk(getSettings(), l1track3D, cand->stubs(), cand->hitPattern(), trackParams["qOverPt"], trackParams["d0"], trackParams["phi0"], trackParams["z0"], trackParams["t"], cand->chi2rphi(), cand->chi2rz(), nPar_, true);
 
-    bool consistentHLS = false;
-    if (this->isHLS()) {
-      unsigned int mBinHelixHLS, cBinHelixHLS;
-      cand->getHLSextra(mBinHelixHLS, cBinHelixHLS, consistentHLS);
-      if( getSettings()->kalmanDebugLevel() >= 3 ){
-        // Check if (m,c) corresponding to helix params are correctly calculated by HLS code.
-        bool HLS_OK = ((mBinHelixHLS == returnTrk.getCellLocationFit().first) && (cBinHelixHLS == returnTrk.getCellLocationFit().second));
-        if (not HLS_OK) std::cout<<"WARNING HLS mBinHelix disagrees with C++:"
-                                 <<" (HLS,C++) m=("<<mBinHelixHLS<<","<<returnTrk.getCellLocationFit().first <<")"
-                                 <<" c=("<<cBinHelixHLS<<","<<returnTrk.getCellLocationFit().second<<")"<<endl;
-      }
-    }
+    bool consistentHLS = false;  // No longer used
+    //    if (this->isHLS()) {
+    //      unsigned int mBinHelixHLS, cBinHelixHLS;
+    //      cand->getHLSselect(mBinHelixHLS, cBinHelixHLS, consistentHLS);
+    //      if( getSettings()->kalmanDebugLevel() >= 3 ){
+    //        // Check if (m,c) corresponding to helix params are correctly calculated by HLS code.
+    //        bool HLS_OK = ((mBinHelixHLS == returnTrk.getCellLocationFit().first) && (cBinHelixHLS == returnTrk.getCellLocationFit().second));
+    //        if (not HLS_OK) std::cout<<"WARNING HLS mBinHelix disagrees with C++:"
+    //                                 <<" (HLS,C++) m=("<<mBinHelixHLS<<","<<returnTrk.getCellLocationFit().first <<")"
+    //                                 <<" c=("<<cBinHelixHLS<<","<<returnTrk.getCellLocationFit().second<<")"<<endl;
+    //      }
+    //    }
 
     // Store supplementary info, specific to KF fitter.
     if(this->isHLS() && nPar_ == 4) {
@@ -409,21 +474,26 @@ L1fittedTrack L1KalmanComb::fit(const L1track3D& l1track3D){
     // and store inside L1fittedTrack object.
     if (getSettings()->kalmanAddBeamConstr()) {
       if (nPar_ == 5) {
-	double chi2_bcon = 0.;
-	std::map<std::string, double> trackParams_bcon = getTrackParams_BeamConstr(cand, chi2_bcon);
-	returnTrk.setBeamConstr(trackParams_bcon["qOverPt"], trackParams_bcon["phi0"], chi2_bcon);
+	double chi2rphi_bcon = 0.;
+	std::map<std::string, double> trackParams_bcon = getTrackParams_BeamConstr(cand, chi2rphi_bcon);
+	returnTrk.setBeamConstr(trackParams_bcon["qOverPt"], trackParams_bcon["phi0"], chi2rphi_bcon);
       }
     }
 
     // Fitted track params must lie in same sector as HT originally found track in.
     if (! getSettings()->hybrid() ) { // consistentSector() function not yet working for Hybrid.
+
+      // Bodge to take into account digitisation in sector consistency check.
+      if (getSettings()->enableDigitize()) returnTrk.digitizeTrack("KF4ParamsComb");
+
       if (! returnTrk.consistentSector()) {
-        L1fittedTrack failedTrk(getSettings(), l1track3D, cand->stubs(), trackParams["qOverPt"], trackParams["d0"], trackParams["phi0"], trackParams["z0"], trackParams["t"], cand->chi2(), nPar_, false);
+        L1fittedTrack failedTrk(getSettings(), l1track3D, cand->stubs(), cand->hitPattern(), trackParams["qOverPt"], trackParams["d0"], trackParams["phi0"], trackParams["z0"], trackParams["t"], cand->chi2rphi(), cand->chi2rz(), nPar_, false);
         if(this->isHLS() && nPar_ == 4) {
           failedTrk.setInfoKF( cand->nSkippedLayers(), numUpdateCalls_, consistentHLS );
         } else {
           failedTrk.setInfoKF( cand->nSkippedLayers(), numUpdateCalls_ );
         }
+        if ( getSettings()->kalmanDebugLevel() >= 1 ) cout<<"Track rejected by sector consistency test"<<endl;
         return failedTrk;
       }
     }
@@ -444,7 +514,7 @@ L1fittedTrack L1KalmanComb::fit(const L1track3D& l1track3D){
 			
     //fill histograms for the selected state with TP for algEff
     if( getSettings()->kalmanFillInternalHists() ) fillCandHists( *cand, tpa );
-			
+
     return returnTrk;
 
   } else {
@@ -472,7 +542,7 @@ L1fittedTrack L1KalmanComb::fit(const L1track3D& l1track3D){
 					const KalmanState *state = *it_last;
 				
 					//std::map<std::string, double> trackParams = getTrackParams(state);
-					//L1fittedTrack returnTrk(getSettings(), l1track3D, state->stubs(), trackParams["qOverPt"], trackParams["d0"], trackParams["phi0"], trackParams["z0"], trackParams["t"], state->chi2(), nPar_, true);
+					//L1fittedTrack returnTrk(getSettings(), l1track3D, state->stubs(), state->hitPattern(), trackParams["qOverPt"], trackParams["d0"], trackParams["phi0"], trackParams["z0"], trackParams["t"], state->chi2rphi(), state->chi2rz(), nPar_, true);
 				
 				
 					std::vector<const Stub *> sstubs = state->stubs();
@@ -502,7 +572,7 @@ L1fittedTrack L1KalmanComb::fit(const L1track3D& l1track3D){
       }
     }
 
-    L1fittedTrack returnTrk(getSettings(), l1track3D, l1track3D.getStubs(), l1track3D.qOverPt(), 0, l1track3D.phi0(), l1track3D.z0(), l1track3D.tanLambda(), 9999, nPar_, false);
+    L1fittedTrack returnTrk(getSettings(), l1track3D, l1track3D.getStubs(), 0, l1track3D.qOverPt(), 0, l1track3D.phi0(), l1track3D.z0(), l1track3D.tanLambda(), 9999, 9999, nPar_, false);
     returnTrk.setInfoKF( 0, numUpdateCalls_ );
     return returnTrk;
   }
@@ -527,7 +597,7 @@ std::vector<const KalmanState *> L1KalmanComb::doKF( const L1track3D& l1track3D,
   TMatrixD K( nPar_, 2 );
   TMatrixD dcov( 2, 2 );
 	
-  const KalmanState *state0 = mkState( l1track3D, 0, 0, 0, 0, x0, pxx0, K, dcov, 0, 0 );
+  const KalmanState *state0 = mkState( l1track3D, 0, 0, 0, nullptr, x0, pxx0, K, dcov, nullptr, 0, 0 );
 	
   if( getSettings()->kalmanFillInternalHists() ) fillSeedHists( state0, tpa );
 	
@@ -536,38 +606,7 @@ std::vector<const KalmanState *> L1KalmanComb::doKF( const L1track3D& l1track3D,
   std::vector<const KalmanState *> new_states;
   std::vector<const KalmanState *> prev_states;
   prev_states.push_back( state0 );
-	
-
-  // === Layer Mapping (i.e. layer order in which stubs should be processed) ===
-
-  // index across is ian encoded layer id (where barrel layers=1,2,7,5,4,3 & endcap wheels=3,4,5,6,7 & 0 never occurs)
-  // index down is eta reg
-  // element is kalman layer where 7 is invalid
-  // assumes we are in barrel, endcap adjustments later
-  // should really be defined once in constructor 
-  
-  unsigned layerMap[18][8] = 
-    { 
-      { 7,  0,  7,  1,  2,  3,  4,  5 },
-      { 7,  0,  7,  1,  2,  3,  4,  5 },
-      { 7,  0,  1,  2,  3,  4,  5,  5 },
-      { 7,  0,  1,  2,  3,  4,  5,  2 },
-      { 7,  0,  1,  3,  4,  3,  6,  2 },
-      { 7,  0,  1,  5,  4,  3,  7,  2 },
-      { 7,  0,  1,  5,  4,  3,  7,  2 },
-      { 7,  0,  1,  5,  4,  3,  7,  2 },
-      { 7,  0,  1,  5,  4,  3,  7,  2 },
-      { 7,  0,  1,  5,  4,  3,  7,  2 },
-      { 7,  0,  1,  5,  4,  3,  7,  2 },
-      { 7,  0,  1,  5,  4,  3,  7,  2 },
-      { 7,  0,  1,  5,  4,  3,  7,  2 },
-      { 7,  0,  1,  3,  4,  3,  6,  2 },
-      { 7,  0,  1,  2,  3,  4,  5,  2 },
-      { 7,  0,  1,  2,  3,  4,  5,  5 },
-      { 7,  0,  7,  1,  2,  3,  4,  5 },
-      { 7,  0,  7,  1,  2,  3,  4,  5 },
-    };
-  
+	  
   // arrange stubs into Kalman layers according to eta region
   int etaReg = l1track3D.iEtaReg();
   std::map<int, std::vector<const StubCluster *> > layerStubs;
@@ -575,35 +614,21 @@ std::vector<const KalmanState *> L1KalmanComb::doKF( const L1track3D& l1track3D,
   // Get dead layers, if any.
   // They are assumed to be idetnical to those defined in StubKiller.cc
   bool remove2PSCut = getSettings()->kalmanRemove2PScut();
-  set<unsigned> kalmanDeadLayers = getKalmanDeadLayers( layerMap, remove2PSCut );
+  set<unsigned> kalmanDeadLayers = getKalmanDeadLayers( remove2PSCut );
 
   for( auto stubCluster : stubClusters ){
+	
+    // Get Kalman encoded layer ID for this stub.
+    int kalmanLayer = this->getKalmanLayer(etaReg, stubCluster->layerIdReduced(), stubCluster->barrel());
 		
-    int kalmanLayer = layerMap[etaReg][stubCluster->layerIdReduced()];
-
-    if ( !stubCluster->barrel() ) {
-			
-      switch ( etaReg ) {
-      case 3:
-      case 14:
-	if (stubCluster->layerIdReduced()==7) kalmanLayer = 6;
-	break;
-      case 4:
-      case 13:
-	if (stubCluster->layerIdReduced()==5) kalmanLayer = 5;
-	break;
-      case 5:
-      case 12:
-	if (stubCluster->layerIdReduced()==4) kalmanLayer = 5;
-	break;
-      default:
-	break;
+    if (kalmanLayer != 7) {
+      const_cast<StubCluster*>(stubCluster)->setLayerKF(kalmanLayer); // Ugly trick to store KF layer inside stub cluster.
+      if (layerStubs[kalmanLayer].size() < getSettings()->kalmanMaxStubsPerLayer()) {
+	layerStubs[kalmanLayer].push_back( stubCluster );
+      } else {
+	// If too many stubs, FW keeps the last stub.
+	layerStubs[kalmanLayer].back() = stubCluster;
       }
-			
-    }
-		
-    if (layerStubs[kalmanLayer].size() < getSettings()->kalmanMaxStubsPerLayer()) {
-      if (kalmanLayer != 7) layerStubs[kalmanLayer].push_back( stubCluster );
     }
   }
 
@@ -623,7 +648,7 @@ std::vector<const KalmanState *> L1KalmanComb::doKF( const L1track3D& l1track3D,
       const KalmanState *the_state = *i_state;
 			
 
-      unsigned layer = the_state->nextLayer();
+      unsigned int layer = the_state->nextLayer();
       unsigned skipped = the_state->nSkippedLayers();
 
       // If this layer is known to be dead, skip to the next layer (layer+1)
@@ -639,7 +664,6 @@ std::vector<const KalmanState *> L1KalmanComb::doKF( const L1track3D& l1track3D,
       // containers for updated state+stub combinations
       std::vector<const KalmanState *> next_states;
       std::vector<const KalmanState *> next_states_skipped;
-
 			
       // find stubs for this layer
       std::vector<const StubCluster *> stubs = layerStubs[layer]; // If layer > 6, this will return empty vector, so safe.
@@ -824,7 +848,7 @@ std::vector<const KalmanState *> L1KalmanComb::doKF( const L1track3D& l1track3D,
 			
       if( tpa && tpa->useForAlgEff() ) {
       std::map<std::string, double> trackParams = getTrackParams(best_state);
-      L1fittedTrack returnTrk(getSettings(), l1track3D, best_state->stubs(), trackParams["qOverPt"], trackParams["d0"], trackParams["phi0"], trackParams["z0"], trackParams["t"], best_state->chi2(), nPar_, true);
+      L1fittedTrack returnTrk(getSettings(), l1track3D, best_state->stubs(), best_state->hitPattern(), trackParams["qOverPt"], trackParams["d0"], trackParams["phi0"], trackParams["z0"], trackParams["t"], best_state->chi2rphi(), best_state->chi2rz(), nPar_, true);
       if (returnTrk.getNumMatchedLayers()>=4) {
       //temp_states.push_back(best_state);
       if(i==0) found = true;
@@ -839,7 +863,7 @@ std::vector<const KalmanState *> L1KalmanComb::doKF( const L1track3D& l1track3D,
     const KalmanState* stateFinal = best_state_by_nstubs.begin()->second; // First element has largest number of stubs.
     finished_states.push_back(stateFinal);
     if ( getSettings()->kalmanDebugLevel() >= 1 ) {
-      cout<<"Track found! final state selection: nLay="<<stateFinal->nStubLayers()<<" etaReg="<<l1track3D.iEtaReg();
+      cout<<"Track found! final state selection: nLay="<<stateFinal->nStubLayers()<<" hitPattern="<<std::hex<<stateFinal->hitPattern()<<std::dec<<" phiSec="<<l1track3D.iPhiSec()<<" etaReg="<<l1track3D.iEtaReg()<<" HT(m,c)=("<<l1track3D.getCellLocationHT().first<<","<<l1track3D.getCellLocationHT().second<<")";
       std::map<std::string, double> y = getTrackParams( stateFinal );
       cout<<" q/pt="<<y["qOverPt"]<<" tanL="<<y["t"]<<" z0="<<y["z0"]<<" phi0="<<y["phi0"];
       if (nPar_==5) cout<<" d0="<<y["d0"];
@@ -960,7 +984,7 @@ const KalmanState *L1KalmanComb::kalmanUpdate( unsigned skipped, unsigned layer,
     new_pxxa.Print();
   }
 
-  const KalmanState *new_state = mkState( state.candidate(), skipped, layer, stubCluster->layerId(), &state, new_xa, new_pxxa, k, dcov, stubCluster, 0 );
+  const KalmanState *new_state = mkState( state.candidate(), skipped, layer, stubCluster->layerId(), &state, new_xa, new_pxxa, k, dcov, stubCluster, 0, 0 );
   if( getSettings()->kalmanDebugLevel() >= 4 ){
     cout << "new state" << endl;
     new_state->dump( cout, tpa  );
@@ -971,15 +995,14 @@ const KalmanState *L1KalmanComb::kalmanUpdate( unsigned skipped, unsigned layer,
 }
 
 
-double L1KalmanComb::calcChi2( const KalmanState &state )const{
+void L1KalmanComb::calcChi2( const KalmanState &state, double& chi2rphi, double& chi2rz )const{
 
   if( getSettings()->kalmanDebugLevel() >= 4 ){
     cout << "calcChi2 " << endl;
   }
-  double chi2(0), chi2_p(0);
+  double deltaChi2rphi(0), deltaChi2rz;
 
   if( state.last_state() ) {
-    chi2 = state.last_state()->chi2();
 			
     const StubCluster *stubCluster = state.stubCluster();
 			
@@ -1016,46 +1039,43 @@ double L1KalmanComb::calcChi2( const KalmanState &state )const{
 	cout << "---" << endl;
 	cout << scientific << "delta = " << delta[0] << ", " << delta[1] << endl;
       }
-      chi2_p = Chi2( covR, delta );  
+      this->getDeltaChi2( covR, delta, false, deltaChi2rphi, deltaChi2rz );  
 	
     }
-    chi2 += chi2_p;
+    chi2rphi = state.last_state()->chi2rphi() + deltaChi2rphi;
+    chi2rz   = state.last_state()->chi2rz()   + deltaChi2rz;
 #ifdef RECALC_DEBUG
-    cout<<"  FITTER CHI2 UPDATE = "<<chi2<<" delta chi2="<<chi2_p<<" ID="<<ID<<endl;
+    cout<<"  FITTER CHI2 UPDATE = "<<(chi2rphi+chi2rz)<<" delta chi2="<<(deltaChi2rphi+deltaChi2rz)<<" ID="<<ID<<endl;
 #endif
   }
-
-  return chi2;
+  return;
 }
 
 
-double L1KalmanComb::Chi2( const TMatrixD &dcov, const std::vector<double> &delta, bool debug )const
+void L1KalmanComb::getDeltaChi2( const TMatrixD &dcov, const std::vector<double> &delta, bool debug,  
+                                 double& deltaChi2rphi, double& deltaChi2rz) const
 {
   if( getSettings()->kalmanDebugLevel() >= 4 ){
     cout << "dcov" << endl;
     dcov.Print();
   }
 
-  if( dcov.Determinant() == 0 ) return 999;
+  if( dcov.Determinant() == 0 ) {
+    deltaChi2rphi = 999;
+    deltaChi2rz   = 999;
+    return;
+  };
 
 
   TMatrixD dcovi( dcov );
   dcovi.Invert();
 
-  vector<double> tmp(2,0);
-  for( int i=0; i < dcovi.GetNrows(); i++ ){ 
-    for( int j=0; j < dcovi.GetNcols(); j++ ){ 
-      tmp.at(j) += delta.at(i) * dcovi(i,j); 
-    }
-  }
-  double chi2(0);
-  for( int j=0; j < 2; j++ ){ 
-    chi2 += tmp.at(j) * delta.at(j);
-  }
+  // Change in chi2 (with r-phi/r-z correlation term included in r-phi component)
+  deltaChi2rphi = delta.at(0) * delta.at(0) * dcovi(0,0) + 2 * delta.at(0) * delta.at(1) * dcovi(0,1); 
+  deltaChi2rz   = delta.at(1) * delta.at(1) * dcovi(1,1); 
 
 #ifdef RECALC_DEBUG
-  cout<<"    FITTER DELTA CHI2: rphi="<<dcovi(0,0)*delta.at(0)*delta.at(0)
-      <<" rz="<<dcovi(1,1)*delta.at(1)*delta.at(1)<<endl;
+  cout<<"    FITTER DELTA CHI2: rphi="<<deltaCii2rphi<<" rz="<<deltaChi2rz<<endl;
 #endif
 
   if( debug ){
@@ -1067,7 +1087,7 @@ double L1KalmanComb::Chi2( const TMatrixD &dcov, const std::vector<double> &delt
     for( unsigned i=0; i < delta.size(); i++ ) cout << delta.at(i) << " ";
     cout << endl;
   }
-  return chi2;
+  return;
 }
 
 
@@ -1218,14 +1238,15 @@ void L1KalmanComb::resetStates()
 
 
 const KalmanState *L1KalmanComb::mkState( const L1track3D &candidate, unsigned skipped, unsigned layer, unsigned layerId, const KalmanState *last_state, 
-					  const std::vector<double> &x, const TMatrixD &pxx, const TMatrixD &K, const TMatrixD &dcov, const StubCluster* stubCluster, double chi2 )
+					  const std::vector<double> &x, const TMatrixD &pxx, const TMatrixD &K, const TMatrixD &dcov, const StubCluster* stubCluster, double chi2rphi, double chi2rz )
 {
 
-  KalmanState *new_state = new KalmanState( candidate, skipped, layer, layerId, last_state, x, pxx, K, dcov, stubCluster, chi2, this, &getTrackParams );
+  KalmanState *new_state = new KalmanState( candidate, skipped, layer, layerId, last_state, x, pxx, K, dcov, stubCluster, chi2rphi, chi2rz, this, &getTrackParams );
 
-  if( chi2 == 0 ){
-    double new_state_chi2 = calcChi2( *new_state ); 
-    new_state->setChi2( new_state_chi2 );
+  if( chi2rphi + chi2rz == 0 ){
+    double new_state_chi2rphi = 0., new_state_chi2rz = 0.;
+    this->calcChi2( *new_state, new_state_chi2rphi, new_state_chi2rz ); 
+    new_state->setChi2( new_state_chi2rphi, new_state_chi2rz );
   }
 
   state_list_.push_back( new_state );
@@ -1583,55 +1604,62 @@ bool L1KalmanComb::isOverlap( const Stub* a, const Stub*b, OVERLAP_TYPE type ){
   }
 }
 
-set<unsigned> L1KalmanComb::getKalmanDeadLayers( unsigned layerMap[18][8], bool& remove2PSCut ) const {
+set<unsigned> L1KalmanComb::getKalmanDeadLayers( bool& remove2PSCut ) const {
+
+  // Kill scenarios described in https://github.com/EmyrClement/StubKiller/blob/master/README.md
 
   // By which Stress Test scenario (if any) are dead modules being emulated?
   const unsigned int killScenario = getSettings()->killScenario(); 
   // Should TMTT tracking be modified to reduce efficiency loss due to dead modules?
   const bool killRecover = getSettings()->killRecover();
 
-  set<unsigned> deadLayers;
+  set<pair<unsigned,bool>> deadLayers; // GP layer ID & boolean indicating if in barrel.
 
   if (killRecover) {
-    if ( killScenario == 1 ) {
-      deadLayers = {4};
+    if ( killScenario == 1 ) { // barrel layer 5
+      deadLayers.insert(pair<unsigned,bool>(4,true));
       if ( iCurrentEtaReg_ < 5 || iCurrentEtaReg_ > 8 || iCurrentPhiSec_ < 8 || iCurrentPhiSec_ > 11 ) {
 	deadLayers.clear();
       }
 
     }
-    else if ( killScenario == 2 ) {
-      deadLayers = {1};
+    else if ( killScenario == 2 ) { // barrel layer 1
+      deadLayers.insert(pair<unsigned,bool>(1,true));
       if ( iCurrentEtaReg_ > 8 || iCurrentPhiSec_ < 8 || iCurrentPhiSec_ > 11 ) {
 	deadLayers.clear();
       }
       remove2PSCut = true;
     }
-    else if ( killScenario == 3 ) {
-      deadLayers = {1,2};
+    else if ( killScenario == 3 ) { // barrel layers 1 & 2
+      deadLayers.insert(pair<unsigned,bool>(1,true));
+      deadLayers.insert(pair<unsigned,bool>(2,true));
       if ( iCurrentEtaReg_ > 8 || iCurrentPhiSec_ < 8 || iCurrentPhiSec_ > 11 ) {
 	deadLayers.clear();
       }
       else if ( iCurrentEtaReg_ < 1 ) {
-	deadLayers = {0};
+        deadLayers.insert(pair<unsigned,bool>(0,true));  // What is this doing?
       }
       remove2PSCut = true;
     }
-    else if ( killScenario == 4 ) {
-      deadLayers = {1,2};
+    else if ( killScenario == 4 ) { // barrel layer 1 & disk 1
+      deadLayers.insert(pair<unsigned,bool>(1,true));
+      deadLayers.insert(pair<unsigned,bool>(3,false));
       if ( iCurrentEtaReg_ > 8 || iCurrentPhiSec_ < 8 || iCurrentPhiSec_ > 11 ) {
 	deadLayers.clear();
       }
       else if ( iCurrentEtaReg_ > 3 ) {
-	deadLayers = {0};
+        deadLayers.insert(pair<unsigned,bool>(0,true));
       }
       remove2PSCut = true;
     }
   }
 
   set<unsigned> kalmanDeadLayers;
-  for ( auto layer : deadLayers ) {
-    kalmanDeadLayers.insert( layerMap[iCurrentEtaReg_][layer] );
+  for ( const auto& p : deadLayers ) {
+    unsigned int layer = p.first;
+    bool barrel = p.second;
+    unsigned int kalmanLayer = this->getKalmanLayer(iCurrentEtaReg_, layer, barrel);
+    kalmanDeadLayers.insert( kalmanLayer );
   }
 
   return kalmanDeadLayers;

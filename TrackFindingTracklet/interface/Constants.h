@@ -9,6 +9,11 @@
 #define USEHYBRID
 #endif
 
+//Uncomment to use HLS version of KF. Also read TrackFindingTMTT/README_HLS.txt
+#ifdef USEHYBRID
+//#define USE_HLS
+#endif
+
 //Uncomment to run the HLS version of the KF if using the Hybrid (instead of the C++ KF).
 //(Please also follow the instructions in L1Trigger/TrackFindingTMTT/README_HLS.txt).
 //#define USE_HLS
@@ -23,7 +28,7 @@ static bool hourglassExtended=false; // turn on displaced tracking, also edit L1
 //Gemetry extensions -- used only by stand-alone code.
 static const std::string geomext=hourglassExtended?"hourglassExtended":"hourglass";  
 
-static const bool geomTDR=true; // false => newest T14 tracker, true => "TDR" (T5/T6 tracker, D21/D11/D17 CMS geometries)
+static const bool geomTkTDR=true; // false => newest T14 tracker, true => "TDR" (T5/T6 tracker, D21/D11/D17 CMS geometries)
 
 //static const double cSpeed=2.99792458e10; // Speed of light (cm/s) => these are currently not used, comment out
 //static double bField=3.81120228767395;    // Assumed B-field
@@ -169,12 +174,12 @@ static const double rmaxdisk=120.0;
 // T5: http://cms-tklayout.web.cern.ch/cms-tklayout/layouts/recent-layouts/OT616_200_IT404/layout.html
 // T14: http://cms-tklayout.web.cern.ch/cms-tklayout/layouts/recent-layouts/OT616_200_IT404/layout.html
 
-static const double rmeanL1=geomTDR?(rmaxdisk*858)/4096:(rmaxdisk*851)/4096;
-static const double rmeanL2=geomTDR?(rmaxdisk*1279)/4096:(rmaxdisk*1269)/4096;
-static const double rmeanL3=geomTDR?(rmaxdisk*1795)/4096:(rmaxdisk*1784)/4096;
-static const double rmeanL4=geomTDR?(rmaxdisk*2347)/4096:(rmaxdisk*2347)/4096;
-static const double rmeanL5=geomTDR?(rmaxdisk*2937)/4096:(rmaxdisk*2936)/4096;
-static const double rmeanL6=geomTDR?(rmaxdisk*3783)/4096:(rmaxdisk*3697)/4096;
+static const double rmeanL1=geomTkTDR?(rmaxdisk*858)/4096:(rmaxdisk*851)/4096;
+static const double rmeanL2=geomTkTDR?(rmaxdisk*1279)/4096:(rmaxdisk*1269)/4096;
+static const double rmeanL3=geomTkTDR?(rmaxdisk*1795)/4096:(rmaxdisk*1784)/4096;
+static const double rmeanL4=geomTkTDR?(rmaxdisk*2347)/4096:(rmaxdisk*2347)/4096;
+static const double rmeanL5=geomTkTDR?(rmaxdisk*2937)/4096:(rmaxdisk*2936)/4096;
+static const double rmeanL6=geomTkTDR?(rmaxdisk*3783)/4096:(rmaxdisk*3697)/4096;
 
 static const double zmeanD1=(zlength*2239)/2048;
 static const double zmeanD2=(zlength*2645)/2048;
@@ -204,17 +209,17 @@ static const double half2SmoduleWidth=4.57;
 //static const double rDSSinner[10] = {66.4391, 71.4391, 76.275, 81.275, 82.9550, 87.9550, 93.815, 98.815, 99.816, 104.816};
 //static const double rDSSouter[10] = {63.9903, 68.9903, 74.275, 79.275, 81.9562, 86.9562, 92.492, 97.492, 99.816, 104.816};
 
-static const double rDSSinner_mod1 = geomTDR?69.2345:68.9391;
-static const double rDSSinner_mod2 = geomTDR?80.0056:78.7750;
-static const double rDSSinner_mod3 = geomTDR?87.3444:85.4550;
-static const double rDSSinner_mod4 = geomTDR?98.2515:96.3150;
-static const double rDSSinner_mod5 = geomTDR?104.9750:102.3160;
+static const double rDSSinner_mod1 = geomTkTDR?69.2345:68.9391;
+static const double rDSSinner_mod2 = geomTkTDR?80.0056:78.7750;
+static const double rDSSinner_mod3 = geomTkTDR?87.3444:85.4550;
+static const double rDSSinner_mod4 = geomTkTDR?98.2515:96.3150;
+static const double rDSSinner_mod5 = geomTkTDR?104.9750:102.3160;
 
-static const double rDSSouter_mod1 = geomTDR?67.6317:66.4903;
-static const double rDSSouter_mod2 = geomTDR?78.1300:76.7750;
-static const double rDSSouter_mod3 = geomTDR?86.4293:84.4562;
-static const double rDSSouter_mod4 = geomTDR?97.1316:94.9920;
-static const double rDSSouter_mod5 = geomTDR?104.9750:102.3160;
+static const double rDSSouter_mod1 = geomTkTDR?67.6317:66.4903;
+static const double rDSSouter_mod2 = geomTkTDR?78.1300:76.7750;
+static const double rDSSouter_mod3 = geomTkTDR?86.4293:84.4562;
+static const double rDSSouter_mod4 = geomTkTDR?97.1316:94.9920;
+static const double rDSSouter_mod5 = geomTkTDR?104.9750:102.3160;
 
 static const double halfstrip = 2.5; //we want the center of the two strip positions in a module, not just the center of a module 
 
@@ -486,6 +491,7 @@ static const int chisqzfactbits=14;
 //Duplicate Removal
 static const int minIndStubs=3; // not used with merge removal
 //"ichi" (pairwise, keep track with best ichisq), "nstub" (pairwise, keep track with more stubs), "grid" (TMTT-like removal), "" (no removal), "merge" (hybrid dup removal)
+
 #ifdef USEHYBRID
 static const std::string RemovalType="merge";
 // "CompareBest" (recommended) Compares only the best stub in each track for each region (best = smallest phi residual) and will merge the two tracks if stubs are shared in three or more regions
@@ -496,7 +502,7 @@ static const std::string RemovalType="ichi";
 #endif
 //static const std::string RemovalType=""; // Run without duplicate removal
 
-static const bool fakefit=false; //if true, run a dummy fit, producing TTracks directly from output of tracklet pattern reco stage.
+static const bool fakefit=false; //if true, run a dummy fit, producing TTracks directly from output of tracklet pattern reco stage. (Not working for Hybrid)
 
 //projection layers by seed index
 static const int projlayers[12][4] = {
