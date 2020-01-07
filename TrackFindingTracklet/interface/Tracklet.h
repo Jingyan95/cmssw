@@ -26,7 +26,6 @@ public:
 
   Tracklet(L1TStub* innerStub, L1TStub* middleStub, L1TStub* outerStub,
 	   Stub* innerFPGAStub, Stub* middleFPGAStub, Stub* outerFPGAStub,
-	   double phioffset,
 	   double rinv, double phi0, double d0, double z0, double t,
 	   double rinvapprox, double phi0approx, double d0approx,
 	   double z0approx, double tapprox,
@@ -47,9 +46,6 @@ public:
 
     trackletIndex_=-1;
     TCIndex_=-1;
-
-
-    phioffset_=phioffset;
 
     assert(disk_||barrel_||overlap_);
 
@@ -92,83 +88,25 @@ public:
     }
 
     
-    if(middleStub_==NULL){
-      if (barrel_) {
-	//barrel
-	for (int i=0;i<4;i++) {
-	  
-	  if (!layerprojs[i].valid()) continue;	  
-	  layerproj_[projlayer_[i]-1]=layerprojs[i];
-
-	}
-	//Now handle projections to the disks
-	for (int i=0;i<5;i++) {
-	  
-	  if (!diskprojs[i].valid()) continue;
-
-	  diskproj_[i]=diskprojs[i];
-
-	}
-      } 
+    //Handle projections to the layers
+    for (int i=0;i<4;i++) {
       
-      if (disk_) {
-	//disk stub 
-	for (int i=0;i<3;i++) {
-	  
-	  if (!diskprojs[i].valid()) continue;
-	  
-	  diskproj_[abs(projdisk_[i])-1]=diskprojs[i];
-
-	}
-	for (int i=0;i<2;i++) {
-	  
-	  if (!layerprojs[i].valid()) continue;
-	  
-	  layerproj_[i]=layerprojs[i];
-
-	}
-      }
+      if (projlayer_[i]==0) continue;
+      if (!layerprojs[i].valid()) continue;
       
-      if (overlap_) {
-	//projections to layers
-	for (int i=0;i<1;i++) {
-	  
-	  if (!layerprojs[i].valid()) continue;
-	  
-	  layerproj_[i]=layerprojs[i];
-
-	}
-	//Now handle projections to the disks
-	for (int i=0;i<4;i++) {
-	  if (!diskprojs[i].valid()) continue;
-	  int offset=1;
-	  if (outerStub->layer()+1==2&&innerStub->layer()+1==3) offset=0;
-	  diskproj_[i+offset]=diskprojs[i];
-	  
-	}
-      } 
+      layerproj_[projlayer_[i]-1]=layerprojs[i];
+      
     }
-    else{
-      //triplet seeding
-      //barrel
-      for (int i=0;i<4;i++) {
+    //Now handle projections to the disks
+    for (int i=0;i<5;i++) {
+      
+      if (projdisk_[i]==0) continue;
+      if (!diskprojs[i].valid()) continue;
 	
-	if (projlayer_[i] <0) continue;
-	if (!layerprojs[i].valid()) continue;
-	
-	layerproj_[projlayer_[i]-1]=layerprojs[i];
-
-      }
-      //Now handle projections to the disks
-      for (int i=0;i<5;i++) {
-	
-	if (projdisk_[i]==0) continue;
-	if (!diskprojs[i].valid()) continue;
-	
-	diskproj_[abs(projdisk_[i])-1]=diskprojs[i];
-
-      }
+      diskproj_[projdisk_[i]-1]=diskprojs[i];
+      
     }
+    
     
     ichisqfit_.set(-1,8,false);
 
@@ -893,9 +831,9 @@ public:
         }             
 	
 	//check disk
-	if(i==3 && layerresid_[0].valid() && innerFPGAStub_->layer().value()==1) continue; // Don't add D4 if track has L1 stub
 	if (i>=5) continue; //i=[0..4] for disks
 	if(diskresid_[i].valid()) {
+	  if(i==3 && layerresid_[0].valid() && innerFPGAStub_->layer().value()==1) continue; // Don't add D4 if track has L1 stub
 	  // two extra bits to indicate if the matched stub is local or from neighbor
 	  int location = 1;  // local
 	  location<<=diskresid_[i].fpgastubid().nbits();
@@ -1329,18 +1267,16 @@ public:
     return disk_;
   }
 
-  bool foundTrack(L1SimTrack simtrk){
+  bool foundTrack(L1SimTrack simtrk,double phioffset){
 
     double deta=simtrk.eta()-asinh(itfit().value()*ktpars);
-    double dphi=Util::phiRange(simtrk.phi()-(iphi0fit().value()*kphi0pars+phioffset_));
+    double dphi=Util::phiRange(simtrk.phi()-(iphi0fit().value()*kphi0pars+phioffset));
     
     bool found=(fabs(deta)<0.06)&&(fabs(dphi)<0.01);
     
     return found;
 
   }
-
-  double phioffset() const {return phioffset_;}
 
   void setTrackletIndex(int index) {
     trackletIndex_=index;
@@ -1423,8 +1359,6 @@ private:
   bool disk_;
   bool overlap_;
   bool triplet_;
-
-  double phioffset_;
 
   Stub* innerFPGAStub_;
   Stub* middleFPGAStub_;

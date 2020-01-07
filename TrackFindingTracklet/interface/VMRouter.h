@@ -354,7 +354,7 @@ public:
 		  cout << getName()<<" try adding stub to "<<vmstubsTEPHI_[iphiRawTmp][l]->getName()<<endl;
 		}
 		int nfinephi=nfinephibarrelinner;
-		if (layer_==2||layer_==4|layer_==6) {
+		if (layer_==2||layer_==4||layer_==6) {
 		  nfinephi=nfinephibarrelouter;
 		}
 		int nphireg=5;

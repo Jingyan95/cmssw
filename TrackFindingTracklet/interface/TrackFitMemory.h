@@ -54,8 +54,8 @@ public:
     double phioffset=phimin_;
     for(unsigned int i=0;i<tracks_.size();i++){
       if (tracks_[i]->getTrack()->duplicate()) continue;
-      if (tracks_[i]->foundTrack(simtrk)) match=true;
-      if (tracks_[i]->foundTrack(simtrk)) {
+      if (tracks_[i]->foundTrack(simtrk,phioffset)) match=true;
+      if (tracks_[i]->foundTrack(simtrk,phioffset)) {
 	Tracklet* tracklet=tracks_[i];
 	
 	/*

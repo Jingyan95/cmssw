@@ -469,16 +469,16 @@ public:
   
 private:
 
-  double getPhiRes(Tracklet* curTracklet, std::pair<L1TStub*, Stub*> curStub)
+  double getPhiRes(Tracklet* curTracklet, std::pair<Stub*, L1TStub*> curStub)
   {
     double phiproj;
     double stubphi;
     double phires;
     // Get phi position of stub
-    stubphi = curStub.first->phi();
+    stubphi = curStub.second->phi();
     // Get region that the stub is in (Layer 1->6, Disk 1->5)
-    int Layer = curStub.second->layer().value() + 1;
-    int Disk = curStub.second->disk().value();
+    int Layer = curStub.first->layer().value() + 1;
+    int Disk = curStub.first->disk().value();
     // Get phi projection of tracklet
     int seedindex = curTracklet->seedIndex();
     // If this stub is a seed stub, set projection=phi, so that res=0

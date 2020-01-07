@@ -16,29 +16,6 @@ class Track{
 
 public:
 
-  Track(int irinv, int iphi0, int it, int iz0, int ichisq,
-            double chisq,
-            std::map<int, int> stubID, std::vector<L1TStub*> l1stub,
-            int seed){
-
-    irinv_=irinv;
-    iphi0_=iphi0;
-    id0_=0.0;
-    iz0_=iz0;
-    it_=it;
-    ichisq_=ichisq;
-
-    chisq_=chisq;
-
-    stubID_=stubID;
-    l1stub_=l1stub;
-
-    seed_=seed;
-    duplicate_=false;
-    sector_=NSector;
-
-  }
-
   Track(int irinv, int iphi0, int id0, int it, int iz0, int ichisq,
             double chisq,
             std::map<int, int> stubID, std::vector<L1TStub*> l1stub,
@@ -53,6 +30,11 @@ public:
 
     chisq_=chisq;
 
+    nstubs_=l1stub.size();
+    if (nstubs_>6) nstubs_=6; //maximum used in fit
+    
+    //assert(stubID.size()==nstubs_);
+    
     stubID_=stubID;
     l1stub_=l1stub;
 
@@ -68,8 +50,6 @@ public:
   
   void setDuplicate(bool flag) { duplicate_=flag; }
   void setSector(int nsec) { sector_=nsec; }
-  void setStubIDpremerge(std::vector<std::pair<int, int>> stubIDpremerge) { stubIDpremerge_ = stubIDpremerge; }
-  void setStubIDprefit(std::vector<std::pair<int, int>> stubIDprefit) { stubIDprefit_ = stubIDprefit; }
 
   int irinv() const { return irinv_; }
   int iphi0() const { return iphi0_; }
@@ -78,8 +58,6 @@ public:
   int it()    const { return it_; }
   int ichisq() const {return ichisq_;}
 
-  std::vector<std::pair<int, int>> stubIDpremerge() const { return stubIDpremerge_; }
-  std::vector<std::pair<int, int>> stubIDprefit() const { return stubIDprefit_; }
   std::map<int, int> stubID() const { return stubID_; }
   std::vector<L1TStub*> stubs() const { return l1stub_; }
   
@@ -141,11 +119,10 @@ private:
   double t_;
   double chisq_;
 
-  std::vector<std::pair<int, int>> stubIDpremerge_;
-  std::vector<std::pair<int, int>> stubIDprefit_;
   std::map<int, int> stubID_;
   std::vector<L1TStub*> l1stub_;
 
+  unsigned int nstubs_;
   int seed_;
   bool duplicate_;
   int sector_;

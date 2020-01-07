@@ -28,18 +28,17 @@ public:
     if (phimin_>M_PI) phimin_-=2*M_PI;
     if (phimax_>M_PI) phimax_-=2*M_PI;
     if (phimin_>phimax_)  phimin_-=2*M_PI;
-    phioffset_=phimin_;
 
     maxtracklet_=127;
     
-   trackletproj_L1PHI1_=0;
-   trackletproj_L1PHI2_=0;
-   trackletproj_L1PHI3_=0;
-   trackletproj_L1PHI4_=0;
-   trackletproj_L1PHI5_=0;
-   trackletproj_L1PHI6_=0;
-   trackletproj_L1PHI7_=0;
-   trackletproj_L1PHI8_=0;
+    trackletproj_L1PHI1_=0;
+    trackletproj_L1PHI2_=0;
+    trackletproj_L1PHI3_=0;
+    trackletproj_L1PHI4_=0;
+    trackletproj_L1PHI5_=0;
+    trackletproj_L1PHI6_=0;
+    trackletproj_L1PHI7_=0;
+    trackletproj_L1PHI8_=0;
    
 
    trackletproj_L2PHI1_=0;
@@ -1173,7 +1172,6 @@ public:
         
     Tracklet* tracklet=new Tracklet(innerStub,middleStub,outerStub,
 				    innerFPGAStub,middleFPGAStub,outerFPGAStub,
-				    phioffset_,
 				    rinv,phi0,d0,z0,t,
 				    rinvapprox,phi0approx,d0approx,
 				    z0approx,tapprox,
@@ -1450,7 +1448,6 @@ public:
         
     Tracklet* tracklet=new Tracklet(innerStub,middleStub,outerStub,
 				    innerFPGAStub,middleFPGAStub,outerFPGAStub,
-				    phioffset_,
 				    rinv,phi0,d0,z0,t,
 				    rinvapprox,phi0approx,d0approx,
 				    z0approx,tapprox,
@@ -1723,7 +1720,6 @@ public:
         
     Tracklet* tracklet=new Tracklet(innerStub,middleStub,outerStub,
 				    innerFPGAStub,middleFPGAStub,outerFPGAStub,
-				    phioffset_,
 				    rinv,phi0,d0,z0,t,
 				    rinvapprox,phi0approx,d0approx,
 				    z0approx,tapprox,
@@ -1940,7 +1936,6 @@ private:
   int disk_;
   double phimin_;
   double phimax_;
-  double phioffset_;
   double rproj_[4];
   int lproj_[4];
   double zproj_[3];
