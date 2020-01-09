@@ -37,7 +37,7 @@ class HybridFit{
 
       static const TMTT::Settings settings;
 
-      int kf_phi_sec=tracklet->homeSector();
+      int kf_phi_sec=iSector_;
 
       for (unsigned int k=0;k<trackstublist.size();k++) {
         L1TStub* L1stubptr=trackstublist[k].second;

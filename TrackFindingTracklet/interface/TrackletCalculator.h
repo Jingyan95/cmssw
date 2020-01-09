@@ -675,9 +675,8 @@ public:
     }
     
     double rinvapprox,phi0approx,tapprox,z0approx;
-    double phiprojapprox[4],zprojapprox[4],phiderapprox[4],zderapprox[4];
+    double phiprojapprox[4],zprojapprox[4];
     double phiprojdiskapprox[5],rprojdiskapprox[5];
-    double phiderdiskapprox[5],rderdiskapprox[5];
     
     IMATH_TrackletCalculator *ITC;
     if(layer_==1)      ITC = &ITC_L1L2;
@@ -769,12 +768,6 @@ public:
     zprojapprox[2]   = ITC->zL_2_final.get_fval();
     zprojapprox[3]   = ITC->zL_3_final.get_fval();
 
-
-    for(int i=0; i<4; ++i){
-      phiderapprox[i] = ITC->der_phiL_final.get_fval();
-      zderapprox[i]   = ITC->der_zL_final.get_fval();
-    }
-
     phiprojdiskapprox[0] = ITC->phiD_0_final.get_fval();
     phiprojdiskapprox[1] = ITC->phiD_1_final.get_fval();
     phiprojdiskapprox[2] = ITC->phiD_2_final.get_fval();
@@ -786,11 +779,6 @@ public:
     rprojdiskapprox[2] = ITC->rD_2_final.get_fval();
     rprojdiskapprox[3] = ITC->rD_3_final.get_fval();
     rprojdiskapprox[4] = ITC->rD_4_final.get_fval();
-
-    for(int i=0; i<5; ++i){
-      phiderdiskapprox[i] = ITC->der_phiD_final.get_fval();
-      rderdiskapprox[i]   = ITC->der_rD_final.get_fval();
-    }
 
     //now binary
     
@@ -1119,9 +1107,8 @@ public:
     }
     
     double rinvapprox,phi0approx,tapprox,z0approx;
-    double phiprojapprox[3],zprojapprox[3],phiderapprox[3],zderapprox[3];
-    double phiprojdiskapprox[3],rprojdiskapprox[3],
-      phiderdiskapprox[3],rderdiskapprox[3];
+    double phiprojapprox[3],zprojapprox[3];
+    double phiprojdiskapprox[3],rprojdiskapprox[3];
 	    
     IMATH_TrackletCalculatorDisk *ITC;
     if(disk_==1)       ITC = &ITC_F1F2;
@@ -1203,11 +1190,6 @@ public:
     zprojapprox[1]   = ITC->zL_1_final.get_fval();
     zprojapprox[2]   = ITC->zL_2_final.get_fval();
 
-    for(int i=0; i<3; ++i){
-      phiderapprox[i] = ITC->der_phiL_final.get_fval();
-      zderapprox[i]   = ITC->der_zL_final.get_fval();
-    }
-
     phiprojdiskapprox[0] = ITC->phiD_0_final.get_fval();
     phiprojdiskapprox[1] = ITC->phiD_1_final.get_fval();
     phiprojdiskapprox[2] = ITC->phiD_2_final.get_fval();
@@ -1215,11 +1197,6 @@ public:
     rprojdiskapprox[0] = ITC->rD_0_final.get_fval();
     rprojdiskapprox[1] = ITC->rD_1_final.get_fval();
     rprojdiskapprox[2] = ITC->rD_2_final.get_fval();
-
-    for(int i=0; i<3; ++i){
-      phiderdiskapprox[i] = ITC->der_phiD_final.get_fval();
-      rderdiskapprox[i]   = ITC->der_rD_final.get_fval();
-    }
 
     //now binary
     
@@ -1488,10 +1465,8 @@ public:
     }
 
     double rinvapprox,phi0approx,tapprox,z0approx;
-    double phiprojapprox[3],zprojapprox[3],phiderapprox[3],zderapprox[3];
-    double phiprojdiskapprox[4],rprojdiskapprox[4],
-      phiderdiskapprox[4],rderdiskapprox[4];
-    
+    double phiprojapprox[3],zprojapprox[3];
+    double phiprojdiskapprox[4],rprojdiskapprox[4];
 
     IMATH_TrackletCalculatorOverlap *ITC;
     int ll = outerFPGAStub->layer().value()+1;
@@ -1566,11 +1541,6 @@ public:
     zprojapprox[1]   = ITC->zL_1_final.get_fval();
     zprojapprox[2]   = ITC->zL_2_final.get_fval();
 
-    for(int i=0; i<3; ++i){
-      phiderapprox[i] = ITC->der_phiL_final.get_fval();
-      zderapprox[i]   = ITC->der_zL_final.get_fval();
-    }
-
     phiprojdiskapprox[0] = ITC->phiD_0_final.get_fval();
     phiprojdiskapprox[1] = ITC->phiD_1_final.get_fval();
     phiprojdiskapprox[2] = ITC->phiD_2_final.get_fval();
@@ -1581,16 +1551,11 @@ public:
     rprojdiskapprox[2] = ITC->rD_2_final.get_fval();
     rprojdiskapprox[3] = ITC->rD_3_final.get_fval();
 
-    for(int i=0; i<4; ++i){
-      phiderdiskapprox[i] = ITC->der_phiD_final.get_fval();
-      rderdiskapprox[i]   = ITC->der_rD_final.get_fval();
-    }
 
     //now binary
 
     int irinv,iphi0,it,iz0;
-    bool validproj[3];
-    int iphiproj[3],izproj[3],iphider[3],izder[3];
+    int iphiproj[3],izproj[3];
     
     int iphiprojdisk[4],irprojdisk[4];
     
@@ -1663,17 +1628,10 @@ public:
     izproj[2]   = ITC->zL_2_final.get_ival();
 
     for(int i=0; i<3; ++i){
-      iphider[i] = ITC->der_phiL_final.get_ival();
-      izder[i]   = ITC->der_zL_final.get_ival();
-
-      validproj[i] = true;
-      if (izproj[i]<-(1<<(nbitszprojL123-1))) validproj[i]=false;
-      if (izproj[i]>=(1<<(nbitszprojL123-1))) validproj[i]=false;
 
       //this is left from the original....
       if (iphiproj[i]>=(1<<nbitsphistubL456)-1) {
 	iphiproj[i]=(1<<nbitsphistubL456)-2; //-2 not to hit atExtreme
-	validproj[i] = false;
       }
 
       if (rproj_[i]<60.0)
@@ -1684,17 +1642,8 @@ public:
 
       if (iphiproj[i]<=0) {
 	iphiproj[i]=1;
-	validproj[i] = false;
       }
 
-      if (rproj_[i]<60.0) {
-        if (iphider[i]<-(1<<(nbitsphiprojderL123-1))) iphider[i] = -(1<<(nbitsphiprojderL123-1));
-        if (iphider[i]>=(1<<(nbitsphiprojderL123-1))) iphider[i] = (1<<(nbitsphiprojderL123-1))-1;
-      }
-      else {
-        if (iphider[i]<-(1<<(nbitsphiprojderL456-1))) iphider[i] = -(1<<(nbitsphiprojderL456-1));
-        if (iphider[i]>=(1<<(nbitsphiprojderL456-1))) iphider[i] = (1<<(nbitsphiprojderL456-1))-1;
-      }
     }
 
     iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
