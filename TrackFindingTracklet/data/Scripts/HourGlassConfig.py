@@ -13,7 +13,7 @@ tdisk=2.4
 tLLD =1.7
 
 #If true it will use a TrackletProcessor to replace TEs, TCs
-combinedTP=True
+combinedTP=False
 
 #If true it will use a MatchProcessor to replace PRs, MEs, MC
 combinedMP=False

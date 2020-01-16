@@ -1613,12 +1613,6 @@ public:
     it    = ITC->t_final.get_ival();
     iz0   = ITC->z0_final.get_ival();
 
-    //"protection" from the original, reinterpreted
-    if (iz0>= 1<<(ITC->z0_final.get_nbits()-1)) iz0=(1<<(ITC->z0_final.get_nbits()-1))-1;
-    if (iz0<=-(1<<(ITC->z0_final.get_nbits()-1))) iz0=1-(1<<(ITC->z0_final.get_nbits()-1))-1; 
-    if (irinv>= (1<<(ITC->rinv_final.get_nbits()-1))) irinv=(1<<(ITC->rinv_final.get_nbits()-1))-1;
-    if (irinv<=-(1<<(ITC->rinv_final.get_nbits()-1))) irinv=1-(1<<(ITC->rinv_final.get_nbits()-1))-1; 
-
     iphiproj[0] = ITC->phiL_0_final.get_ival();
     iphiproj[1] = ITC->phiL_1_final.get_ival();
     iphiproj[2] = ITC->phiL_2_final.get_ival();
@@ -1626,25 +1620,6 @@ public:
     izproj[0]   = ITC->zL_0_final.get_ival();
     izproj[1]   = ITC->zL_1_final.get_ival();
     izproj[2]   = ITC->zL_2_final.get_ival();
-
-    for(int i=0; i<3; ++i){
-
-      //this is left from the original....
-      if (iphiproj[i]>=(1<<nbitsphistubL456)-1) {
-	iphiproj[i]=(1<<nbitsphistubL456)-2; //-2 not to hit atExtreme
-      }
-
-      if (rproj_[i]<60.0)
-	iphiproj[i]>>=(nbitsphistubL456-nbitsphistubL123);
-      else {
-	izproj[i]>>=(nbitszprojL123-nbitszprojL456);
-      }
-
-      if (iphiproj[i]<=0) {
-	iphiproj[i]=1;
-      }
-
-    }
 
     iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
     iphiprojdisk[1] = ITC->phiD_1_final.get_ival();
