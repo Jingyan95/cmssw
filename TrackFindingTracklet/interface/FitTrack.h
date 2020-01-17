@@ -156,10 +156,12 @@ class FitTrack:public ProcessBase{
   }
 
 
-
-  void trackFitNew(Tracklet* tracklet, std::vector<std::pair<Stub*,L1TStub*>> &trackstublist, std::vector<std::pair<int,int>> &stubidslist){
+#ifndef USEHYBRID
+  void trackFitNew(Tracklet* tracklet, std::vector<std::pair<Stub*,L1TStub*>> &, std::vector<std::pair<int,int>> &){
+#endif
 
 #ifdef USEHYBRID
+  void trackFitNew(Tracklet* tracklet, std::vector<std::pair<Stub*,L1TStub*>> &trackstublist, std::vector<std::pair<int,int>> &stubidslist){
    if (doKF) {
 
     // From full match lists, collect all the stubs associated with the tracklet seed
@@ -983,13 +985,16 @@ class FitTrack:public ProcessBase{
 
    double phicrit=phi0fit-asin(0.5*rcrit*rinvfit);
    bool keep=(phicrit>phicritmin)&&(phicrit<phicritmax);
-   
-   if (!keep) return;
 
-   tracklet->setFitPars(rinvfit,phi0fit,tfit,z0fit,chisqfit,
-     rinvfitexact,phi0fitexact,tfitexact,
-     z0fitexact,chisqfitexact,
-     irinvfit,iphi0fit,itfit,iz0fit,ichisqfit);
+   
+   if (!keep) {
+     return;
+   }
+     
+   tracklet->setFitPars(rinvfit,phi0fit,0.0,tfit,z0fit,chisqfit,
+			rinvfitexact,phi0fitexact,0.0,tfitexact,
+			z0fitexact,chisqfitexact,
+			irinvfit,iphi0fit,0,itfit,iz0fit,ichisqfit);
 
   }
 
@@ -1009,13 +1014,18 @@ class FitTrack:public ProcessBase{
 
    std::vector<unsigned int> indexArray;
    for (unsigned int i=0;i<fullmatch.size();i++) {
+
+     //checks that we have correct order
+     if (fullmatch[i]->nMatches()>1) {
+       for (unsigned int j=0;j<fullmatch[i]->nMatches()-1;j++){
+	 assert(fullmatch[i]->getFPGATracklet(j)->TCID()<=fullmatch[i]->getFPGATracklet(j+1)->TCID());
+       }
+     }
+     
+     
     if(debug1 && fullmatch[i]->nMatches()!=0) cout<<"orderedMatches: "<<fullmatch[i]->getName()<<" "<< fullmatch[i]->nMatches()<<"\n";
 
     indexArray.push_back(0);
-    for (unsigned int j=0;j<fullmatch[i]->nMatches();j++){
-      //cout<<"Name tracklet:"<<fullmatch[i]->getName()<<" "<<fullmatch[i]->getFPGATracklet(j)<<endl;
-      assert(iSector_==fullmatch[i]->getFPGATracklet(j)->homeSector());
-    }
    }
 
    int bestIndex=-1;
@@ -1057,13 +1067,12 @@ class FitTrack:public ProcessBase{
 
   void execute() {
 
-
    // merge
    std::vector<Tracklet*> matches1=orderedMatches(fullmatch1_);
    std::vector<Tracklet*> matches2=orderedMatches(fullmatch2_);
    std::vector<Tracklet*> matches3=orderedMatches(fullmatch3_);
    std::vector<Tracklet*> matches4=orderedMatches(fullmatch4_);
-
+   
    if (debug1&&(matches1.size()+matches2.size()+matches3.size()+matches4.size())>0) {
     for (unsigned int i=0;i<fullmatch1_.size();i++) {
      cout << fullmatch1_[i]->getName()<<" "<<fullmatch1_[i]->nMatches()<<endl;

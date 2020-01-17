@@ -65,6 +65,7 @@ static const bool writeSeeds=false;
 static const bool writeTE=false;
 static const bool writeTED=false;
 static const bool writeTRE=false;
+static const bool writeTrackletProcessor=false;
 static const bool writeTrackletCalculator=false;
 static const bool writeTrackletCalculatorDisplaced=false;
 static const bool writeTrackletPars=false;
@@ -74,10 +75,10 @@ static const bool writeTrackProjOcc=false;
 static const bool writeME=false;
 static const bool writeMatchCalculator=false;
 static const bool writeResiduals=false;
-static const bool writeProjectionTransceiver=false;
-static const bool writeMatchTransceiver=false;
 static const bool writeFitTrack=false;
 static const bool writeChiSq=false;
+
+static const bool writeTC=false; //if true write out which memories track projetions will fill
 
 static const bool writeNMatches=false;
 static const bool writeHitEff=false;
@@ -99,7 +100,7 @@ static const bool writeVariance=false; //write out residuals for variand matrix 
 static const bool writeResEff=false; //write files for making resolution & efficiency plots for standable code version
 static const bool writePars=false; //write files for making plots of track parameters
 
-static const bool writeMatchEff=false; //write files for making plots with truth matched efficiency
+static const bool writeMatchEff=true; //write files for making plots with truth matched efficiency
 
 
 
@@ -122,7 +123,7 @@ static const bool writetrace=false; //Print out details about startup
 static const bool debug1=false; //Print detailed debug information about tracking
 static const bool writeoutReal = false; 
 static const bool writememLinks = false; //Write files for dtc links
-static const bool writemem=false; //Note that for 'full' detector this will open
+static const bool writemem = false; //Note that for 'full' detector this will open
                             //a LOT of files, and the program will run excruciatingly slow
 static const unsigned int writememsect=3;  //writemem only for this sector
 
@@ -261,18 +262,13 @@ static const unsigned int nvmteoverlapdisks[2] = {4, 4};
 static const double rcrit=55.0;
 
 
-static const double rminL1=rmeanL1-drmax; 
 static const double rmaxL1=rmeanL1+drmax; 
-static const double rminL2=rmeanL2-drmax; 
 static const double rmaxL2=rmeanL2+drmax; 
-static const double rminL3=rmeanL3-drmax; 
 static const double rmaxL3=rmeanL3+drmax; 
-static const double rminL4=rmeanL4-drmax; 
 static const double rmaxL4=rmeanL4+drmax; 
-static const double rminL5=rmeanL5-drmax; 
 static const double rmaxL5=rmeanL5+drmax; 
-static const double rminL6=rmeanL6-drmax; 
 static const double rmaxL6=rmeanL6+drmax; 
+
 
 static const double zminD1=zmeanD1-dzmax; 
 static const double zmaxD1=zmeanD1+dzmax; 
@@ -289,11 +285,13 @@ static const double two_pi=2*M_PI;
 
 static const double ptcut=1.91; //Minimum pt
 static const double rinvcut=0.01*0.3*3.8/ptcut; //0.01 to convert to cm-1
-static const double ptcutte=1.6; //Minimum pt in TE
+static const double ptcutte=1.8; //Minimum pt in TE
 static const double rinvcutte=0.01*0.3*3.8/ptcutte; //0.01 to convert to cm-1 in TE
-static const double bendcut=1.5;
-static const double bendcutdisk=2.0;
+static const double bendcut=1.25;
+static const double bendcutdisk=1.25;
 static const double z0cut=15.0;
+static const double mecut=2.0;
+static const double mecutdisk=1.5;
 
 
 static const unsigned int NSector=9; 
@@ -387,11 +385,11 @@ static const int nbitszprojderL456=7+2;
 static const int nfinephibarrelinner=2;
 static const int nfinephibarrelouter=3;
 
-static const int nfinephidiskinner=1;
-static const int nfinephidiskouter=2;
+static const int nfinephidiskinner=2; //too small!
+static const int nfinephidiskouter=3;
 
-static const int nfinephioverlapinner=1;
-static const int nfinephioverlapouter=2;
+static const int nfinephioverlapinner=2;
+static const int nfinephioverlapouter=3;
 
 
 //Bits used to store track parameter in tracklet
@@ -408,7 +406,6 @@ static const double maxrinv=0.006;
 //static const double maxz0=28.0;
 static const double maxd0=10.;
 
-static const double rmin[6]={rminL1,rminL2,rminL3,rminL4,rminL5,rminL6};
 
 //These are constants defining global coordinate system
 
@@ -507,6 +504,39 @@ static const std::string RemovalType="ichi";
 
 static const bool fakefit=false; //if true, run a dummy fit, producing TTracks directly from output of tracklet pattern reco stage. (Not working for Hybrid)
 
+//projection layers by seed index
+static const int projlayers[12][4] = {
+  {3, 4, 5, 6},  //0 L1L2
+  {1, 2, 5, 6},  //1 L3L4
+  {1, 2, 3, 4},  //2 L5L6    
+  {1, 2},  //3 D1D2    
+  {1, 2},  //4 D3D4    
+  {1, 2},  //5 L1D1    
+  {1, 2},  //6 L2D1    
+  {1, 4, 5, 6},  //7 L2L3
+  {1, 5, 6}, //8 L2L3L4
+  {1, 2, 3}, //9 L4L5L6
+  {1}, //10 L2L3D1
+  {} //11 D1D2L2
+};
+
+//projection disks by seed index
+static const int projdisks[12][5] = {
+  {1, 2, 3, 4, 5}, //0 L1L2
+  {1, 2, 3, 4, 5}, //1 L3L4
+  {1, 2, 3, 4, 5}, //2 L5L6
+  {3, 4, 5},       //3 D1D2    
+  {1, 2, 5},       //4 D3D4    
+  {2, 3, 4, 5}, //5 L1D1    
+  {2, 3, 4, 5}, //6 L2D1    
+  {1, 2, 3, 4, 5}, //7 L2L3    
+  {1, 2},          //8 L2L3L4
+  {},              //9 L4L5L6
+  {2, 3, 4},              //10 L2L3D1
+  {}               //11 D1D2L2
+};
+  
+  
 #endif
 
 

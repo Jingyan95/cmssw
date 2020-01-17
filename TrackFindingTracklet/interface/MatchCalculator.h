@@ -520,10 +520,7 @@ public:
 
       if (oldTracklet!=0) {
 	//allow equal here since we can have more than one cadidate match per tracklet projection
-	if (iSector_==tracklet->homeSector()&&
-	    iSector_==oldTracklet->homeSector()) {
-	  assert(oldTracklet->TCID()<=tracklet->TCID());
-	}
+	assert(oldTracklet->TCID()<=tracklet->TCID());
       }
       oldTracklet=tracklet;
       
@@ -561,7 +558,7 @@ public:
 	
 	if (phi<0) phi+=2*M_PI;
 	phi-=phioffset_;
-	
+
 	double dr=r-tracklet->rproj(layer_);
 	assert(fabs(dr)<drmax);
 
@@ -602,6 +599,10 @@ public:
 	      <<"   "<<ideltaz*fact_*kz<<" "<<dz<<" "<<zmatchcut_[seedindex]*kz<<endl;	  
 	}
 
+
+	//cout << "Layer "<<layer_<<" phimatch "<<(fabs(ideltaphi)<=phimatchcut_[seedindex])<<" "<<dphi*rmean[layer_-1]*10
+	//     <<"mm zmatch "<<(fabs(ideltaz*fact_)<=zmatchcut_[seedindex])<<endl;
+	
 	bool imatch=(fabs(ideltaphi)<=phimatchcut_[seedindex])&&(fabs(ideltaz*fact_)<=zmatchcut_[seedindex]);
 
 	//if (!imatch) {
@@ -657,7 +658,6 @@ public:
 		  (layer==0&&disk==3&&fullmatches_[l]->getName().substr(3,4)=="D3D4")||
 		  (layer==1&&disk==1&&fullmatches_[l]->getName().substr(3,4)=="L1D1")||
 		  (layer==2&&disk==1&&fullmatches_[l]->getName().substr(3,4)=="L2D1")){
-		assert(tracklet->homeSector()==iSector_);
 		if (debug1) {
 		  cout << getName()<<" adding match to "<<fullmatches_[l]->getName()<<endl;
 		}
@@ -683,7 +683,6 @@ public:
 		  (iSeed==9&&fullmatches_[l]->getName().substr(3,6)=="L5L6L4")||
 		  (iSeed==10&&fullmatches_[l]->getName().substr(3,6)=="L2L3D1")||
 		  (iSeed==11&&fullmatches_[l]->getName().substr(3,6)=="D1D2L2")){
-		assert(tracklet->homeSector()==iSector_);
 		if (debug1) {
 		  cout << getName()<<" adding match to "<<fullmatches_[l]->getName()<<endl;
 		}
@@ -702,9 +701,9 @@ public:
 	
 	//check that stubs and projections in same half of detector
 	assert(stub->z()*tracklet->t()>0.0);
-	
-	int disk=disk_;
-	if (tracklet->t()<0) disk=-disk_;
+
+	int sign=(tracklet->t()>0.0)?1:-1;
+	int disk=sign*disk_;
 	assert(disk!=0);
 	  
 	//Perform integer calculations here
@@ -772,12 +771,12 @@ public:
 
 	if (phi<0) phi+=2*M_PI;
 	phi-=phioffset_;
-	  
-	double dz=z-tracklet->zprojdisk(disk);
+
+	double dz=z-sign*zmean[disk_-1];
 	
 	if(fabs(dz) > dzmax){
 	  cout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << tracklet->getISeed() << endl;
-	  cout << "stub "<<stub->z() <<" disk "<<disk<<" zproj "<<tracklet->zprojdisk(disk)<<" "<<dz<<endl;
+	  cout << "stub "<<stub->z() <<" disk "<<disk<<" "<<dz<<endl;
 	  assert(fabs(dz)<dzmax);
 	}	
 		  
@@ -866,7 +865,7 @@ public:
 
           if(fabs(dphi)>=0.25){
             cout<<"dphi "<<dphi<<"\n";
-            cout<<"Seed / ISeed "<<tracklet->seed()<<" "<<tracklet->getISeed()<<"\n";
+            cout<<"Seed / ISeed "<<tracklet->getISeed()<<"\n";
           }
           assert(fabs(dphi)<0.25);
           assert(fabs(dphiapprox)<0.25);
@@ -894,7 +893,6 @@ public:
 		  (layer==1&&disk==1&&fullmatches_[l]->getName().substr(3,4)=="L1D1")||
 		  (layer==2&&disk==1&&fullmatches_[l]->getName().substr(3,4)=="L2D1")||
 		  (layer==2&&disk==0&&fullmatches_[l]->getName().substr(3,4)=="L2L3")){
-		assert(tracklet->homeSector()==iSector_);
 		if (debug1) {
 		  cout << getName()<<" adding match to "<<fullmatches_[l]->getName()<<endl;
 		}
@@ -920,7 +918,6 @@ public:
 		  (iSeed==9&&fullmatches_[l]->getName().substr(3,6)=="L5L6L4")||
 		  (iSeed==10&&fullmatches_[l]->getName().substr(3,6)=="L2L3D1")||
 		  (iSeed==11&&fullmatches_[l]->getName().substr(3,6)=="D1D2L2")){
-		assert(tracklet->homeSector()==iSector_);
 		if (debug1) {
 		  cout << getName()<<" adding match to "<<fullmatches_[l]->getName()<<endl;
 		}
@@ -970,7 +967,7 @@ public:
 	  continue;
 	}
 	int TCID=candmatch[i]->getFPGATracklet(indexArray[i])->TCID();
-	int dSector=candmatch[i]->getFPGATracklet(indexArray[i])->homeSector()-iSector_;
+	int dSector=0;
 	if (dSector>2) dSector-=NSector;
 	if (dSector<-2) dSector+=NSector;
 	assert(abs(dSector)<2);
@@ -1022,10 +1019,8 @@ public:
 	//in L1L2 that projects to both L3 and D4. The algorithm will pick up the first hit and
 	//drop the second
 
-	if (iSector_==tmp[i-1].first.first->homeSector()&&
-	    iSector_==tmp[i].first.first->homeSector()) {
-	  assert(tmp[i-1].first.first->TCID()<=tmp[i].first.first->TCID());
-	}
+	assert(tmp[i-1].first.first->TCID()<=tmp[i].first.first->TCID());
+
       }
     }
     

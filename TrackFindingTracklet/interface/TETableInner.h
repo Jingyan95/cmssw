@@ -84,7 +84,6 @@ public:
       for (int irbin=0;irbin<rbins_;irbin++) {
 	//int ibin=irbin+izbin*rbins_;
 	int value=getLookupValue(izbin,irbin,extra);
-	//cout << "table "<<table_.size()<<" "<<value<<" "<<rmeanl2_<<endl;
 	table_.push_back(value);
       }
     }
@@ -342,6 +341,7 @@ public:
   int lookup(int zbin, int rbin) {
 
     int index=zbin*rbins_+rbin;
+
     return table_[index];
     
   }

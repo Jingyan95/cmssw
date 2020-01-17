@@ -72,7 +72,7 @@ public:
   }
 
   void execute(std::vector<Track*>& outputtracks_) {
-
+    
     inputtracklets_.clear();
     inputtracks_.clear();
 
@@ -216,9 +216,9 @@ public:
             {
               int i = stubsTrk1[stcount].first;
               int reg = (i>0&&i<10)*(i-1) + (i>10)*(i-5) - (i<0)*i;
-              double nres = getPhiRes(inputtracklets_[itrk],fullStubslistsTrk1[stcount].first);
+              double nres = getPhiRes(inputtracklets_[itrk],fullStubslistsTrk1[stcount]);
               double ores = 0;
-              if (URStubidsTrk1[reg] != -1) ores = getPhiRes(inputtracklets_[itrk],fullStubslistsTrk1[URStubidsTrk1[reg]].first);
+              if (URStubidsTrk1[reg] != -1) ores = getPhiRes(inputtracklets_[itrk],fullStubslistsTrk1[URStubidsTrk1[reg]]);
               if (URStubidsTrk1[reg] == -1 || nres < ores)
               {
                 URStubidsTrk1[reg] = stcount;
@@ -229,9 +229,9 @@ public:
             {
               int i = stubsTrk2[stcount].first;
               int reg = (i>0&&i<10)*(i-1) + (i>10)*(i-5) - (i<0)*i;
-              double nres = getPhiRes(inputtracklets_[jtrk],fullStubslistsTrk2[stcount].first);
+              double nres = getPhiRes(inputtracklets_[jtrk],fullStubslistsTrk2[stcount]);
               double ores;
-              if (URStubidsTrk2[reg] != -1) ores = getPhiRes(inputtracklets_[jtrk],fullStubslistsTrk2[URStubidsTrk2[reg]].first);
+              if (URStubidsTrk2[reg] != -1) ores = getPhiRes(inputtracklets_[jtrk],fullStubslistsTrk2[URStubidsTrk2[reg]]);
               if (URStubidsTrk2[reg] == -1 || nres < ores)
               {
                 URStubidsTrk2[reg] = stcount;
@@ -387,7 +387,7 @@ public:
         //}
         //cout << endl;
       }
-      
+
       for(unsigned int itrk=0; itrk<numTrk-1; itrk++) { // numTrk-1 since last track has no other to compare to
 	
         // If primary track is a duplicate, it cannot veto any...move on
@@ -448,13 +448,14 @@ public:
         } // end tag duplicates
 
       } // end loop over primary track
+
     } // end ichi + nstub removal
 
     //Add tracks to output
     if(RemovalType!="merge") {
       for(unsigned int i=0;i<inputtrackfits_.size();i++) {
         for(unsigned int j=0;j<inputtrackfits_[i]->nTracks();j++) {
-          if(inputtrackfits_[i]->getTrack(j)->getTrack()->duplicate()==0) {
+	  if(inputtrackfits_[i]->getTrack(j)->getTrack()->duplicate()==0) {
             if (writeSeeds) {
               ofstream fout("seeds.txt", ofstream::app);
               fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << inputtrackfits_[i]->getTrack(j)->getISeed() << endl;
@@ -468,23 +469,22 @@ public:
       }
     }
 
-    
   }
 
 
   
 private:
 
-  double getPhiRes(Tracklet* curTracklet, Stub* curStub)
+  double getPhiRes(Tracklet* curTracklet, std::pair<Stub*, L1TStub*> curStub)
   {
     double phiproj;
     double stubphi;
     double phires;
     // Get phi position of stub
-    stubphi = curStub->stubphi();
+    stubphi = curStub.second->phi();
     // Get region that the stub is in (Layer 1->6, Disk 1->5)
-    int Layer = curStub->layer().value() + 1;
-    int Disk = curStub->disk().value();
+    int Layer = curStub.first->layer().value() + 1;
+    int Disk = curStub.first->disk().value();
     // Get phi projection of tracklet
     int seedindex = curTracklet->seedIndex();
     // If this stub is a seed stub, set projection=phi, so that res=0

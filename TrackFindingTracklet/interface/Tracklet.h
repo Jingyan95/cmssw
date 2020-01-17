@@ -11,10 +11,12 @@
 #include "Stub.h"
 #include "FPGAWord.h"
 #include "Track.h"
+#include "TrackPars.h"
 #include "LayerProjection.h"
 #include "DiskProjection.h"
 #include "LayerResidual.h"
 #include "DiskResidual.h"
+#include "Util.h"
 
 using namespace std;
 
@@ -23,35 +25,19 @@ class Tracklet{
 public:
 
   Tracklet(L1TStub* innerStub, L1TStub* middleStub, L1TStub* outerStub,
-	       Stub* innerFPGAStub, Stub* middleFPGAStub, Stub* outerFPGAStub,
-	       unsigned int homeSector,
-	       double phioffset,
-	       double rinv, double phi0, double d0, double z0, double t,
-	       double rinvapprox, double phi0approx, double d0approx,
-	       double z0approx, double tapprox,
-	       int irinv, int iphi0, int id0,
-	       int iz0, int it,
-	       bool validproj[4],
-	       int iphiproj[4], int izproj[4],
-	       int iphider[4], int izder[4],
-	       double phiproj[4], double zproj[4],
-	       double phider[4], double zder[4],
-	       double phiprojapprox[4], double zprojapprox[4],
-	       double phiderapprox[4], double zderapprox[4],
-	       bool validprojdisk[5],
-	       int iphiprojDisk[5], int irprojDisk[5],
-	       int iphiderDisk[5], int irderDisk[5],
-	       double phiprojDisk[5], double rprojDisk[5],
-	       double phiderDisk[5], double rderDisk[5],
-	       double phiprojapproxDisk[5], double rprojapproxDisk[5],
-	       double phiderapproxDisk[5], double rderapproxDisk[5],
-	       bool disk, bool overlap=false){
+	   Stub* innerFPGAStub, Stub* middleFPGAStub, Stub* outerFPGAStub,
+	   double rinv, double phi0, double d0, double z0, double t,
+	   double rinvapprox, double phi0approx, double d0approx,
+	   double z0approx, double tapprox,
+	   int irinv, int iphi0, int id0,
+	   int iz0, int it,
+	   LayerProjection layerprojs[4],
+	   DiskProjection diskprojs[4],
+	   bool disk, bool overlap=false){
 
     
     //cout << "New Tracklet"<<endl;
 
-    homeSector_=homeSector;
-    
     overlap_=overlap;
     disk_=disk;
     assert(!(disk&&overlap));
@@ -60,9 +46,6 @@ public:
 
     trackletIndex_=-1;
     TCIndex_=-1;
-
-
-    phioffset_=phioffset;
 
     assert(disk_||barrel_||overlap_);
 
@@ -74,22 +57,16 @@ public:
     innerFPGAStub_=innerFPGAStub;
     middleFPGAStub_=middleFPGAStub;
     outerFPGAStub_=outerFPGAStub;
-    rinv_=rinv;
-    phi0_=phi0;
-    d0_=d0;
-    z0_=z0;
-    t_=t;
-    rinvapprox_=rinvapprox;
-    phi0approx_=phi0approx;
-    d0approx_=d0approx;
-    z0approx_=z0approx;
-    tapprox_=tapprox;
 
-    fpgarinv_.set(irinv,nbitsrinv,false,__LINE__,__FILE__); 
-    fpgaphi0_.set(iphi0,nbitsphi0,false,__LINE__,__FILE__); 
-    fpgad0_.set(id0,nbitsd0,false,__LINE__,__FILE__); 
-    fpgaz0_.set(iz0,nbitsz0,false,__LINE__,__FILE__);
-    fpgat_.set(it,nbitst,false,__LINE__,__FILE__);       
+    trackpars_.init(rinv,phi0,d0,t,z0);
+
+    trackparsapprox_.init(rinvapprox,phi0approx,d0approx,tapprox,z0approx);
+
+    fpgapars_.rinv().set(irinv,nbitsrinv,false,__LINE__,__FILE__); 
+    fpgapars_.phi0().set(iphi0,nbitsphi0,false,__LINE__,__FILE__); 
+    fpgapars_.d0().set(id0,nbitsd0,false,__LINE__,__FILE__); 
+    fpgapars_.z0().set(iz0,nbitsz0,false,__LINE__,__FILE__);
+    fpgapars_.t().set(it,nbitst,false,__LINE__,__FILE__);       
 
     fpgatrack_ = NULL;
     
@@ -97,411 +74,46 @@ public:
     if (middleStub_) assert(middleStub_->layer()<6||middleStub_->disk()<5);
     if (outerStub_) assert(outerStub_->layer()<6||outerStub_->disk()<5);
 
+    seedIndex_=calcSeedIndex();
+
+    triplet_=(seedIndex_>=8);
+
+    //fill projection layers
+    for(unsigned int i=0;i<4;i++) {
+      projlayer_[i]=projlayers[seedIndex_][i];
+    }
+
+    //fill projection disks
+    for(unsigned int i=0;i<5;i++) {
+      projdisk_[i]=projdisks[seedIndex_][i];
+    }
+
     
-    for(unsigned int i = 0; i < 6; i++) rproj_[i]=0.;
-    for(unsigned int i = 0; i < 5; i++) zprojdisk_[i]=0.;
-
-    for(unsigned int i = 0; i < 4; i++) projlayer_[i]=0;
-    for(unsigned int i = 0; i < 5; i++) projdisk_[i]=0;
-
-
-    if (innerStub_->layer()==0 && middleStub_==NULL) { //L1L2XX
-      rproj_[0]=rmeanL3;
-      rproj_[1]=rmeanL4;
-      rproj_[2]=rmeanL5;
-      rproj_[3]=rmeanL6;
-      projlayer_[0]=3;
-      projlayer_[1]=4;
-      projlayer_[2]=5;
-      projlayer_[3]=6;
-    }
-
-    if (innerStub_->layer()==1 && middleStub_==NULL) { //L2L3XX
-      rproj_[0]=rmeanL1;
-      rproj_[1]=rmeanL4;
-      rproj_[2]=rmeanL5;
-      rproj_[3]=rmeanL6;
-      projlayer_[0]=1;
-      projlayer_[1]=4;
-      projlayer_[2]=5;
-      projlayer_[3]=6;
-    }
-    
-    if (innerStub_->layer()==1 && middleStub_!=NULL) {
-      triplet_ = true;
-      if(middleStub_->layer()==2){           //L3L4L2
-	rproj_[0]=rmeanL1;
-	rproj_[1]=rmeanL5;
-	rproj_[2]=rmeanL6;
-	projlayer_[0]=1;
-	projlayer_[1]=5;
-	projlayer_[2]=6;
-	projlayer_[3]=-1;
-	
-	int sign=1;
-	if (it<0) sign=-1;
-	zprojdisk_[0]=sign*zmeanD1;
-	zprojdisk_[1]=sign*zmeanD2;
-	projdisk_[0]=sign*1;
-	projdisk_[1]=sign*2;
-	projdisk_[2]=0;
-	projdisk_[3]=0;
-	projdisk_[4]=0;
-      }
-      else{                                  //D1D2L2
-	rproj_[0]=rmeanL1;
-	projlayer_[0]=1;
-	projlayer_[1]=-1;
-	projlayer_[2]=-1;
-	projlayer_[3]=-1;
-	
-	int sign=1;
-	if (it<0) sign=-1;
-	zprojdisk_[0]=sign*zmeanD3;
-	zprojdisk_[1]=sign*zmeanD4;
-	zprojdisk_[2]=sign*zmeanD5;
-	projdisk_[0]=sign*3;
-	projdisk_[1]=sign*4;
-	projdisk_[2]=sign*5;
-	projdisk_[3]=0;
-	projdisk_[4]=0;
-      }
-    }
-    
-    if (innerStub_->layer()==2 && middleStub_==NULL) { //L3L4XX
-      rproj_[0]=rmeanL1;
-      rproj_[1]=rmeanL2;
-      rproj_[2]=rmeanL5;
-      rproj_[3]=rmeanL6;
-      projlayer_[0]=1;
-      projlayer_[1]=2;
-      projlayer_[2]=5;
-      projlayer_[3]=6;
-    }
-    
-    if (innerStub_->layer()==3 && middleStub_!=NULL) { //L5L6L4
-      triplet_ = true;
-      rproj_[0]=rmeanL1;
-      rproj_[1]=rmeanL2;
-      rproj_[2]=rmeanL3;
-      rproj_[3]=rmeanL4;
-      projlayer_[0]=1;
-      projlayer_[1]=2;
-      projlayer_[2]=3;
-      projlayer_[3]=-1;
-    }
-
-    if (innerStub_->layer()==4 && middleStub_==NULL) { //L5L6XX
-      rproj_[0]=rmeanL1;
-      rproj_[1]=rmeanL2;
-      rproj_[2]=rmeanL3;
-      rproj_[3]=rmeanL4;
-      projlayer_[0]=1;
-      projlayer_[1]=2;
-      projlayer_[2]=3;
-      projlayer_[3]=4;
-    }
-
-    if(middleStub_==NULL){
-      if (innerStub_->layer()>999) {
-  
-	assert((innerStub->disk()==1)||(innerStub->disk()==3)||
-	       (innerStub->disk()==-1)||(innerStub->disk()==-3));
-	
-	rproj_[0]=rmeanL1;
-	rproj_[1]=rmeanL2;
-	projlayer_[0]=1;
-	projlayer_[1]=2;
-	projlayer_[2]=-1;
-	projlayer_[3]=-1;
-	
-	if (overlap_) {
-	  assert((innerStub->disk()==1)||(innerStub->disk()==-1));
-	  if (innerStub->disk()==1) {
-	    zprojdisk_[0]=zmeanD1;
-	    zprojdisk_[1]=zmeanD2;
-	    zprojdisk_[2]=zmeanD3;
-	    zprojdisk_[3]=zmeanD4;
-	    zprojdisk_[4]=zmeanD5;
-	  } else {
-	    zprojdisk_[0]=-zmeanD1;
-	    zprojdisk_[1]=-zmeanD2;
-	    zprojdisk_[2]=-zmeanD3;
-	    zprojdisk_[3]=-zmeanD4;
-	    zprojdisk_[4]=-zmeanD5;
-	    
-	  }
-	  projdisk_[0]=1;
-	  projdisk_[1]=2;
-	  projdisk_[2]=3;
-	  projdisk_[3]=4;
-	  projdisk_[4]=5;
-	} else {
-	  
-	  if (innerStub->disk()==1) {
-	    zprojdisk_[0]=zmeanD3;
-	    zprojdisk_[1]=zmeanD4;
-	    zprojdisk_[2]=zmeanD5;
-	    projdisk_[0]=3;
-	    projdisk_[1]=4;
-	    projdisk_[2]=5;
-	  }
-	  if (innerStub->disk()==3) {
-	    zprojdisk_[0]=zmeanD1;
-	    zprojdisk_[1]=zmeanD2;
-	    zprojdisk_[2]=zmeanD5;
-	    projdisk_[0]=1;
-	    projdisk_[1]=2;
-	    projdisk_[2]=5;
-	  }
-	  
-	  if (innerStub->disk()==-1) {
-	    zprojdisk_[0]=-zmeanD3;
-	    zprojdisk_[1]=-zmeanD4;
-	    zprojdisk_[2]=-zmeanD5;
-	    projdisk_[0]=-3;
-	    projdisk_[1]=-4;
-	    projdisk_[2]=-5;
-	  }
-	  if (innerStub->disk()==-3) {
-	    zprojdisk_[0]=-zmeanD1;
-	    zprojdisk_[1]=-zmeanD2;
-	    zprojdisk_[2]=-zmeanD5;
-	    projdisk_[0]=-1;
-	    projdisk_[1]=-2;
-	    projdisk_[2]=-5;
-	  } 
-	}
-	
-      } else {
-	int sign=1;
-	if (it<0) sign=-1;
-	
-	zprojdisk_[0]=sign*zmeanD1;
-	zprojdisk_[1]=sign*zmeanD2;
-	zprojdisk_[2]=sign*zmeanD3;
-	zprojdisk_[3]=sign*zmeanD4;
-	zprojdisk_[4]=sign*zmeanD5;
-	projdisk_[0]=sign*1;
-	projdisk_[1]=sign*2;
-	projdisk_[2]=sign*3;
-	projdisk_[3]=sign*4;
-	projdisk_[4]=sign*5;	
-
-      }
-    }
-    else{
-      if (innerStub_->layer()>999) { //L2L3D1
-	triplet_ = true;
-	
-	assert((innerStub->disk()==1)||(innerStub->disk()==-1));
-	
-	rproj_[0]=rmeanL1;
-	projlayer_[0]=1;
-	projlayer_[1]=-1;
-	projlayer_[2]=-1;
-	projlayer_[3]=-1;
-	
-	int sign=1;
-	if (it<0) sign=-1;
-	zprojdisk_[0]=sign*zmeanD2;
-	zprojdisk_[1]=sign*zmeanD3;
-	zprojdisk_[2]=sign*zmeanD4;
-	projdisk_[0]=sign*2;
-	projdisk_[1]=sign*3;
-	projdisk_[2]=sign*4;
-	projdisk_[3]=0;
-	projdisk_[4]=0;
-      }
-    }
-    
-    if(middleStub_==NULL){
-      if (barrel_) {
-	//barrel
-	for (int i=0;i<4;i++) {
-	  
-	  if (!validproj[i]) continue;
-	  
-	  layerproj_[projlayer_[i]-1].init(projlayer_[i],
-					   rproj_[i],
-					   iphiproj[i],
-					   izproj[i],
-					   iphider[i],
-					   izder[i],
-					   phiproj[i],
-					   zproj[i],
-					   phider[i],
-					   zder[i],
-					   phiprojapprox[i],
-					   zprojapprox[i],
-					   phiderapprox[i],
-					   zderapprox[i]);    
-	  
-	}
-	//Now handle projections to the disks
-	for (int i=0;i<5;i++) {
-	  
-	  if (!validprojdisk[i]) continue;
-	  
-	  diskproj_[i].init(i+1,
-			    zprojdisk_[i],
-			    iphiprojDisk[i],
-			    irprojDisk[i],
-			    iphiderDisk[i],
-			    irderDisk[i],
-			    phiprojDisk[i],
-			    rprojDisk[i],
-			    phiderDisk[i],
-			    rderDisk[i],
-			    phiprojapproxDisk[i],
-			    rprojapproxDisk[i],
-			    phiderapproxDisk[i],
-			    rderapproxDisk[i]); 
-	}
-      } 
+    //Handle projections to the layers
+    for (int i=0;i<4;i++) {
       
-      if (disk_) {
-	//disk stub 
-	for (int i=0;i<3;i++) {
-	  
-	  if (!validprojdisk[i]) continue;
-	  
-	  diskproj_[abs(projdisk_[i])-1].init(projdisk_[i],
-					      zprojdisk_[i],
-					      iphiprojDisk[i],
-					      irprojDisk[i],
-					      iphiderDisk[i],
-					      irderDisk[i],
-					      phiprojDisk[i],
-					      rprojDisk[i],
-					      phiderDisk[i],
-					      rderDisk[i],
-					      phiprojapproxDisk[i],
-					      rprojapproxDisk[i],
-					      phiderapproxDisk[i],
-					      rderapproxDisk[i]); 
-	  
-	}
-	for (int i=0;i<2;i++) {
-	  
-	  if (!validproj[i]) continue;
-	  
-	  layerproj_[i].init(i+1,
-			     rproj_[i],
-			     iphiproj[i],
-			     izproj[i],
-			     iphider[i],
-			     izder[i],
-			     phiproj[i],
-			     zproj[i],
-			     phider[i],
-			     zder[i],
-			     phiprojapprox[i],
-			     zprojapprox[i],
-			     phiderapprox[i],
-			     zderapprox[i]);    
-	  
-	}
-      }
+      if (projlayer_[i]==0) continue;
+      if (!layerprojs[i].valid()) continue;
       
-      if (overlap_) {
-	//projections to layers
-	for (int i=0;i<1;i++) {
-	  assert(rproj_[i]<60.0);
-	  
-	  if (!validproj[i]) continue;
-	  
-	  layerproj_[i].init(i+1,
-			     rproj_[i],
-			     iphiproj[i],
-			     izproj[i],
-			     iphider[i],
-			     izder[i],
-			     phiproj[i],
-			     zproj[i],
-			     phider[i],
-			     zder[i],
-			     phiprojapprox[i],
-			     zprojapprox[i],
-			     phiderapprox[i],
-			     zderapprox[i]);    
-	}
-	//Now handle projections to the disks
-	for (int i=0;i<4;i++) {
-	  if (!validprojdisk[i]) continue;
-	  int offset=1;
-	  if (outerStub->layer()+1==2&&innerStub->layer()+1==3) offset=0;
-	  diskproj_[i+offset].init(i+offset+1,
-				   zprojdisk_[i],
-				   iphiprojDisk[i],
-				   irprojDisk[i],
-				   iphiderDisk[i],
-				   irderDisk[i],
-				   phiprojDisk[i],
-				   rprojDisk[i],
-				   phiderDisk[i],
-				   rderDisk[i],
-				   phiprojapproxDisk[i],
-				   rprojapproxDisk[i],
-				   phiderapproxDisk[i],
-				   rderapproxDisk[i]);  
-	  
-	}
-      } 
+      layerproj_[projlayer_[i]-1]=layerprojs[i];
+      
     }
-    else{
-      //triplet seeding
-      //barrel
-      for (int i=0;i<4;i++) {
+    //Now handle projections to the disks
+    for (int i=0;i<5;i++) {
+      
+      if (projdisk_[i]==0) continue;
+      if (!diskprojs[i].valid()) continue;
 	
-	if (projlayer_[i] <0) continue;
-	if (!validproj[i]) continue;
-	
-	layerproj_[projlayer_[i]-1].init(projlayer_[i],
-					 rproj_[i],
-					 iphiproj[i],
-					 izproj[i],
-					 iphider[i],
-					 izder[i],
-					 phiproj[i],
-					 zproj[i],
-					 phider[i],
-					 zder[i],
-					 phiprojapprox[i],
-					 zprojapprox[i],
-					 phiderapprox[i],
-					 zderapprox[i]);    
-	
-      }
-      //Now handle projections to the disks
-      for (int i=0;i<5;i++) {
-	
-	if (projdisk_[i]==0) continue;
-	if (!validprojdisk[i]) continue;
-	
-	diskproj_[abs(projdisk_[i])-1].init(projdisk_[i],
-					    zprojdisk_[i],
-					    iphiprojDisk[i],
-					    irprojDisk[i],
-					    iphiderDisk[i],
-					    irderDisk[i],
-					    phiprojDisk[i],
-					    rprojDisk[i],
-					    phiderDisk[i],
-					    rderDisk[i],
-					    phiprojapproxDisk[i],
-					    rprojapproxDisk[i],
-					    phiderapproxDisk[i],
-					    rderapproxDisk[i]); 
-      }
+      diskproj_[projdisk_[i]-1]=diskprojs[i];
+      
     }
+    
     
     ichisqfit_.set(-1,8,false);
+
     
   }
   
-  
-
 
   ~Tracklet() {
 
@@ -624,11 +236,11 @@ public:
   std::string trackletparstr() {
     std::ostringstream oss;
     if(writeoutReal){
-      oss << fpgarinv_.value()*krinvpars<<" "
-	  << fpgaphi0_.value()*kphi0pars<<" "
-	  << fpgad0_.value()*kd0pars<<" "
-	  << fpgaz0_.value()*kz<<" "
-	  << fpgat_.value()*ktpars;
+      oss << fpgapars_.rinv().value()*krinvpars<<" "
+	  << fpgapars_.phi0().value()*kphi0pars<<" "
+	  << fpgapars_.d0().value()*kd0pars<<" "
+	  << fpgapars_.z0().value()*kz<<" "
+	  << fpgapars_.t().value()*ktpars;
     }
     
     //Binary Print out
@@ -638,11 +250,11 @@ public:
         oss << middleFPGAStub_->stubindex().str()<<"|";
       }
       oss << outerFPGAStub_->stubindex().str()<<"|"
-	  << fpgarinv_.str()<<"|"
-	  << fpgaphi0_.str()<<"|"
-	  << fpgad0_.str()<<"|"
-	  << fpgaz0_.str()<<"|"
-	  << fpgat_.str();
+	  << fpgapars_.rinv().str()<<"|"
+	  << fpgapars_.phi0().str()<<"|"
+	  << fpgapars_.d0().str()<<"|"
+	  << fpgapars_.z0().str()<<"|"
+	  << fpgapars_.t().str();
     }
 
     return oss.str();
@@ -676,7 +288,7 @@ public:
     oss << index.str()
 	<<"|"<< layerproj_[layer-1].fpgazbin1projvm().str() 
         <<"|"<< layerproj_[layer-1].fpgazbin2projvm().str()
-	<<"|"<<layerproj_[layer-1].fpgafinezvm().str()
+	<<"|"<< layerproj_[layer-1].fpgafinezvm().str()
 	<<"|"<< tmp.str()<<"|"<<PSseed();
     return oss.str();
 
@@ -925,19 +537,6 @@ public:
     return diskresid_[abs(disk)-1].zstub();
   }
 
-
-  double zprojdisk(int disk) const {
-    if (!disk_ && !triplet_) return zprojdisk_[abs(disk)-1];
-    for (int i=0;i<3;i++) {
-      if (projdisk_[i]==disk) {
-	return zprojdisk_[i];
-      }
-    }
-    assert(0);
-    return 0.0;
-    
-  }
-
   void setBendIndex(int bendIndex,int disk) {
     assert(abs(disk)>=1&&abs(disk)<=5);
     diskproj_[abs(disk)-1].setBendIndex(bendIndex);
@@ -1057,39 +656,6 @@ public:
     
   }
 
-  std::string candmatchstr(int layer) {
-    assert(layer>=1&&layer<=6);
-    std::ostringstream oss;
-    FPGAWord tmp;
-    if (trackletIndex_<0||trackletIndex_>127) {
-      cout << "trackletIndex_ = "<<trackletIndex_<<endl;
-      assert(0);
-    }
-    tmp.set(trackletIndex_,7);
-    oss << tmp.str()<<"|";
-    
-    return oss.str();
-  }
-
-  std::string candmatchdiskstr(int disk) {
-    assert(disk>=1&&disk<=5);
-    std::ostringstream oss;
-    FPGAWord tmp;
-    if (trackletIndex_<0||trackletIndex_>63) {
-      cout << "trackletIndex_ = "<<trackletIndex_<<endl;
-      assert(0);
-    }
-    tmp.set(trackletIndex_,6);
-    oss << tmp.str()<<"|";
-
-    return oss.str();
-  }
-
-
-
-
-
-
   int nMatches() {
 
     int nmatches=0;
@@ -1104,39 +670,17 @@ public:
     
   }
 
-  int nMatchesDisk(bool skipD5=false) {
+  int nMatchesDisk() {
 
     int nmatches=0;
     
-    int lastdisk=5;
-    if (skipD5) lastdisk--; 
-    for (int i=0;i<lastdisk;i++) {
+    for (int i=0;i<5;i++) {
       if (diskresid_[i].valid()) {
 	nmatches++;
       }
     }
     return nmatches;
 
-  }
-
-
-  int nMatchesOverlap() {
-
-    int nmatches=0;
-
-    assert(overlap_);
-    
-    for (int i=1;i<5;i++) {
-      if (diskresid_[i].valid()) {
-	nmatches++;
-      }
-    }
-    
-    for (int i=0;i<2;i++) {
-      if (layerresid_[i].valid()) nmatches++;
-    }
-    return nmatches;
-    
   }
 
 
@@ -1266,11 +810,6 @@ public:
 
     std::map<int, int> stubIDs;
     
-    //printf("Track Type Barrel %i   Disk %i   Overlap %i  \n",barrel_,disk_,overlap_);
-    //printf(" irinv %i,  iphi %i  it %i \n",irinvfit().value(),iphi0fit().value(),itfit().value());
-    //printf(" Matches:  barrel  %i   disks %i \n",nMatches(),nMatchesDisk());
-    //for(int i=0; i<16; i++)  stubIDs[i] = 63; //this is no stub code value
-
     // For future reference, *resid_[i] uses i as the absolute stub index. (0-5 for barrel, 0-4 for disk)
     // On the other hand, proj*_[i] uses i almost like *resid_[i], except the *seeding* layer indices are removed entirely.
     // E.g. An L3L4 track has 0=L1, 1=L2, 2=L4, 3=L5 for the barrels (for proj*_[i])
@@ -1295,8 +834,9 @@ public:
         }             
 	
 	//check disk
-	if(i==3 && layerresid_[0].valid() && innerFPGAStub_->layer().value()==1) continue; // Don't add D4 if track has L1 stub
+	if (i>=5) continue; //i=[0..4] for disks
 	if(diskresid_[i].valid()) {
+	  if(i==3 && layerresid_[0].valid() && innerFPGAStub_->layer().value()==1) continue; // Don't add D4 if track has L1 stub
 	  // two extra bits to indicate if the matched stub is local or from neighbor
 	  int location = 1;  // local
 	  location<<=diskresid_[i].fpgastubid().nbits();
@@ -1387,8 +927,7 @@ public:
       }
       
       //get stubs making up tracklet
-      //printf(" inner %i  outer %i layers \n",innerFPGAStub_.layer().value(),outerFPGAStub_.layer().value());
-      //printf(" inner %i  outer %i disks \n",innerFPGAStub_.disk().value(),outerFPGAStub_.disk().value());
+
       if(innerFPGAStub_->layer().value()==2) { // L3L2 track
 	if (innerFPGAStub_) stubIDs[innerFPGAStub_->layer().value()+1] = ((innerFPGAStub_->phiregion().value())<<7)+innerFPGAStub_->stubindex().value()+(1<<10);
 	if (middleFPGAStub_) stubIDs[middleFPGAStub_->layer().value()+1] = ((middleFPGAStub_->phiregion().value())<<7)+middleFPGAStub_->stubindex().value()+(1<<10);
@@ -1406,59 +945,48 @@ public:
     }
     
     
-    //cout << "New track layer = "<<innerFPGAStub_->layer().value()+1<<endl;
-    //for(std::map<int,int>::iterator i=stubIDs.begin(); i!=stubIDs.end(); i++) {
-    //      printf("Layer/Disk %i  ID  %i \n",i->first, i->second);
-    //}
-    
-    //for (const auto & id : stubIDs) {
-    //  if (id.second<0) cout<<"i stubID : "<<id.first<<" " <<id.second<<endl;
-    //  assert(id.second>=0);
-    //}
-    
     return stubIDs;
   }
   
 
-  double rinv() const { return rinv_; }
-  double phi0() const { return phi0_; }
-  double d0() const { return d0_; }
-  double t() const { return t_; }
-  double z0() const { return z0_; }
+  double rinv() const { return trackpars_.rinv(); }
+  double phi0() const { return trackpars_.phi0(); }
+  double d0() const { return trackpars_.d0(); }
+  double t() const { return trackpars_.t(); }
+  double z0() const { return trackpars_.z0(); }
 
-  double rinvapprox() const { return rinvapprox_; }
-  double phi0approx() const { return phi0approx_; }
-  double d0approx() const { return d0approx_; }
-  double tapprox() const { return tapprox_; }
-  double z0approx() const { return z0approx_; }
+  double rinvapprox() const { return trackparsapprox_.rinv(); }
+  double phi0approx() const { return trackparsapprox_.phi0(); }
+  double d0approx() const { return trackparsapprox_.d0(); }
+  double tapprox() const { return trackparsapprox_.t(); }
+  double z0approx() const { return trackparsapprox_.z0(); }
 
 
-  FPGAWord fpgarinv() const { return fpgarinv_; }
-  FPGAWord fpgaphi0() const { return fpgaphi0_; }
-  FPGAWord fpgad0() const { return fpgad0_; }
-  FPGAWord fpgat() const { return fpgat_; }
-  FPGAWord fpgaz0() const { return fpgaz0_; }
+  FPGAWord fpgarinv() const { return fpgapars_.rinv(); }
+  FPGAWord fpgaphi0() const { return fpgapars_.phi0(); }
+  FPGAWord fpgad0() const { return fpgapars_.d0(); }
+  FPGAWord fpgat() const { return fpgapars_.t(); }
+  FPGAWord fpgaz0() const { return fpgapars_.z0(); }
 
-  double rinvfit() const { return rinvfit_; }
-  double phi0fit() const { return phi0fit_; }
-  double d0fit() const { return d0fit_; }
-  double tfit() const { return tfit_; }
-  double z0fit() const { return z0fit_; }
+  double rinvfit() const { return fitpars_.rinv(); }
+  double phi0fit() const { return fitpars_.phi0(); }
+  double d0fit() const { return fitpars_.d0(); }
+  double tfit() const { return fitpars_.t(); }
+  double z0fit() const { return fitpars_.z0(); }
   double chiSqfit() const { return chisqfit_; }
 
-  double rinvfitexact() const { return rinvfitexact_; }
-  double phi0fitexact() const { return phi0fitexact_; }
-  double d0fitexact() const { return d0fitexact_; }
-  double tfitexact() const { return tfitexact_; }
-  double z0fitexact() const { return z0fitexact_; }
+  double rinvfitexact() const { return fitparsexact_.rinv(); }
+  double phi0fitexact() const { return fitparsexact_.phi0(); }
+  double d0fitexact() const { return fitparsexact_.d0(); }
+  double tfitexact() const { return fitparsexact_.t(); }
+  double z0fitexact() const { return fitparsexact_.z0(); }
 
-  FPGAWord irinvfit() const { return irinvfit_; }
-  FPGAWord iphi0fit() const { return iphi0fit_; }
-  FPGAWord id0fit() const { return id0fit_; }
-  FPGAWord itfit() const { return itfit_; }
-  FPGAWord iz0fit() const { return iz0fit_; }
+  FPGAWord irinvfit() const { return fpgafitpars_.rinv(); }
+  FPGAWord iphi0fit() const { return fpgafitpars_.phi0(); }
+  FPGAWord id0fit() const { return fpgafitpars_.d0(); }
+  FPGAWord itfit() const { return fpgafitpars_.t(); }
+  FPGAWord iz0fit() const { return fpgafitpars_.z0(); }
   FPGAWord ichiSqfit() const { return ichisqfit_; }
-
 
   void setFitPars(double rinvfit, double phi0fit, double d0fit, double tfit,
 		  double z0fit, double chisqfit,
@@ -1467,27 +995,19 @@ public:
 		  int irinvfit, int iphi0fit, int id0fit, int itfit,
 		  int iz0fit, int ichisqfit,
 		  const vector<L1TStub*>& l1stubs = vector<L1TStub*>()){
-    
-    rinvfit_=rinvfit;
-    phi0fit_=phi0fit;
-    d0fit_=d0fit;
-    tfit_=tfit;
-    z0fit_=z0fit;
+
+    fitpars_.init(rinvfit,phi0fit,d0fit,tfit,z0fit);
     chisqfit_=chisqfit;
 
-    rinvfitexact_=rinvfitexact;
-    phi0fitexact_=phi0fitexact;
-    d0fitexact_=d0fitexact;
-    tfitexact_=tfitexact;
-    z0fitexact_=z0fitexact;
+    fitparsexact_.init(rinvfitexact,phi0fitexact,d0fitexact,tfitexact,z0fitexact);
     chisqfitexact_=chisqfitexact;
     
     if (irinvfit>(1<<14)) irinvfit=(1<<14);
     if (irinvfit<=-(1<<14)) irinvfit=-(1<<14)+1;
-    irinvfit_.set(irinvfit,15,false,__LINE__,__FILE__);
-    iphi0fit_.set(iphi0fit,19,false,__LINE__,__FILE__);
-    id0fit_.set(id0fit,19,false,__LINE__,__FILE__);
-    itfit_.set(itfit,14,false,__LINE__,__FILE__);
+    fpgafitpars_.rinv().set(irinvfit,15,false,__LINE__,__FILE__);
+    fpgafitpars_.phi0().set(iphi0fit,19,false,__LINE__,__FILE__);
+    fpgafitpars_.d0().set(id0fit,19,false,__LINE__,__FILE__);
+    fpgafitpars_.t().set(itfit,14,false,__LINE__,__FILE__);
 
     if (iz0fit>=(1<<(nbitsz0-1))) {
       iz0fit=(1<<(nbitsz0-1))-1; 
@@ -1497,7 +1017,7 @@ public:
       iz0fit=1-(1<<(nbitsz0-1)); 
     }
     
-    iz0fit_.set(iz0fit,nbitsz0,false,__LINE__,__FILE__);
+    fpgafitpars_.z0().set(iz0fit,nbitsz0,false,__LINE__,__FILE__);
     ichisqfit_.set(ichisqfit,8,true,__LINE__,__FILE__);
 
     delete fpgatrack_;
@@ -1505,52 +1025,6 @@ public:
 
   }
   
-  void setFitPars(double rinvfit, double phi0fit, double tfit,
-		  double z0fit, double chisqfit,
-		  double rinvfitexact, double phi0fitexact, double tfitexact,
-		  double z0fitexact, double chisqfitexact,
-		  int irinvfit, int iphi0fit, int itfit,
-		  int iz0fit, int ichisqfit,
-		  const vector<L1TStub*>& l1stubs = vector<L1TStub*>()){
-    
-    rinvfit_=rinvfit;
-    phi0fit_=phi0fit;
-    d0fit_=0;
-    tfit_=tfit;
-    z0fit_=z0fit;
-    chisqfit_=chisqfit;
-
-    rinvfitexact_=rinvfitexact;
-    phi0fitexact_=phi0fitexact;
-    d0fitexact_=0;
-    tfitexact_=tfitexact;
-    z0fitexact_=z0fitexact;
-    chisqfitexact_=chisqfitexact;
-    
-    if (irinvfit>(1<<14)) irinvfit=(1<<14);
-    if (irinvfit<=-(1<<14)) irinvfit=-(1<<14)+1;
-    irinvfit_.set(irinvfit,15,false,__LINE__,__FILE__);
-    iphi0fit_.set(iphi0fit,19,false,__LINE__,__FILE__);
-    id0fit_.set(0,19,false,__LINE__,__FILE__);
-    itfit_.set(itfit,14,false,__LINE__,__FILE__);
-
-    if (iz0fit>=(1<<(nbitsz0-1))) {
-      iz0fit=(1<<(nbitsz0-1))-1; 
-    }
-
-    if (iz0fit<=-(1<<(nbitsz0-1))) {
-      iz0fit=1-(1<<(nbitsz0-1)); 
-    }
-
-    iz0fit_.set(iz0fit,nbitsz0,false,__LINE__,__FILE__);
-    ichisqfit_.set(ichisqfit,8,true,__LINE__,__FILE__);
-
-    delete fpgatrack_;
-    fpgatrack_=new Track(makeTrack(l1stubs));
-
-  }
-
-
   std::string trackfitstr() {
     std::ostringstream oss;
 
@@ -1687,11 +1161,11 @@ public:
     
     // real Q print out for fitted tracks
     if(writeoutReal){
-    oss << (irinvfit_.value())*krinvpars<<" "
-        << (iphi0fit_.value())*kphi0pars<<" "
-        << (id0fit_.value())*kd0pars<<" "
-        << (itfit_.value())*ktpars<<" "
-        << (iz0fit_.value())*kz<<" "
+      oss << (fpgafitpars_.rinv().value())*krinvpars<<" "
+	  << (fpgafitpars_.phi0().value())*kphi0pars<<" "
+	  << (fpgafitpars_.d0().value())*kd0pars<<" "
+	  << (fpgafitpars_.t().value())*ktpars<<" "
+	  << (fpgafitpars_.z0().value())*kz<<" "
       //<< ichisqfit_.str()<< "|"                            
         << innerFPGAStub_->phiregionaddressstr()<<" ";
     if (middleFPGAStub_) {
@@ -1705,12 +1179,12 @@ public:
     }
     //Binary print out
     if(!writeoutReal){
-      oss << irinvfit_.str()<<"|"
-	  << iphi0fit_.str()<<"|"
-	  << id0fit_.str()<<"|"
+      oss << fpgafitpars_.rinv().str()<<"|"
+	  << fpgafitpars_.phi0().str()<<"|"
+	  << fpgafitpars_.d0().str()<<"|"
 	//<< "xxxxxxxxxxx|"
-	  << itfit_.str()<<"|"
-	  << iz0fit_.str()<<"|"
+	  << fpgafitpars_.t().str()<<"|"
+	  << fpgafitpars_.z0().str()<<"|"
 	//<< ichisqfit_.str()<< "|"
 	  << innerFPGAStub_->phiregionaddressstr()<<"|";
     if (middleFPGAStub_) {
@@ -1731,16 +1205,16 @@ public:
     if (l1stubs.size() == 0) {
       l1stubs = getL1Stubs(); // If fitter produced no stub list, take it from original tracklet.
     };
-    Track tmpTrack(irinvfit_.value(),
-                       iphi0fit_.value(),
-                       id0fit_.value(),
-                       itfit_.value(),
-                       iz0fit_.value(),
-                       ichisqfit_.value(),
-                       chisqfit_,
-                       getStubIDs(),
-                       l1stubs,
-                       getISeed());
+    Track tmpTrack(fpgafitpars_.rinv().value(),
+		   fpgafitpars_.phi0().value(),
+		   fpgafitpars_.d0().value(),
+		   fpgafitpars_.t().value(),
+		   fpgafitpars_.z0().value(),
+		   ichisqfit_.value(),
+		   chisqfit_,
+		   getStubIDs(),
+		   l1stubs,
+		   getISeed());
 
     return tmpTrack;
     
@@ -1784,23 +1258,6 @@ public:
     return innerStub_->layer()+21;
   }
 
-  int seed() const {
-    // Returns integer code for tracklet seed.
-    // Barrel: L1L2=1, L2L3=2, L3L4=3, L5L6=6
-    // Disk: D1D2=11, D3D4=13 (+/- for forward/backward disk)
-    // Overlap: L1D1=21, L2D1=22 (+/- for forward/backward disk)
-    if(barrel_) return innerStub_->layer()+1;
-    if(disk_) {
-        if(innerStub_->disk() < 0) return innerStub_->disk()-10;
-        else return innerStub_->disk()+10;
-    }
-    if(overlap_) {
-        if(innerStub_->disk() < 0) return -21-outerStub_->layer();
-        else return 21+outerStub_->layer();
-    }
-    return 0;
-  }
-
   bool isBarrel() const { 
     return barrel_;
   }
@@ -1813,22 +1270,16 @@ public:
     return disk_;
   }
 
-  double eta() const {
-    return asinh(tapprox_);
-  }
-
-  bool foundTrack(L1SimTrack simtrk){
+  bool foundTrack(L1SimTrack simtrk,double phioffset){
 
     double deta=simtrk.eta()-asinh(itfit().value()*ktpars);
-    double dphi=Util::phiRange(simtrk.phi()-(iphi0fit().value()*kphi0pars+phioffset_));
+    double dphi=Util::phiRange(simtrk.phi()-(iphi0fit().value()*kphi0pars+phioffset));
     
     bool found=(fabs(deta)<0.06)&&(fabs(dphi)<0.01);
     
     return found;
 
   }
-
-  double phioffset() const {return phioffset_;}
 
   void setTrackletIndex(int index) {
     trackletIndex_=index;
@@ -1858,13 +1309,36 @@ public:
     return iTC;
   }
   
-  unsigned int homeSector() const {return homeSector_;}
-  
   unsigned int PSseed() {
     return ((layer()==1)||(disk()!=0))?1:0;
   }
-  
+
   unsigned int seedIndex() const {
+    return seedIndex_;
+  }
+
+
+  //should be removed and use seedindex instead
+  int seed() const {
+    // Returns integer code for tracklet seed.
+    // Barrel: L1L2=1, L2L3=2, L3L4=3, L5L6=6
+    // Disk: D1D2=11, D3D4=13 (+/- for forward/backward disk)
+    // Overlap: L1D1=21, L2D1=22 (+/- for forward/backward disk)
+    if(barrel_) return innerStub_->layer()+1;
+    if(disk_) {
+      if(innerStub_->disk() < 0) return innerStub_->disk()-10;
+      else return innerStub_->disk()+10;
+    }
+    if(overlap_) {
+      if(innerStub_->disk() < 0) return -21-outerStub_->layer();
+      else return 21+outerStub_->layer();
+    }
+    return 0;
+  }
+
+
+  
+  unsigned int calcSeedIndex() const {
   
     int seedindex=-1;
     int seedlayer=layer();
@@ -1880,6 +1354,8 @@ public:
     if (seedlayer==2&&abs(seeddisk)==0) seedindex=7;  //L2L3
     if (middleFPGAStub_&&seedlayer==2&&seeddisk==0) seedindex = 8; // L3L4L2
     if (middleFPGAStub_&&seedlayer==4&&seeddisk==0) seedindex = 9; // L5L6L4
+    assert(innerFPGAStub_!=0);
+    assert(outerFPGAStub_!=0);
     if (middleFPGAStub_&&seedlayer==2&&abs(seeddisk)==1) {
       int l1 = (innerFPGAStub_ && innerFPGAStub_->isBarrel()) ? innerStub_->layer()+1 : 999,
           l2 = (middleFPGAStub_ && middleFPGAStub_->isBarrel()) ? middleStub_->layer()+1 : 999,
@@ -1907,10 +1383,6 @@ private:
   bool overlap_;
   bool triplet_;
 
-  unsigned int homeSector_;
-  
-  double phioffset_;
-
   Stub* innerFPGAStub_;
   Stub* middleFPGAStub_;
   Stub* outerFPGAStub_;
@@ -1923,55 +1395,28 @@ private:
   int trackletIndex_;
   int TCIndex_;
 
+  unsigned int seedIndex_;
+
   //Tracklet track parameters  
 
-  FPGAWord fpgarinv_;
-  FPGAWord fpgaphi0_;
-  FPGAWord fpgad0_;
-  FPGAWord fpgaz0_;
-  FPGAWord fpgat_;
+  TrackPars<FPGAWord> fpgapars_;
 
-  double rinv_;
-  double phi0_;
-  double d0_;
-  double z0_;
-  double t_;
+  TrackPars<double> trackpars_;
   
-  double rinvapprox_;
-  double phi0approx_;
-  double d0approx_;
-  double z0approx_;
-  double tapprox_;
-
-  double rproj_[6];
-  double zprojdisk_[5];
+  TrackPars<double> trackparsapprox_;
 
   int      projlayer_[4];
   int      projdisk_[5];
 
-
-
   //Track  parameters from track fit
-  
-  FPGAWord irinvfit_;
-  FPGAWord iphi0fit_;
-  FPGAWord id0fit_;
-  FPGAWord itfit_;
-  FPGAWord iz0fit_;
+
+  TrackPars<FPGAWord> fpgafitpars_;  
   FPGAWord ichisqfit_;
 
-  double rinvfit_;
-  double phi0fit_;
-  double d0fit_;
-  double tfit_;
-  double z0fit_;
+  TrackPars<double> fitpars_;  
   double chisqfit_;
 
-  double rinvfitexact_;
-  double phi0fitexact_;
-  double d0fitexact_;
-  double tfitexact_;
-  double z0fitexact_;
+  TrackPars<double> fitparsexact_;  
   double chisqfitexact_;
 
   Track *fpgatrack_;
@@ -1981,7 +1426,7 @@ private:
   DiskProjection diskproj_[5];
 
   LayerResidual layerresid_[6];
-  DiskResidual diskresid_[6];
+  DiskResidual diskresid_[5];
 
   
 };

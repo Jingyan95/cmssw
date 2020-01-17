@@ -56,10 +56,9 @@ void matcheff(){
   
   //TString parttype="All Tracks";
   //TString parttype="Electron";
-  //TString parttype="Pion";
+  TString parttype="Pion";
   //TString parttype="Kaon";
   //TString parttype="Proton";
-  TString parttype="Muon";
 
   int itype=-1;
 
@@ -73,7 +72,7 @@ void matcheff(){
     cout << "Need to correctly specify parttype:"<<parttype<<endl;
   }
   
-  double effmin=0.7;
+  double effmin=0.0;
   int nbin=32;
   double maxpt=20.0;
   

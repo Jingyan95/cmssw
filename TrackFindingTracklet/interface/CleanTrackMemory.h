@@ -33,8 +33,8 @@ public:
     bool match=false;
     double phioffset=phimin_-(phimax_-phimin_)/6.0;
     for(unsigned int i=0;i<tracks_.size();i++){
-      match=match||tracks_[i]->foundTrack(simtrk);
-      if (tracks_[i]->foundTrack(simtrk)) {
+      match=match||tracks_[i]->foundTrack(simtrk,phimin_);
+      if (tracks_[i]->foundTrack(simtrk,phimin_)) {
 	Tracklet* tracklet=tracks_[i];
 	int charge = simtrk.trackid()/abs(simtrk.trackid());
 	if(abs(simtrk.trackid())<100) charge = -charge; 

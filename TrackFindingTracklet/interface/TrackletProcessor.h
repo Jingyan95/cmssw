@@ -1,12 +1,14 @@
-//This class implementes the tracklet engine
-#ifndef TRACKLETCALCULATOR_H
-#define TRACKLETCALCULATOR_H
+//This class implementes the tracklet processor
+#ifndef TRACKLETPROCESSOR_H
+#define TRACKLETPROCESSOR_H
 
 #include "IMATH_TrackletCalculator.h"
 #include "IMATH_TrackletCalculatorDisk.h"
 #include "IMATH_TrackletCalculatorOverlap.h"
 
 #include "ProcessBase.h"
+#include "VMStubsTEMemory.h"
+#include "StubPairsMemory.h"
 #include "TrackletProjectionsMemory.h"
 #include "GlobalHistTruth.h"
 #include "Util.h"
@@ -14,11 +16,11 @@
 
 using namespace std;
 
-class TrackletCalculator:public ProcessBase{
+class TrackletProcessor:public ProcessBase{
 
 public:
 
-  TrackletCalculator(string name, unsigned int iSector):
+  TrackletProcessor(string name, unsigned int iSector):
     ProcessBase(name,iSector){
    double dphi=2*M_PI/NSector;
    double dphiHG=0.5*dphisectorHG-M_PI/NSector;
@@ -46,10 +48,15 @@ public:
     
     layer_=0;
     disk_=0;
-    
-    if (name_[3]=='L') layer_=name_[4]-'0';    
+
+    if (name_[3]=='L') {
+      layer_=name_[4]-'0';
+      if (name_[5]=='D') disk_=name_[6]-'0';    
+    }
     if (name_[3]=='D') disk_=name_[4]-'0';    
-    
+
+    extra_=(layer_==2&&disk_==0);
+
 
     // set TC index
     if      (name_[7]=='A') iTC_ =0;
@@ -164,9 +171,9 @@ public:
     }
     
     if (usephicritapprox) {
-      double phicritFactor = 0.5 * rcrit * TrackletCalculator::ITC_L1L2.rinv_final.get_K() / TrackletCalculator::ITC_L1L2.phi0_final.get_K();
+      double phicritFactor = 0.5 * rcrit * TrackletProcessor::ITC_L1L2.rinv_final.get_K() / TrackletProcessor::ITC_L1L2.phi0_final.get_K();
       if (fabs(phicritFactor - 2.) > 0.25)
-        cout << "TrackletCalculator::TrackletCalculator phicrit approximation may be invalid! Please check." << endl;
+        cout << "TrackletProcessor::TrackletProcessor phicrit approximation may be invalid! Please check." << endl;
     }
   }
   
@@ -226,6 +233,21 @@ public:
       cout << "In "<<name_<<" adding input from "<<memory->getName()
 	   << " to input "<<input<<endl;
     }
+
+    if (input=="innervmstubin"){
+      VMStubsTEMemory* tmp=dynamic_cast<VMStubsTEMemory*>(memory);
+      assert(tmp!=0);
+      innervmstubs_.push_back(tmp);
+      setVMPhiBin();
+      return;
+    }
+    if (input=="outervmstubin"){
+      VMStubsTEMemory* tmp=dynamic_cast<VMStubsTEMemory*>(memory);
+      assert(tmp!=0);
+      outervmstubs_.push_back(tmp);
+      setVMPhiBin();
+      return;
+    }
     if (input=="innerallstubin"){
       AllStubsMemory* tmp=dynamic_cast<AllStubsMemory*>(memory);
       assert(tmp!=0);
@@ -236,12 +258,6 @@ public:
       AllStubsMemory* tmp=dynamic_cast<AllStubsMemory*>(memory);
       assert(tmp!=0);
       outerallstubs_.push_back(tmp);
-      return;
-    }
-    if (input.substr(0,8)=="stubpair"){
-      StubPairsMemory* tmp=dynamic_cast<StubPairsMemory*>(memory);
-      assert(tmp!=0);
-      stubpairs_.push_back(tmp);
       return;
     }
     assert(0);
@@ -466,100 +482,418 @@ public:
     unsigned int countall=0;
     unsigned int countsel=0;
 
-    //cout << "TrackletCalculator execute "<<getName()<<" "<<stubpairs_.size()<<endl;
+    StubPairsMemory stubpairs("tmp",iSector_,0.0,1.0); //dummy arguments for now
+
+    bool print=false;
     
-    for(unsigned int l=0;l<stubpairs_.size();l++){
+    assert(innervmstubs_.size()==outervmstubs_.size());
+    
+    if (!((doL1L2&&(layer_==1)&&(disk_==0))||
+	  (doL2L3&&(layer_==2)&&(disk_==0))||
+	  (doL3L4&&(layer_==3)&&(disk_==0))||
+	  (doL5L6&&(layer_==5)&&(disk_==0))||
+	  (doD1D2&&(disk_==1)&&(layer_==0))||
+	  (doD3D4&&(disk_==3)&&(layer_==0))||
+	  (doL1D1&&(layer_==1)&&(disk_==1))||
+	  (doL2D1&&(layer_==2)&&(disk_==1)))) return;
+    
+
+
+    for (unsigned int ivmmem=0;ivmmem<innervmstubs_.size();ivmmem++) {
+
+      unsigned int innerphibin=innervmstubs_[ivmmem]->phibin();
+      unsigned int outerphibin=outervmstubs_[ivmmem]->phibin();
+
+      unsigned phiindex=32*innerphibin+outerphibin;
+      
+      
+      //overlap seeding
+      if (disk_==1 && (layer_==1 || layer_==2) ) {
+
+	for(unsigned int i=0;i<innervmstubs_[ivmmem]->nVMStubs();i++){
+
+	  VMStubTE innervmstub=innervmstubs_[ivmmem]->getVMStubTE(i); 
+	
+	  int lookupbits=innervmstub.vmbits().value();
+
+	  int rdiffmax=(lookupbits>>7);	
+	  int newbin=(lookupbits&127);
+	  int bin=newbin/8;
+	  
+	  int rbinfirst=newbin&7;
+
+	  int start=(bin>>1);
+	  int last=start+(bin&1);
+	  
+	  for(int ibin=start;ibin<=last;ibin++) {
+	    if (debug1) cout << getName() << " looking for matching stub in bin "<<ibin
+			     <<" with "<<outervmstubs_[ivmmem]->nVMStubsBinned(ibin)<<" stubs"<<endl;
+	    for(unsigned int j=0;j<outervmstubs_[ivmmem]->nVMStubsBinned(ibin);j++){
+	      //if (countall>=MAXTE) break;
+	      countall++;
+	      
+	      VMStubTE outervmstub=outervmstubs_[ivmmem]->getVMStubTEBinned(ibin,j);
+	      int rbin=(outervmstub.vmbits().value()&7);
+	      if (start!=ibin) rbin+=8;
+	      if ((rbin<rbinfirst)||(rbin-rbinfirst>rdiffmax)) {
+		if (debug1) {
+		  cout << getName() << " layer-disk stub pair rejected because rbin cut : "
+		     <<rbin<<" "<<rbinfirst<<" "<<rdiffmax<<endl;
+		}
+		continue;
+	      }
+
+	      int ir=((start&3)<<3)+rbinfirst;
+	    
+	      assert(innerphibits_!=-1);
+	      assert(outerphibits_!=-1);
+	      
+	      FPGAWord iphiinnerbin=innervmstub.finephi();
+	      FPGAWord iphiouterbin=outervmstub.finephi();
+
+	      assert(iphiouterbin==outervmstub.finephi());
+	      
+	      unsigned int index = (((iphiinnerbin.value()<<outerphibits_)+iphiouterbin.value())<<5)+ir;
+	      
+	      assert(index<phitable_[phiindex].size());
+	      
+	      if (!phitable_[phiindex][index]) {
+		if (debug1) {
+		  cout << "Stub pair rejected because of tracklet pt cut"<<endl;
+		}
+		continue;
+	      }
+	      
+	      FPGAWord innerbend=innervmstub.bend();
+	      FPGAWord outerbend=outervmstub.bend();
+
+	      int ptinnerindex=(index<<innerbend.nbits())+innerbend.value();
+	      int ptouterindex=(index<<outerbend.nbits())+outerbend.value();
+	      
+	      if (!(pttableinner_[phiindex][ptinnerindex]&&pttableouter_[phiindex][ptouterindex])) {
+		if (debug1) {
+		  cout << "Stub pair rejected because of stub pt cut bends : "
+		       <<Stub::benddecode(innervmstub.bend().value(),innervmstub.isPSmodule())
+		       <<" "
+		       <<Stub::benddecode(outervmstub.bend().value(),outervmstub.isPSmodule())
+		       <<endl;
+		}		
+		continue;
+	      }
+
+	      
+	      if (debug1) cout << "Adding layer-disk pair in " <<getName()<<endl;
+	      if (writeSeeds) {
+		ofstream fout("seeds.txt", ofstream::app);
+		fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
+		fout.close();
+	      }
+	      stubpairs.addStubPair(innervmstub,outervmstub);
+	      countall++;
+	    }
+	  }
+	}
+
+      } else {
+
+
+
+	for(unsigned int i=0;i<innervmstubs_[ivmmem]->nVMStubs();i++){
+	  if (debug1) {
+	    cout << "In "<<getName()<<" have inner stub"<<endl;
+	  }
+
+	  
+	  if ((layer_==1 && disk_==0)||
+	      (layer_==2 && disk_==0)||
+	      (layer_==3 && disk_==0)||
+	      (layer_==5 && disk_==0)) {	  
+
+	    
+
+	    VMStubTE innervmstub=innervmstubs_[ivmmem]->getVMStubTE(i);
+
+	    
+	    int lookupbits=(int)innervmstub.vmbits().value();
+	    int zdiffmax=(lookupbits>>7);	
+	    int newbin=(lookupbits&127);
+	    int bin=newbin/8;
+	    
+	    int zbinfirst=newbin&7;
+	    
+	    int start=(bin>>1);
+	    int last=start+(bin&1);
+	    
+	    if (print) {
+	      cout << "start last : "<<start<<" "<<last<<endl;
+	    }
+	    
+	    if (debug1) {
+	      cout << "Will look in zbins "<<start<<" to "<<last<<endl;
+	    }
+	    for(int ibin=start;ibin<=last;ibin++) {
+	      for(unsigned int j=0;j<outervmstubs_[ivmmem]->nVMStubsBinned(ibin);j++){
+		if (debug1) {
+		  cout << "In "<<getName()<<" have outer stub"<<endl;
+		}
+		
+		//if (countall>=MAXTE) break;
+		countall++;
+
+		VMStubTE outervmstub=outervmstubs_[ivmmem]->getVMStubTEBinned(ibin,j);
+
+		int zbin=(outervmstub.vmbits().value()&7);
+		
+		if (start!=ibin) zbin+=8;
+		
+		if (zbin<zbinfirst||zbin-zbinfirst>zdiffmax) {
+		  if (debug1) {
+		    cout << "Stubpair rejected because of wrong fine z"<<endl;
+		  }
+		  continue;
+		}
+
+		if (print) {
+		  cout << "ibin j "<<ibin<<" "<<j<<endl;
+		}
+	      
+		//For debugging
+		//double trinv=rinv(innerstub.second->phi(), outerstub.second->phi(),
+		//		       innerstub.second->r(), outerstub.second->r());
+		
+		assert(innerphibits_!=-1);
+		assert(outerphibits_!=-1);
+	      
+		FPGAWord iphiinnerbin=innervmstub.finephi();
+		FPGAWord iphiouterbin=outervmstub.finephi();
+		
+		int index = (iphiinnerbin.value()<<outerphibits_)+iphiouterbin.value();
+		
+		assert(index<(int)phitable_[phiindex].size());		
+		
+		
+		if (!phitable_[phiindex][index]) {
+		  if (debug1) {
+		    cout << "Stub pair rejected because of tracklet pt cut"<<endl;
+		  }
+		  continue;
+		}
+		
+		FPGAWord innerbend=innervmstub.bend();
+		FPGAWord outerbend=outervmstub.bend();
+
+		
+		int ptinnerindex=(index<<innerbend.nbits())+innerbend.value();
+		int ptouterindex=(index<<outerbend.nbits())+outerbend.value();
+		
+		
+		if (!(pttableinner_[phiindex][ptinnerindex]&&pttableouter_[phiindex][ptouterindex])) {
+		  if (debug1) {
+		    cout << "Stub pair rejected because of stub pt cut bends : "
+			 <<Stub::benddecode(innervmstub.bend().value(),innervmstub.isPSmodule())
+			 <<" "
+			 <<Stub::benddecode(outervmstub.bend().value(),outervmstub.isPSmodule())
+			 <<endl;
+		  }		
+		  continue;
+		}
+		
+		if (debug1) cout << "Adding layer-layer pair in " <<getName()<<endl;
+		if (writeSeeds) {
+		  ofstream fout("seeds.txt", ofstream::app);
+		  fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
+		  fout.close();
+		}
+		stubpairs.addStubPair(innervmstub,outervmstub);
+		
+		countall++;
+	      }
+	    }
+	    
+	  } else if ((disk_==1 && layer_==0)||
+		     (disk_==3 && layer_==0)) {
+	    
+	    if (debug1) cout << getName()<<"["<<iSector_<<"] Disk-disk pair" <<endl;
+
+	    VMStubTE innervmstub=innervmstubs_[ivmmem]->getVMStubTE(i);
+
+	    
+	    int lookupbits=(int)innervmstub.vmbits().value();
+	    bool negdisk=innervmstub.stub().first->disk().value()<0; //FIXME
+	    int rdiffmax=(lookupbits>>6);	
+	    int newbin=(lookupbits&63);
+	    int bin=newbin/8;
+	    
+	    int rbinfirst=newbin&7;
+
+	    //cout << "rbinfirst+rdiffmax next "<<rdiffmax<<" "<<rbinfirst+rdiffmax<<" "<<(bin&1)<<endl;
+	  
+	    int start=(bin>>1);
+	    if (negdisk) start+=4;
+	    int last=start+(bin&1);
+	    for(int ibin=start;ibin<=last;ibin++) {
+	      if (debug1) cout << getName() << " looking for matching stub in bin "<<ibin
+			       <<" with "<<outervmstubs_[ivmmem]->nVMStubsBinned(ibin)<<" stubs"<<endl;
+	      for(unsigned int j=0;j<outervmstubs_[ivmmem]->nVMStubsBinned(ibin);j++){
+		//if (countall>=MAXTE) break;
+		countall++;
+		
+		VMStubTE outervmstub=outervmstubs_[ivmmem]->getVMStubTEBinned(ibin,j);
+
+		int vmbits=(int)outervmstub.vmbits().value();
+		int rbin=(vmbits&7);
+		if (start!=ibin) rbin+=8;
+		if (rbin<rbinfirst) continue;
+		if (rbin-rbinfirst>rdiffmax) continue;
+		
+	      
+		unsigned int irouterbin=vmbits>>2;
+		
+		FPGAWord iphiinnerbin=innervmstub.finephi();
+		FPGAWord iphiouterbin=outervmstub.finephi();
+	      	      
+		unsigned int index = (irouterbin<<(outerphibits_+innerphibits_))+(iphiinnerbin.value()<<outerphibits_)+iphiouterbin.value();
+		
+		assert(index<phitable_[phiindex].size());		
+		if (!phitable_[phiindex][index]) {
+		  if (debug1) {
+		    cout << "Stub pair rejected because of tracklet pt cut"<<endl;
+		  }
+		  continue;
+		}
+		
+		FPGAWord innerbend=innervmstub.bend();
+		FPGAWord outerbend=outervmstub.bend();
+		
+		unsigned int ptinnerindex=(index<<innerbend.nbits())+innerbend.value();
+		unsigned int ptouterindex=(index<<outerbend.nbits())+outerbend.value();
+	      
+		assert(ptinnerindex<pttableinner_[phiindex].size());
+		assert(ptouterindex<pttableouter_[phiindex].size());
+	      
+		if (!(pttableinner_[phiindex][ptinnerindex]&&pttableouter_[phiindex][ptouterindex])) {
+		  if (debug1) {
+		    cout << "Stub pair rejected because of stub pt cut bends : "
+			 <<Stub::benddecode(innervmstub.bend().value(),innervmstub.isPSmodule())
+			 <<" "
+			 <<Stub::benddecode(outervmstub.bend().value(),outervmstub.isPSmodule())
+		      //<<" FP bend: "<<innerstub.second->bend()<<" "<<outerstub.second->bend()
+		      <<" pass : "<<pttableinner_[phiindex][ptinnerindex]<<" "<<pttableouter_[phiindex][ptouterindex]
+			 <<endl;
+		  }
+		  continue;
+		}
+
+		if (debug1) cout << "Adding disk-disk pair in " <<getName()<<endl;
+	      
+		if (writeSeeds) {
+		  ofstream fout("seeds.txt", ofstream::app);
+		  fout << __FILE__ << ":" << __LINE__ << " " << name_ << "_" << iSector_ << " " << iSeed_ << endl;
+		  fout.close();
+		}
+		stubpairs.addStubPair(innervmstub,outervmstub);
+		countall++;
+	
+	      }
+	    }
+	  }
+	}
+      
+      }
+    }
+    
+        
+    for(unsigned int i=0;i<stubpairs.nStubPairs();i++){
+
       if (trackletpars_->nTracklets()>=maxtracklet_) {
 	cout << "Will break on too many tracklets in "<<getName()<<endl;
 	break;
       }
-      for(unsigned int i=0;i<stubpairs_[l]->nStubPairs();i++){
-
-	countall++;
-	L1TStub* innerStub=stubpairs_[l]->getL1TStub1(i);
-	Stub* innerFPGAStub=stubpairs_[l]->getFPGAStub1(i);
-
-	L1TStub* outerStub=stubpairs_[l]->getL1TStub2(i);
-	Stub* outerFPGAStub=stubpairs_[l]->getFPGAStub2(i);
-
-	if (debug1) {
-	  cout << "TrackletCalculator execute "<<getName()<<"["<<iSector_<<"]"<<endl;
-	}
+      countall++;
+      L1TStub* innerStub=stubpairs.getL1TStub1(i);
+      Stub* innerFPGAStub=stubpairs.getFPGAStub1(i);
+      
+      L1TStub* outerStub=stubpairs.getL1TStub2(i);
+      Stub* outerFPGAStub=stubpairs.getFPGAStub2(i);
+      
+      if (debug1) {
+	cout << "TrackletProcessor execute "<<getName()<<"["<<iSector_<<"]"<<endl;
+      }
+      
+      if (innerFPGAStub->isBarrel()&&(getName()!="TC_D1L2A"&&getName()!="TC_D1L2B")){
 	
-	if (innerFPGAStub->isBarrel()&&(getName()!="TC_D1L2A"&&getName()!="TC_D1L2B")){
-
-
-          if (outerFPGAStub->isDisk()) {
-
-            //overlap seeding                                              
-            bool accept = overlapSeeding(outerFPGAStub,outerStub,innerFPGAStub,innerStub);
-            if (accept) countsel++;
-
-          } else {
+	
+	if (outerFPGAStub->isDisk()) {
 	  
-	    //barrel+barrel seeding	  
+	  //overlap seeding                                              
+	  bool accept = overlapSeeding(outerFPGAStub,outerStub,innerFPGAStub,innerStub);
+	  if (accept) countsel++;
+	  
+	} else {
+	  
+	  //barrel+barrel seeding	  
 	    bool accept = barrelSeeding(innerFPGAStub,innerStub,outerFPGAStub,outerStub);
 	    
 	    if (accept) countsel++;
-
-	  }
-	  
-	}  else {
-
-	  if (outerFPGAStub->isDisk()) {
-
-	    //disk+disk seeding
-
-	    bool accept = diskSeeding(innerFPGAStub,innerStub,outerFPGAStub,outerStub);
-
-	    if (accept) countsel++;
 	    
-
-	  } else if (innerFPGAStub->isDisk()) {
-
-
-	    //layer+disk seeding
-	    
-	    bool accept = overlapSeeding(innerFPGAStub,innerStub,outerFPGAStub,outerStub);
-
-	    if (accept) countsel++;
-
-
-	  } else {
-
-	    assert(0);
-	    
-	  }
-	}
-
-	if (trackletpars_->nTracklets()>=maxtracklet_) {
-	  cout << "Will break on number of tracklets in "<<getName()<<endl;
-	  break;
 	}
 	
-	if (countall>=MAXTC) {
-	  if (debug1) cout << "Will break on MAXTC 1"<<endl;
-	  break;
-	}
-	if (debug1) {
-	  cout << "TrackletCalculator execute done"<<endl;
-	}
+	}  else {
+	
+	if (outerFPGAStub->isDisk()) {
+	  
+	  //disk+disk seeding
+	  
+	  bool accept = diskSeeding(innerFPGAStub,innerStub,outerFPGAStub,outerStub);
+	  
+	  if (accept) countsel++;
+	  
 
+	} else if (innerFPGAStub->isDisk()) {
+	  
+	  
+	  //layer+disk seeding
+	  
+	  bool accept = overlapSeeding(innerFPGAStub,innerStub,outerFPGAStub,outerStub);
+	  
+	  if (accept) countsel++;
+	  
+	  
+	} else {
+	  
+	  assert(0);
+	  
+	}
       }
-      if (countall>=MAXTC) {
-	if (debug1) cout << "Will break on MAXTC 2"<<endl;
+      
+      if (trackletpars_->nTracklets()>=maxtracklet_) {
+	cout << "Will break on number of tracklets in "<<getName()<<endl;
 	break;
       }
+      
+      if (countall>=MAXTC) {
+	if (debug1) cout << "Will break on MAXTC 1"<<endl;
+	break;
+      }
+      if (debug1) {
+	cout << "TrackletProcessor execute done"<<endl;
+      }
+      
     }
-
-    if (writeTrackletCalculator) {
+    if (countall>=MAXTC) {
+      if (debug1) cout << "Will break on MAXTC 2"<<endl;
+      //break;
+    }
+  
+    
+    if (writeTrackletProcessor) {
       static ofstream out("trackletcalculator.txt");
       out << getName()<<" "<<countall<<" "<<countsel<<endl;
     }
-
-
+    
+    
   }
-
+  
 
   void addDiskProj(Tracklet* tracklet, int disk){
 
@@ -632,9 +966,9 @@ public:
   }
 
   bool barrelSeeding(Stub* innerFPGAStub, L1TStub* innerStub, Stub* outerFPGAStub, L1TStub* outerStub){
-	  
+
     if (debug1) {
-      cout << "TrackletCalculator "<<getName()<<" "<<layer_<<" trying stub pair in layer (inner outer): "
+      cout << "TrackletProcessor "<<getName()<<" "<<layer_<<" trying stub pair in layer (inner outer): "
 	   <<innerFPGAStub->layer().value()<<" "<<outerFPGAStub->layer().value()<<endl;
     }
 	    
@@ -652,7 +986,9 @@ public:
     double r2=outerStub->r();
     double z2=outerStub->z();
     double phi2=outerStub->phi();
-    
+
+    LayerProjection layerprojs[4];
+    DiskProjection diskprojs[5];
     
     double rinv,phi0,t,z0;
     
@@ -768,6 +1104,7 @@ public:
     zprojapprox[2]   = ITC->zL_2_final.get_fval();
     zprojapprox[3]   = ITC->zL_3_final.get_fval();
 
+
     phiprojdiskapprox[0] = ITC->phiD_0_final.get_fval();
     phiprojdiskapprox[1] = ITC->phiD_1_final.get_fval();
     phiprojdiskapprox[2] = ITC->phiD_2_final.get_fval();
@@ -783,8 +1120,6 @@ public:
     //now binary
     
     int irinv,iphi0,it,iz0;
-    LayerProjection layerprojs[4];
-    DiskProjection diskprojs[5];
     int iphiproj[4],izproj[4];
     int iphiprojdisk[5],irprojdisk[5];
     
@@ -866,15 +1201,11 @@ public:
     izproj[2]   = ITC->zL_2_final.get_ival();
     izproj[3]   = ITC->zL_3_final.get_ival();
 
-    if (writeTC) {
-      cout << "TC "<<layer_<<" "<<innerFPGAStub->iphivmRaw()<<" "<<outerFPGAStub->iphivmRaw();
-    }
-
 
     bool success = true;
     if(!ITC->rinv_final.local_passes()){
       if (debug1) 
-	cout << "TrackletCalculator::BarrelSeeding irinv too large: "
+	cout << "TrackletProcessor::BarrelSeeding irinv too large: "
 	     <<ITC->rinv_final.get_fval()<<"("<<ITC->rinv_final.get_ival()<<")\n";
       success = false;
     }
@@ -883,7 +1214,7 @@ public:
       success = false;
     }
     success = success && ITC->valid_trackpar.passes();
-    
+
     if (!success) return false;
 
     double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
@@ -892,14 +1223,21 @@ public:
          keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
     if (debug1)
       if (keep && !keepapprox)
-        cout << "TrackletCalculator::barrelSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
+        cout << "TrackletProcessor::barrelSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
     if (!usephicritapprox) {
       if (!keep) return false;
     }
     else {
       if (!keepapprox) return false;
     }
-        
+    
+    
+
+    
+    if (writeTC) {
+      cout << "TC "<<layer_<<" "<<innerFPGAStub->iphivmRaw()<<" "<<outerFPGAStub->iphivmRaw();
+    }
+    
     for(int i=0; i<4; ++i){
 
       //reject projection if z is out of range
@@ -928,7 +1266,6 @@ public:
       
     }
 
-    
     if (writeTC) {
       cout << endl;
     }
@@ -945,7 +1282,7 @@ public:
     irprojdisk[3]   = ITC->rD_3_final.get_ival();
     irprojdisk[4]   = ITC->rD_4_final.get_ival();
 
-   if(fabs(it * ITC->t_final.get_K())>1.0) {
+    if(fabs(it * ITC->t_final.get_K())>1.0) {
       for(int i=0; i<5; ++i){
 
 	if (iphiprojdisk[i]<=0) continue;
@@ -964,7 +1301,8 @@ public:
 	
       }
     }
- 
+
+    
     
     if (writeTrackletPars) {
       static ofstream out("trackletpars.txt");
@@ -975,7 +1313,8 @@ public:
 	  <<"   "<<z0<<" "<<z0approx<<" "<<ITC->z0_final.get_fval()
 	  <<endl;
     }	        
-        
+
+    
     Tracklet* tracklet=new Tracklet(innerStub,NULL,outerStub,
 				    innerFPGAStub,NULL,outerFPGAStub,
 				    rinv,phi0,0.0,z0,t,
@@ -987,7 +1326,7 @@ public:
 				    false);
     
     if (debug1) {
-      cout << "TrackletCalculator "<<getName()<<" Found tracklet in layer = "<<layer_<<" "
+      cout << "TrackletProcessor "<<getName()<<" Found tracklet in layer = "<<layer_<<" "
 	   <<iSector_<<" phi0 = "<<phi0<<endl;
     }
         
@@ -1054,14 +1393,14 @@ public:
 
 	    
     if (debug1) {
-      cout <<  "TrackletCalculator::execute calculate disk seeds" << endl;
+      cout <<  "TrackletProcessor::execute calculate disk seeds" << endl;
     }
 	      
     int sign=1;
     if (innerFPGAStub->disk().value()<0) sign=-1;
     
-    disk_=innerFPGAStub->disk().value();
-    assert(abs(disk_)==1||abs(disk_)==3);
+    int disk=innerFPGAStub->disk().value();
+    assert(abs(disk)==1||abs(disk)==3);
     
     
     assert(innerStub->isPSmodule());
@@ -1082,6 +1421,9 @@ public:
       //to avoid problem with floating point 
       //calculation
     }
+
+    LayerProjection layerprojs[3];
+    DiskProjection diskprojs[3];
     
     double rinv,phi0,t,z0;
     
@@ -1111,9 +1453,9 @@ public:
     double phiprojdiskapprox[3],rprojdiskapprox[3];
 	    
     IMATH_TrackletCalculatorDisk *ITC;
-    if(disk_==1)       ITC = &ITC_F1F2;
-    else if(disk_==3)  ITC = &ITC_F3F4;
-    else if(disk_==-1) ITC = &ITC_B1B2;
+    if(disk==1)       ITC = &ITC_F1F2;
+    else if(disk==3)  ITC = &ITC_F3F4;
+    else if(disk==-1) ITC = &ITC_B1B2;
     else               ITC = &ITC_B3B4;
     
     ITC->r1.set_fval(r1);
@@ -1264,10 +1606,11 @@ public:
     izproj[1]   = ITC->zL_1_final.get_ival();
     izproj[2]   = ITC->zL_2_final.get_ival();
 
-        bool success = true;
+
+    bool success = true;
     if(!ITC->rinv_final.local_passes()){
      if (debug1) 
-	cout << "TrackletCalculator::DiskSeeding irinv too large: "<<ITC->rinv_final.get_fval()
+	cout << "TrackletProcessor::DiskSeeding irinv too large: "<<ITC->rinv_final.get_fval()
 	     << " disk = "<<disk_<<" r1="<<r1<<endl;
       success = false;
     }
@@ -1286,17 +1629,16 @@ public:
          keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
     if (debug1)
       if (keep && !keepapprox)
-        cout << "TrackletCalculator::diskSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
+        cout << "TrackletProcessor::diskSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
     if (!usephicritapprox) {
       if (!keep) return false;
     }
     else {
       if (!keepapprox) return false;
     }
-    
-    LayerProjection layerprojs[4];
-    DiskProjection diskprojs[3];
 
+    
+    
     
     for(int i=0; i<3; ++i){
 
@@ -1320,7 +1662,6 @@ public:
 			 ITC->der_phiL_final.get_fval(),ITC->der_zL_final.get_fval());
     }
 
- 
     iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
     iphiprojdisk[1] = ITC->phiD_1_final.get_ival();
     iphiprojdisk[2] = ITC->phiD_2_final.get_ival();
@@ -1328,8 +1669,6 @@ public:
     irprojdisk[0]   = ITC->rD_0_final.get_ival();
     irprojdisk[1]   = ITC->rD_1_final.get_ival();
     irprojdisk[2]   = ITC->rD_2_final.get_ival();
-
-    
 
     for(int i=0; i<3; ++i){
 
@@ -1414,7 +1753,7 @@ public:
     
     assert(innerFPGAStub->isDisk());
     
-    disk_=innerFPGAStub->disk().value();
+    int disk=innerFPGAStub->disk().value();
     
     if (debug1) {
       cout << "trying to make overlap tracklet disk_ = "<<disk_<<" "<<getName()<<endl;
@@ -1464,16 +1803,19 @@ public:
       r2=outerFPGAStub->rapprox();
     }
 
+    LayerProjection layerprojs[3];
+    DiskProjection diskprojs[4];
+
     double rinvapprox,phi0approx,tapprox,z0approx;
     double phiprojapprox[3],zprojapprox[3];
     double phiprojdiskapprox[4],rprojdiskapprox[4];
 
     IMATH_TrackletCalculatorOverlap *ITC;
     int ll = outerFPGAStub->layer().value()+1;
-    if     (ll==1 && disk_==1)  ITC = &ITC_L1F1;
-    else if(ll==2 && disk_==1)  ITC = &ITC_L2F1;
-    else if(ll==1 && disk_==-1) ITC = &ITC_L1B1;
-    else if(ll==2 && disk_==-1) ITC = &ITC_L2B1;
+    if     (ll==1 && disk==1)  ITC = &ITC_L1F1;
+    else if(ll==2 && disk==1)  ITC = &ITC_L2F1;
+    else if(ll==1 && disk==-1) ITC = &ITC_L1B1;
+    else if(ll==2 && disk==-1) ITC = &ITC_L2B1;
     else assert(0);
     
     ITC->r1.set_fval(r2-rmean[ll-1]);
@@ -1551,7 +1893,6 @@ public:
     rprojdiskapprox[2] = ITC->rD_2_final.get_fval();
     rprojdiskapprox[3] = ITC->rD_3_final.get_fval();
 
-
     //now binary
 
     int irinv,iphi0,it,iz0;
@@ -1613,6 +1954,12 @@ public:
     it    = ITC->t_final.get_ival();
     iz0   = ITC->z0_final.get_ival();
 
+    //"protection" from the original, reinterpreted
+    if (iz0>= 1<<(ITC->z0_final.get_nbits()-1)) iz0=(1<<(ITC->z0_final.get_nbits()-1))-1;
+    if (iz0<=-(1<<(ITC->z0_final.get_nbits()-1))) iz0=1-(1<<(ITC->z0_final.get_nbits()-1))-1; 
+    if (irinv>= (1<<(ITC->rinv_final.get_nbits()-1))) irinv=(1<<(ITC->rinv_final.get_nbits()-1))-1;
+    if (irinv<=-(1<<(ITC->rinv_final.get_nbits()-1))) irinv=1-(1<<(ITC->rinv_final.get_nbits()-1))-1; 
+
     iphiproj[0] = ITC->phiL_0_final.get_ival();
     iphiproj[1] = ITC->phiL_1_final.get_ival();
     iphiproj[2] = ITC->phiL_2_final.get_ival();
@@ -1621,32 +1968,23 @@ public:
     izproj[1]   = ITC->zL_1_final.get_ival();
     izproj[2]   = ITC->zL_2_final.get_ival();
 
-    iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
-    iphiprojdisk[1] = ITC->phiD_1_final.get_ival();
-    iphiprojdisk[2] = ITC->phiD_2_final.get_ival();
-    iphiprojdisk[3] = ITC->phiD_3_final.get_ival();
-
-    irprojdisk[0]   = ITC->rD_0_final.get_ival();
-    irprojdisk[1]   = ITC->rD_1_final.get_ival();
-    irprojdisk[2]   = ITC->rD_2_final.get_ival();
-    irprojdisk[3]   = ITC->rD_3_final.get_ival();
-
+    
     bool success = true;
     if(!ITC->t_final.local_passes()) {
       if (debug1) {
-	cout << "TrackletCalculator::OverlapSeeding t too large: "<<ITC->t_final.get_fval()<<endl;
+	cout << "TrackletProcessor::OverlapSeeding t too large: "<<ITC->t_final.get_fval()<<endl;
       }
       success = false;
     }
     if(!ITC->rinv_final.local_passes()){
       if (debug1) {
-	cout << "TrackletCalculator::OverlapSeeding irinv too large: "<<ITC->rinv_final.get_fval()<<endl;
+	cout << "TrackletProcessor::OverlapSeeding irinv too large: "<<ITC->rinv_final.get_fval()<<endl;
        }
       success = false;
     }
     if (!ITC->z0_final.local_passes()) {
       if (debug1) {
-	cout << "TrackletCalculator::OverlapSeeding Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" r1="<<r1<<" "<<layer_<<endl;
+	cout << "TrackletProcessor::OverlapSeeding Failed tracklet z0 cut "<<ITC->z0_final.get_fval()<<" r1="<<r1<<" "<<layer_<<endl;
       }
       success = false;
     }
@@ -1656,7 +1994,7 @@ public:
     if (!success) {
       if (debug1) {
 	
-	cout << "TrackletCalculator::OverlapSeeding rejected no success: "
+	cout << "TrackletProcessor::OverlapSeeding rejected no success: "
 	     <<ITC->valid_trackpar.passes()<<" rinv="
 	     <<ITC->rinv_final.get_ival()*ITC->rinv_final.get_K()<<" eta="
 	     <<asinh(ITC->t_final.get_ival()*ITC->t_final.get_K())<<" z0="
@@ -1666,25 +2004,23 @@ public:
       return false;
     }
 
+
     double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
     int phicritapprox=iphi0-2*irinv;
     bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
          keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
     if (debug1)
       if (keep && !keepapprox)
-        cout << "TrackletCalculator::overlapSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
+        cout << "TrackletProcessor::overlapSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
     if (!usephicritapprox) {
       if (!keep) return false;
     }
     else {
       if (!keepapprox) return false;
     }
+
     
-
-    LayerProjection layerprojs[4];
-    DiskProjection diskprojs[5];
-
-
+    
     for(int i=0; i<3; ++i){
 
       //check that zproj is in range
@@ -1708,17 +2044,27 @@ public:
       
     }
 
+    iphiprojdisk[0] = ITC->phiD_0_final.get_ival();
+    iphiprojdisk[1] = ITC->phiD_1_final.get_ival();
+    iphiprojdisk[2] = ITC->phiD_2_final.get_ival();
+    iphiprojdisk[3] = ITC->phiD_3_final.get_ival();
+
+    irprojdisk[0]   = ITC->rD_0_final.get_ival();
+    irprojdisk[1]   = ITC->rD_1_final.get_ival();
+    irprojdisk[2]   = ITC->rD_2_final.get_ival();
+    irprojdisk[3]   = ITC->rD_3_final.get_ival();
 
     for(int i=0; i<4; ++i){
 
-      //check that phi projection in range
+      //check that phi projetion in range
       if (iphiprojdisk[i]<=0) continue;
       if (iphiprojdisk[i]>=(1<<nbitsphistubL123)-1) continue;
 
-      //check that r projection in range
-      if(irprojdisk[i]<=0 ||
-	 irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ) continue;
+      //check that r projetion in range
+      if(irprojdisk[i]<=0
+	 || irprojdisk[i] > 120. / ITC->rD_0_final.get_K() ) continue;
 
+      
       diskprojs[i].init(i+1,rproj_[i],
 			iphiprojdisk[i],irprojdisk[i],
 			ITC->der_phiD_final.get_ival(),ITC->der_rD_final.get_ival(),
@@ -1726,11 +2072,12 @@ public:
 			phiderdisk[i],rderdisk[i],
 			phiprojdiskapprox[i],rprojdiskapprox[i],
 			ITC->der_phiD_final.get_fval(),ITC->der_rD_final.get_fval());
-
+      
       
     }
 
-       
+    
+
     if (writeTrackletParsOverlap) {
       static ofstream out("trackletparsoverlap.txt");
       out <<"Trackpars "<<disk_
@@ -1791,7 +2138,393 @@ public:
   int round_int( double r ) {
     return (r > 0.0) ? (r + 0.5) : (r - 0.5); 
   }
- 
+
+  void setVMPhiBin() {
+
+    //cout << "setVMPhiBin"<<innervmstubs_.size()<<" "<<outervmstubs_.size()<<endl;
+    
+    if (innervmstubs_.size()!=outervmstubs_.size() ) return;
+
+    for(unsigned int ivmmem=0;ivmmem<innervmstubs_.size();ivmmem++){
+    
+      unsigned int innerphibin=innervmstubs_[ivmmem]->phibin();
+      unsigned int outerphibin=outervmstubs_[ivmmem]->phibin();
+      
+      unsigned phiindex=32*innerphibin+outerphibin;
+
+
+      if (phitable_.find(phiindex)!=phitable_.end()) continue;
+      
+      innervmstubs_[ivmmem]->setother(outervmstubs_[ivmmem]);
+      outervmstubs_[ivmmem]->setother(innervmstubs_[ivmmem]);
+
+
+    
+      if ((layer_==1 && disk_==0)||
+	  (layer_==2 && disk_==0)||
+	  (layer_==3 && disk_==0)||
+	  (layer_==5 && disk_==0)){
+      
+	innerphibits_=nfinephibarrelinner;
+	outerphibits_=nfinephibarrelouter;
+	
+	int innerphibins=(1<<innerphibits_);
+	int outerphibins=(1<<outerphibits_);
+	
+	double innerphimin, innerphimax;
+	innervmstubs_[ivmmem]->getPhiRange(innerphimin,innerphimax);
+	double rinner=rmean[layer_-1];
+	
+	double outerphimin, outerphimax;
+	outervmstubs_[ivmmem]->getPhiRange(outerphimin,outerphimax);
+	double router=rmean[layer_];
+	
+	double phiinner[2];
+	double phiouter[2];
+	
+	std::vector<bool> vmbendinner;
+	std::vector<bool> vmbendouter;
+	unsigned int nbins1=8;
+	if (layer_>=4) nbins1=16;
+	for (unsigned int i=0;i<nbins1;i++) {
+	  vmbendinner.push_back(false);
+	}
+	
+	unsigned int nbins2=8;
+	if (layer_>=3) nbins2=16;
+	for (unsigned int i=0;i<nbins2;i++) {
+	  vmbendouter.push_back(false);
+	}
+	
+	for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
+	  phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
+	  phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
+	  for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
+	    phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
+	    phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
+	    
+	    double bendinnermin=20.0;
+	    double bendinnermax=-20.0;
+	    double bendoutermin=20.0;
+	    double bendoutermax=-20.0;
+	    double rinvmin=1.0; 
+	    for(int i1=0;i1<2;i1++) {
+	      for(int i2=0;i2<2;i2++) {
+		double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router);
+		double abendinner=bend(rinner,rinv1); 
+		double abendouter=bend(router,rinv1);
+		if (abendinner<bendinnermin) bendinnermin=abendinner;
+		if (abendinner>bendinnermax) bendinnermax=abendinner;
+		if (abendouter<bendoutermin) bendoutermin=abendouter;
+		if (abendouter>bendoutermax) bendoutermax=abendouter;
+		if (fabs(rinv1)<rinvmin) {
+		  rinvmin=fabs(rinv1);
+		}
+		
+	      }
+	    }
+	    
+	    //cout << "Fill: "<<getName()<<" "<<phiindex<<endl;
+	    phitable_[phiindex].push_back(rinvmin<rinvcutte);
+	    
+	    int nbins1=8;
+	    if (layer_>=4) nbins1=16;
+	    for(int ibend=0;ibend<nbins1;ibend++) {
+	      double bend=Stub::benddecode(ibend,layer_<=3); 
+	      
+	      bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;	    
+	      if (passinner) vmbendinner[ibend]=true;
+	      pttableinner_[phiindex].push_back(passinner);
+	      
+	    }
+	    
+	    int nbins2=8;
+	    if (layer_>=3) nbins2=16;
+	    for(int ibend=0;ibend<nbins2;ibend++) {
+	      double bend=Stub::benddecode(ibend,layer_<=2); 
+	      
+	      bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+	      if (passouter) vmbendouter[ibend]=true;
+	      pttableouter_[phiindex].push_back(passouter);
+	      
+	    }   
+	  }
+	}
+
+	innervmstubs_[ivmmem]->setbendtable(vmbendinner);
+	outervmstubs_[ivmmem]->setbendtable(vmbendouter);
+      
+	if (iSector_==0&&writeTETables) writeTETable();
+      
+      }
+
+      if ((disk_==1 && layer_==0)||
+	  (disk_==3 && layer_==0)){
+	
+	innerphibits_=nfinephidiskinner;
+	outerphibits_=nfinephidiskouter;
+	
+	
+	int outerrbits=3;
+	
+	int outerrbins=(1<<outerrbits);
+	int innerphibins=(1<<innerphibits_);
+	int outerphibins=(1<<outerphibits_);
+	
+	double innerphimin, innerphimax;
+	innervmstubs_[ivmmem]->getPhiRange(innerphimin,innerphimax);
+	
+	double outerphimin, outerphimax;
+	outervmstubs_[ivmmem]->getPhiRange(outerphimin,outerphimax);
+	
+	
+	double phiinner[2];
+	double phiouter[2];
+	double router[2];
+	
+	std::vector<bool> vmbendinner;
+	std::vector<bool> vmbendouter;
+	
+	for (unsigned int i=0;i<8;i++) {
+	  vmbendinner.push_back(false);
+	  vmbendouter.push_back(false);
+	}
+	
+
+	for (int irouterbin=0;irouterbin<outerrbins;irouterbin++){
+	  router[0]=rmindiskvm+irouterbin*(rmaxdiskvm-rmindiskvm)/outerrbins;
+	  router[1]=rmindiskvm+(irouterbin+1)*(rmaxdiskvm-rmindiskvm)/outerrbins;
+	  for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
+	    phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
+	    phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
+	    for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
+	      phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
+	      phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
+	      
+	      double bendinnermin=20.0;
+	      double bendinnermax=-20.0;
+	      double bendoutermin=20.0;
+	      double bendoutermax=-20.0;
+	      double rinvmin=1.0; 
+	      double rinvmax=-1.0; 
+	      for(int i1=0;i1<2;i1++) {
+		for(int i2=0;i2<2;i2++) {
+		  for(int i3=0;i3<2;i3++) {
+		    double rinner=router[i3]*zmean[disk_-1]/zmean[disk_];
+		    double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router[i3]);
+		    double abendinner=bend(rinner,rinv1);
+		    double abendouter=bend(router[i3],rinv1);
+		    if (abendinner<bendinnermin) bendinnermin=abendinner;
+		    if (abendinner>bendinnermax) bendinnermax=abendinner;
+		    if (abendouter<bendoutermin) bendoutermin=abendouter;
+		    if (abendouter>bendoutermax) bendoutermax=abendouter;
+		    if (fabs(rinv1)<rinvmin) {
+		      rinvmin=fabs(rinv1);
+		    }
+		    if (fabs(rinv1)>rinvmax) {
+		      rinvmax=fabs(rinv1);
+		    }
+		  }
+		}
+	      }
+	      
+	      //if (disk1_==1 && rinvmax>0.013 && rinvmin<0.0057){
+	      //  cout << "router rinvmax rinvmin :"<<router[0]<<" "<<rinvmax<<" "<<rinvmin<<endl;
+	      //}
+	      
+	      phitable_[phiindex].push_back(rinvmin<rinvcutte);
+
+
+	      for(int ibend=0;ibend<8;ibend++) {
+		double bend=Stub::benddecode(ibend,true); 
+		
+		bool passinner=bend-bendinnermin>-bendcutdisk&&bend-bendinnermax<bendcutdisk;	    
+		if (passinner) vmbendinner[ibend]=true;
+		pttableinner_[phiindex].push_back(passinner);
+		
+	      }
+	      
+	      for(int ibend=0;ibend<8;ibend++) {
+		double bend=Stub::benddecode(ibend,true); 
+		
+		bool passouter=bend-bendoutermin>-bendcutdisk&&bend-bendoutermax<bendcutdisk;
+		if (passouter) vmbendouter[ibend]=true;
+		pttableouter_[phiindex].push_back(passouter);
+		
+	      }
+	    
+	    }
+	  }
+	}
+	
+	innervmstubs_[ivmmem]->setbendtable(vmbendinner);
+	outervmstubs_[ivmmem]->setbendtable(vmbendouter);
+	
+	if (iSector_==0&&writeTETables) writeTETable();
+	
+      } else if (disk_==1 && (layer_==1 || layer_==2)) {
+	
+	innerphibits_=nfinephioverlapinner;
+	outerphibits_=nfinephioverlapouter;
+	unsigned int nrbits=5;
+	
+	int innerphibins=(1<<innerphibits_);
+	int outerphibins=(1<<outerphibits_);
+	
+	double innerphimin, innerphimax;
+	innervmstubs_[ivmmem]->getPhiRange(innerphimin,innerphimax);
+	
+	double outerphimin, outerphimax;
+	outervmstubs_[ivmmem]->getPhiRange(outerphimin,outerphimax);
+	
+	double phiinner[2];
+	double phiouter[2];
+	double router[2];
+	
+
+	std::vector<bool> vmbendinner;
+	std::vector<bool> vmbendouter;
+	
+	for (unsigned int i=0;i<8;i++) {
+	  vmbendinner.push_back(false);
+	  vmbendouter.push_back(false);
+	}
+	
+	double dr=(rmaxdiskvm-rmindiskvm)/(1<<nrbits);
+
+	for (int iphiinnerbin=0;iphiinnerbin<innerphibins;iphiinnerbin++){
+	  phiinner[0]=innerphimin+iphiinnerbin*(innerphimax-innerphimin)/innerphibins;
+	  phiinner[1]=innerphimin+(iphiinnerbin+1)*(innerphimax-innerphimin)/innerphibins;
+	  for (int iphiouterbin=0;iphiouterbin<outerphibins;iphiouterbin++){
+	    phiouter[0]=outerphimin+iphiouterbin*(outerphimax-outerphimin)/outerphibins;
+	    phiouter[1]=outerphimin+(iphiouterbin+1)*(outerphimax-outerphimin)/outerphibins;
+	    for (int irbin=0;irbin<(1<<nrbits);irbin++){
+	      router[0]=rmindiskvm+dr*irbin;
+	      router[1]=router[0]+dr; 
+	      double bendinnermin=20.0;
+	      double bendinnermax=-20.0;
+	      double bendoutermin=20.0;
+	      double bendoutermax=-20.0;
+	      double rinvmin=1.0; 
+	      for(int i1=0;i1<2;i1++) {
+		for(int i2=0;i2<2;i2++) {
+		  for(int i3=0;i3<2;i3++) {
+		    double rinner=rmean[layer_-1];
+		    double rinv1=rinv(phiinner[i1],phiouter[i2],rinner,router[i3]);
+		    double abendinner=bend(rinner,rinv1);
+		    double abendouter=bend(router[i3],rinv1);
+		    if (abendinner<bendinnermin) bendinnermin=abendinner;
+		    if (abendinner>bendinnermax) bendinnermax=abendinner;
+		    if (abendouter<bendoutermin) bendoutermin=abendouter;
+		    if (abendouter>bendoutermax) bendoutermax=abendouter;
+		    if (fabs(rinv1)<rinvmin) {
+		      rinvmin=fabs(rinv1);
+		    }
+		  }
+		}
+	      }
+	    
+	      phitable_[phiindex].push_back(rinvmin<rinvcutte);
+	      
+	      
+	      for(int ibend=0;ibend<8;ibend++) {
+		double bend=Stub::benddecode(ibend,true); 
+		
+		bool passinner=bend-bendinnermin>-bendcut&&bend-bendinnermax<bendcut;	    
+		if (passinner) vmbendinner[ibend]=true;
+		pttableinner_[phiindex].push_back(passinner);
+		
+	      }
+	      
+	      for(int ibend=0;ibend<8;ibend++) {
+		double bend=Stub::benddecode(ibend,true); 
+		
+		bool passouter=bend-bendoutermin>-bendcut&&bend-bendoutermax<bendcut;
+		if (passouter) vmbendouter[ibend]=true;
+		pttableouter_[phiindex].push_back(passouter);
+		
+	      }
+	    }
+	  }
+	}
+	
+    
+	innervmstubs_[ivmmem]->setbendtable(vmbendinner);
+	outervmstubs_[ivmmem]->setbendtable(vmbendouter);
+	
+	if (iSector_==0&&writeTETables) writeTETable();
+	
+	
+      }
+    } 
+  }
+    
+  double rinv(double phi1, double phi2,double r1, double r2){
+    
+    if (r2<r1) { //can not form tracklet
+      return 20.0; 
+    }
+    
+    assert(r2>r1);
+
+    double dphi=phi2-phi1;
+    double dr=r2-r1;
+    
+    return 2.0*sin(dphi)/dr/sqrt(1.0+2*r1*r2*(1.0-cos(dphi))/(dr*dr));
+    
+  }
+
+  double bend(double r, double rinv) {
+
+    double dr=0.18;
+    
+    double delta=r*dr*0.5*rinv;
+
+    double bend=delta/0.009;
+    if (r<55.0) bend=delta/0.01;
+
+    return bend;
+    
+  }
+
+
+    void writeTETable() {
+
+    ofstream outptcut;
+    outptcut.open(getName()+"_ptcut.txt");
+    outptcut << "{"<<endl;
+    //for(unsigned int i=0;i<phitable_.size();i++){
+    //  if (i!=0) outptcut<<","<<endl;
+    //  outptcut << phitable_[i];
+    //}
+    outptcut <<endl<<"};"<<endl;
+    outptcut.close();
+
+    ofstream outstubptinnercut;
+    outstubptinnercut.open(getName()+"_stubptinnercut.txt");
+    outstubptinnercut << "{"<<endl;
+    //for(unsigned int i=0;i<pttableinner_.size();i++){
+    //  if (i!=0) outstubptinnercut<<","<<endl;
+    //  outstubptinnercut << pttableinner_[i];
+    //}
+    outstubptinnercut <<endl<<"};"<<endl;
+    outstubptinnercut.close();
+    
+    ofstream outstubptoutercut;
+    outstubptoutercut.open(getName()+"_stubptoutercut.txt");
+    outstubptoutercut << "{"<<endl;
+    //for(unsigned int i=0;i<pttableouter_.size();i++){
+    //  if (i!=0) outstubptoutercut<<","<<endl;
+    //  outstubptoutercut << pttableouter_[i];
+    //}
+    outstubptoutercut <<endl<<"};"<<endl;
+    outstubptoutercut.close();
+
+    
+  }
+  
+
+  
     
 private:
   
@@ -1812,16 +2545,28 @@ private:
   
   double zprojoverlap_[4];
 
+  vector<VMStubsTEMemory*> innervmstubs_;
+  vector<VMStubsTEMemory*> outervmstubs_;
+  
   vector<AllStubsMemory*> innerallstubs_;
   vector<AllStubsMemory*> outerallstubs_;
-  vector<StubPairsMemory*> stubpairs_;
 
   TrackletParametersMemory* trackletpars_;
 
   //First index is layer/disk second is phi region
   vector<vector<TrackletProjectionsMemory*> > trackletprojlayers_;
   vector<vector<TrackletProjectionsMemory*> > trackletprojdisks_;
+
+  bool extra_;
+
   
+  map<unsigned int, vector<bool> > phitable_;
+  map<unsigned int, vector<bool> > pttableinner_;
+  map<unsigned int, vector<bool> > pttableouter_;
+  
+  int innerphibits_;
+  int outerphibits_;
+
 
 public:
   static IMATH_TrackletCalculator ITC_L1L2;
@@ -1841,19 +2586,19 @@ public:
     
 };
 
-IMATH_TrackletCalculator TrackletCalculator::ITC_L1L2{1,2};
-IMATH_TrackletCalculator TrackletCalculator::ITC_L2L3{2,3};
-IMATH_TrackletCalculator TrackletCalculator::ITC_L3L4{3,4};
-IMATH_TrackletCalculator TrackletCalculator::ITC_L5L6{5,6};
+IMATH_TrackletCalculator TrackletProcessor::ITC_L1L2{1,2};
+IMATH_TrackletCalculator TrackletProcessor::ITC_L2L3{2,3};
+IMATH_TrackletCalculator TrackletProcessor::ITC_L3L4{3,4};
+IMATH_TrackletCalculator TrackletProcessor::ITC_L5L6{5,6};
 
-IMATH_TrackletCalculatorDisk TrackletCalculator::ITC_F1F2{1,2};
-IMATH_TrackletCalculatorDisk TrackletCalculator::ITC_F3F4{3,4};
-IMATH_TrackletCalculatorDisk TrackletCalculator::ITC_B1B2{-1,-2};
-IMATH_TrackletCalculatorDisk TrackletCalculator::ITC_B3B4{-3,-4};
+IMATH_TrackletCalculatorDisk TrackletProcessor::ITC_F1F2{1,2};
+IMATH_TrackletCalculatorDisk TrackletProcessor::ITC_F3F4{3,4};
+IMATH_TrackletCalculatorDisk TrackletProcessor::ITC_B1B2{-1,-2};
+IMATH_TrackletCalculatorDisk TrackletProcessor::ITC_B3B4{-3,-4};
 
-IMATH_TrackletCalculatorOverlap TrackletCalculator::ITC_L1F1{1,1};
-IMATH_TrackletCalculatorOverlap TrackletCalculator::ITC_L2F1{2,1};
-IMATH_TrackletCalculatorOverlap TrackletCalculator::ITC_L1B1{1,-1};
-IMATH_TrackletCalculatorOverlap TrackletCalculator::ITC_L2B1{2,-1};
+IMATH_TrackletCalculatorOverlap TrackletProcessor::ITC_L1F1{1,1};
+IMATH_TrackletCalculatorOverlap TrackletProcessor::ITC_L2F1{2,1};
+IMATH_TrackletCalculatorOverlap TrackletProcessor::ITC_L1B1{1,-1};
+IMATH_TrackletCalculatorOverlap TrackletProcessor::ITC_L2B1{2,-1};
 
 #endif

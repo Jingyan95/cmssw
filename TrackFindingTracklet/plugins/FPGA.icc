@@ -139,66 +139,43 @@
         bool add=sectors[k]->addStub(stub,dtcbase);
 
 	static std::map<string,ofstream*> dtcstubs;
-	static std::map<string,vector<int> > dtclayerdisk;
-
-	if (dtclayerdisk.size()==0) {
-	  ifstream in("dtclinklayerdisk.dat");
-	  string dtc;
-	  in >> dtc;
-	  while (in.good()){
-	    vector<int> tmp;
-	    dtclayerdisk[dtc]=tmp;
-	    int layerdisk;
-	    in >> layerdisk;
-	    while (layerdisk>0) {
-	      dtclayerdisk[dtc].push_back(layerdisk);
-	      in >> layerdisk;
-            }
-	    in >> dtc;
-          }
-        }
 
 	if (writememLinks) {
-	   vector<string>  dtcs=cabling.DTCs();
-	   for(auto it=dtcs.begin();it!=dtcs.end();++it){
-	     string dtc=*it;
-	     string dtcbase=dtc.substr(2,dtc.size()-2);
-      	     if (dtc[0]=='n') {
-               dtcbase=dtc.substr(0,4)+dtc.substr(6,dtc.size()-6);
-	     }     
-
-	     string fname="MemPrints/InputStubs/Link_";
-	     fname+=dtcbase;
-	     if (dtcstubs.find(dtcbase+"A")!=dtcstubs.end()) continue;
-	     fname+="_A.dat";
-	     ofstream* out=new ofstream;
-	     out->open(fname.c_str());
-	     dtcstubs[dtcbase+"A"]=out;
-
-	     fname="MemPrints/InputStubs/Link_";
-	     fname+=dtcbase;
-	     if (dtcstubs.find(dtcbase+"B")!=dtcstubs.end()) continue;
-	     fname+="_B.dat";
-	     out=new ofstream;
-	     out->open(fname.c_str());
-	     dtcstubs[dtcbase+"B"]=out;
-	   }
-        }  
-
-	#ifndef CMSSW_GIT_HASH
-	// this only works in standalone currently as "i" is the event counter used in fpga.cc which is not present in L1FPGATrackProducer.cc for CMSSW version
-	if (writememLinks) {
+	  vector<string>  dtcs=cabling.DTCs();
+	  for(auto it=dtcs.begin();it!=dtcs.end();++it){
+	    string dtc=*it;
+	    string dtcbase=dtc.substr(2,dtc.size()-2);
+	    if (dtc[0]=='n') {
+	      dtcbase=dtc.substr(0,4)+dtc.substr(6,dtc.size()-6);
+	    }     
+	    
+	    string fname="../data/MemPrints/InputStubs/Link_";
+	    fname+=dtcbase;
+	    if (dtcstubs.find(dtcbase+"A")!=dtcstubs.end()) continue;
+	    fname+="_A.dat";
+	    ofstream* out=new ofstream;
+	    out->open(fname.c_str());
+	    dtcstubs[dtcbase+"A"]=out;
+	    
+	    fname="../data/MemPrints/InputStubs/Link_";
+	    fname+=dtcbase;
+	    if (dtcstubs.find(dtcbase+"B")!=dtcstubs.end()) continue;
+	    fname+="_B.dat";
+	    out=new ofstream;
+	    out->open(fname.c_str());
+	    dtcstubs[dtcbase+"B"]=out;
+	  }
+	  
 	  static int oldevent=-1;
-	  if (i!=oldevent) {
-	    oldevent=i;
+	  if (eventnum!=oldevent) {
+	    oldevent=eventnum;
 	    for(auto it=dtcstubs.begin();it!=dtcstubs.end();++it) {
 	      FPGAWord tmp;
-	      tmp.set(i%8,3);
-	      (*(it->second)) << "BX "<<tmp.str()<<" Event : "<<i+1<<endl;
+	      tmp.set(eventnum%8,3);
+	      (*(it->second)) << "BX "<<tmp.str()<<" Event : "<<eventnum+1<<endl;
 	    }	       		
 	  }
 	}
-	#endif	
 
 	if(add&&writememLinks&&k==writememsect) {
 	  Stub fpgastub(stub,sectors[k]->phimin(),sectors[k]->phimax());
@@ -360,9 +337,19 @@ if (writeHitEff) {
     }
     TRETimer.stop();
 
+    for (unsigned int k=0;k<NSector;k++) {
+      sectors[k]->executeTP();	 
+      if(writemem&&k==writememsect){
+        sectors[k]->writeTPAR(first);
+        //sectors[k]->writeTPROJ(first);
+      } 
+    }
 
     TCTimer.start();
     for (unsigned int k=0;k<NSector;k++) {
+      if (writeTC) {
+	cout << "TCSector" << endl;
+      }
       sectors[k]->executeTC();	 
       if(writemem&&k==writememsect){
         sectors[k]->writeTPAR(first);

@@ -177,6 +177,8 @@ private:
   /// Containers of parameters passed by python configuration file
   edm::ParameterSet config;
 
+  bool readMoreMcTruth_;
+
   /// File path for configuration files
   edm::FileInPath fitPatternFile;
   edm::FileInPath memoryModulesFile;
@@ -186,6 +188,9 @@ private:
   edm::FileInPath DTCLinkFile;
   edm::FileInPath moduleCablingFile;
 
+  edm::FileInPath DTCLinkLayerDiskFile;
+
+  
   int failscenario_;
   StubKiller* my_stubkiller;
 
@@ -200,6 +205,8 @@ private:
 
   Sector** sectors;
   Cabling cabling;
+
+  std::map<string,vector<int> > dtclayerdisk;
 
   edm::ESHandle<TrackerTopology> tTopoHandle;
   edm::ESHandle<TrackerGeometry> tGeomHandle;
@@ -236,10 +243,11 @@ private:
 // CONSTRUCTOR
 L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
   config(iConfig),
-  MCTruthClusterInputTag(config.getParameter<edm::InputTag>("MCTruthClusterInputTag")),
-  MCTruthStubInputTag(config.getParameter<edm::InputTag>("MCTruthStubInputTag")),
-  TrackingParticleInputTag(iConfig.getParameter<edm::InputTag>("TrackingParticleInputTag")),
-  TrackingVertexInputTag(iConfig.getParameter<edm::InputTag>("TrackingVertexInputTag")),
+  readMoreMcTruth_(iConfig.getParameter<bool>("readMoreMcTruth")),
+  MCTruthClusterInputTag(readMoreMcTruth_ ? config.getParameter<edm::InputTag>("MCTruthClusterInputTag") : edm::InputTag()),
+  MCTruthStubInputTag(readMoreMcTruth_ ? config.getParameter<edm::InputTag>("MCTruthStubInputTag") : edm::InputTag()),
+  TrackingParticleInputTag(readMoreMcTruth_ ? iConfig.getParameter<edm::InputTag>("TrackingParticleInputTag") : edm::InputTag()),
+  TrackingVertexInputTag(readMoreMcTruth_ ? iConfig.getParameter<edm::InputTag>("TrackingVertexInputTag") : edm::InputTag()),
   simTrackSrc_(config.getParameter<edm::InputTag>("SimTrackSource")),
   simVertexSrc_(config.getParameter<edm::InputTag>("SimVertexSource")),
   ttStubSrc_(config.getParameter<edm::InputTag>("TTStubSource")),
@@ -248,12 +256,14 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
   simTrackToken_(consumes< edm::SimTrackContainer >(simTrackSrc_)),
   simVertexToken_(consumes< edm::SimVertexContainer >(simVertexSrc_)),
   ttStubToken_(consumes< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > > >(ttStubSrc_)),
-  bsToken_(consumes< reco::BeamSpot >(bsSrc_)),
-  ttClusterMCTruthToken_(consumes< TTClusterAssociationMap< Ref_Phase2TrackerDigi_ > >(MCTruthClusterInputTag)),
-  ttStubMCTruthToken_(consumes< TTStubAssociationMap< Ref_Phase2TrackerDigi_ > >(MCTruthStubInputTag)),
-  TrackingParticleToken_(consumes< std::vector< TrackingParticle > >(TrackingParticleInputTag)),
-  TrackingVertexToken_(consumes< std::vector< TrackingVertex > >(TrackingVertexInputTag))
+  bsToken_(consumes< reco::BeamSpot >(bsSrc_))
 {
+  if (readMoreMcTruth_) {
+      ttClusterMCTruthToken_ = consumes< TTClusterAssociationMap< Ref_Phase2TrackerDigi_ > >(MCTruthClusterInputTag);
+      ttStubMCTruthToken_ = consumes< TTStubAssociationMap< Ref_Phase2TrackerDigi_ > >(MCTruthStubInputTag);
+      TrackingParticleToken_ = consumes< std::vector< TrackingParticle > >(TrackingParticleInputTag);
+      TrackingVertexToken_ = consumes< std::vector< TrackingVertex > >(TrackingVertexInputTag);
+  }
 
   produces< std::vector< TTTrack< Ref_Phase2TrackerDigi_ > > >( "Level1TTTracks" ).setBranchAlias("Level1TTTracks");
 
@@ -272,6 +282,8 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
 
   DTCLinkFile = iConfig.getParameter<edm::FileInPath> ("DTCLinkFile");
   moduleCablingFile = iConfig.getParameter<edm::FileInPath> ("moduleCablingFile");
+
+  DTCLinkLayerDiskFile = iConfig.getParameter<edm::FileInPath> ("DTCLinkLayerDiskFile");
 
 
   // --------------------------------------------------------------------------------
@@ -327,9 +339,26 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig) :
   if (debug1) {
     cout << "cabling DTC links :     "<<DTCLinkFile.fullPath()<<endl;
     cout << "module cabling :     "<<moduleCablingFile.fullPath()<<endl;
+    cout << "DTC link layer disk :     "<<DTCLinkLayerDiskFile.fullPath()<<endl;
   }
 
   cabling.init(DTCLinkFile.fullPath().c_str(),moduleCablingFile.fullPath().c_str());
+
+  ifstream in(DTCLinkLayerDiskFile.fullPath().c_str());
+  string dtc;
+  in >> dtc;
+  while (in.good()){
+    vector<int> tmp;
+    dtclayerdisk[dtc]=tmp;
+    int layerdisk;
+    in >> layerdisk;
+    while (layerdisk>0) {
+      dtclayerdisk[dtc].push_back(layerdisk);
+      in >> layerdisk;
+    }
+    in >> dtc;
+  }
+  
 
   for (unsigned int i=0;i<NSector;i++) {
     sectors[i]=new Sector(i);
@@ -547,8 +576,9 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
   // tracking particles
   edm::Handle< std::vector< TrackingParticle > > TrackingParticleHandle;
   edm::Handle< std::vector< TrackingVertex > > TrackingVertexHandle;
-  iEvent.getByToken(TrackingParticleToken_, TrackingParticleHandle);
-  iEvent.getByToken(TrackingVertexToken_, TrackingVertexHandle);
+  if (readMoreMcTruth_) iEvent.getByToken(TrackingParticleToken_, TrackingParticleHandle);
+  if (readMoreMcTruth_) iEvent.getByToken(TrackingVertexToken_, TrackingVertexHandle);
+
 
 
   const TrackerTopology* const tTopo = tTopoHandle.product();
@@ -560,11 +590,15 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
   edm::Handle< edmNew::DetSetVector< TTStub< Ref_Phase2TrackerDigi_ > > >    Phase2TrackerDigiTTStubHandle;
   iEvent.getByToken( ttStubToken_,        Phase2TrackerDigiTTStubHandle );
 
+  // must be defined for code to compile, even if it's not used unless readMoreMcTruth_ is true
+  map<edm::Ptr< TrackingParticle >, int > translateTP;
+
 
   // MC truth association maps
   edm::Handle< TTClusterAssociationMap< Ref_Phase2TrackerDigi_ > > MCTruthTTClusterHandle;
-  iEvent.getByToken(ttClusterMCTruthToken_, MCTruthTTClusterHandle);
   edm::Handle< TTStubAssociationMap< Ref_Phase2TrackerDigi_ > > MCTruthTTStubHandle;
+  if (readMoreMcTruth_) {
+  iEvent.getByToken(ttClusterMCTruthToken_, MCTruthTTClusterHandle);
   iEvent.getByToken(ttStubMCTruthToken_, MCTruthTTStubHandle);
 
 
@@ -577,8 +611,6 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
   std::vector< TrackingParticle >::const_iterator iterTP;
 
   int ntps=1; //count from 1 ; 0 will mean invalid
-
-  map<edm::Ptr< TrackingParticle >, int > translateTP;
 
   for (iterTP = TrackingParticleHandle->begin(); iterTP != TrackingParticleHandle->end(); ++iterTP) {
 
@@ -623,7 +655,8 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
   }//end loop over TPs
 
-
+  } // end if (readMoreMcTruth_)
+  
 
   ////////////////////////////////
   /// COLLECT STUB INFORMATION ///
@@ -658,6 +691,7 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
       vector<int> assocTPs;
 
+      if (readMoreMcTruth_) { 
       for (unsigned int iClus = 0; iClus <= 1; iClus++) { // Loop over both clusters that make up stub.
 
 	const TTClusterRef& ttClusterRef = tempStubPtr->getClusterRef(iClus);
@@ -679,21 +713,25 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 	  }
 	}
       }
+      } // end if (readMoreMcTruth_)      
 
       MeasurementPoint coords = tempStubPtr->getClusterRef(0)->findAverageLocalCoordinatesCentered();
       LocalPoint clustlp = topol->localPosition(coords);
       GlobalPoint posStub  =  theGeomDet->surface().toGlobal(clustlp);
 
+      int eventID=-1;
+
+      if (readMoreMcTruth_) {
       edm::Ptr< TrackingParticle > my_tp = MCTruthTTStubHandle->findTrackingParticlePtr(tempStubPtr);
 
-      int eventID=-1;
       if (my_tp.isNull()) {
 	if (doMyDebug) cout << "TP is null pointer" << endl;
       }
       else {
 	if (doMyDebug) cout << "TP is NOT null pointer" << endl;
       }
-
+      } // end if (readMoreMcTruth_)
+      
       int layer=-999999;
       int ladder=-999999;
       int module=-999999;

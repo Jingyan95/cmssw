@@ -1052,11 +1052,11 @@ DiskMatchCalculator: MC_D5PHIB
 DiskMatchCalculator: MC_D5PHIC
 DiskMatchCalculator: MC_D5PHID
 FitTrack: FT_L1L2
-FitTrack: FT_L2L3
 FitTrack: FT_L3L4
 FitTrack: FT_L5L6
 FitTrack: FT_D1D2
 FitTrack: FT_D3D4
 FitTrack: FT_L1D1
 FitTrack: FT_L2D1
+FitTrack: FT_L2L3
 PurgeDuplicate: PD

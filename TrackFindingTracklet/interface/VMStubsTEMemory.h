@@ -4,6 +4,7 @@
 
 #include "L1TStub.h"
 #include "Stub.h"
+#include "VMStubTE.h"
 #include "MemoryBase.h"
 
 using namespace std;
@@ -11,81 +12,29 @@ using namespace std;
 class VMStubsTEMemory:public MemoryBase{
 
 public:
-
-  VMStubsTEMemory(string name, unsigned int iSector, 
-	      double phimin, double phimax):
-    MemoryBase(name,iSector){
+  
+ VMStubsTEMemory(string name, unsigned int iSector, 
+		 double phimin, double phimax):
+  MemoryBase(name,iSector){
     phimin_=phimin;
     phimax_=phimax;
-    string subname=name.substr(6,2);
-    layer_ = 0;
-    disk_  = 0;
-    phibin_=-1;
-    other_=0;
-    if (subname=="L1") layer_=1;
-    if (subname=="L2") layer_=2;
-    if (subname=="L3") layer_=3;
-    if (subname=="L4") layer_=4;
-    if (subname=="L5") layer_=5;
-    if (subname=="L6") layer_=6;
-    if (subname=="D1") disk_=1;
-    if (subname=="D2") disk_=2;
-    if (subname=="D3") disk_=3;
-    if (subname=="D4") disk_=4;
-    if (subname=="D5") disk_=5;
-    if (layer_==0&&disk_==0) {
-      cout << name<<" subname = "<<subname<<" "<<layer_<<" "<<disk_<<endl;
-    }
-    assert((layer_!=0)||(disk_!=0));
-    overlap_=false;
-    extra_=false;
-    subname=name.substr(11,1);
-    if (subname=="X") overlap_=true;
-    if (subname=="Y") overlap_=true;
-    if (subname=="W") overlap_=true;
-    if (subname=="Q") overlap_=true;
-    if (subname=="R") overlap_=true;
-    if (subname=="S") overlap_=true;
-    if (subname=="T") overlap_=true;
-    if (subname=="Z") overlap_=true;
-    if (subname=="x") overlap_=true;
-    if (subname=="y") overlap_=true;
-    if (subname=="z") overlap_=true;
-    if (subname=="w") overlap_=true;
-    if (subname=="q") overlap_=true;
-    if (subname=="r") overlap_=true;
-    if (subname=="s") overlap_=true;
-    if (subname=="t") overlap_=true;
-    if (subname=="I") extra_=true;
-    if (subname=="J") extra_=true;
-    if (subname=="K") extra_=true;
-    if (subname=="L") extra_=true;
-    
 
-    extended_ = false;
-    if (subname=="a") extended_=true;
-    if (subname=="b") extended_=true;
-    if (subname=="c") extended_=true;
-    if (subname=="d") extended_=true;
-    if (subname=="e") extended_=true;
-    if (subname=="f") extended_=true;
-    if (subname=="g") extended_=true;
-    if (subname=="h") extended_=true;
-    if (subname=="x") extended_=true;
-    if (subname=="y") extended_=true;
-    if (subname=="z") extended_=true;
-    if (subname=="w") extended_=true;
-    if (subname=="q") extended_=true;
-    if (subname=="r") extended_=true;
-    if (subname=="s") extended_=true;
-    if (subname=="t") extended_=true;
-        
-    subname=name.substr(12,2);
+    //set the layer or disk that the memory is in
+    initLayerDisk(6,layer_,disk_);
+
+    //Pointer to other VMStub memory for creating stub pairs
+    other_=0;    
+
+    //What type of seeding is this memory used for
+    initSpecialSeeding(11,overlap_,extra_,extended_);
+    
+    string subname=name.substr(12,2);
     phibin_=subname[0]-'0';
     if (subname[1]!='n') {
       phibin_=10*phibin_+(subname[1]-'0');
     }
 
+    //set the bins used in the bend tabele
     unsigned int nbins=8;
     if (layer_>=4) nbins=16;
     if (disk_==1 && extended_ && overlap_) nbins = 16;
@@ -98,7 +47,7 @@ public:
     if (overlap_ and layer_==2) isinner_ = true;
     if (overlap_ and layer_==3) isinner_ = false;
     if (overlap_ and disk_==1) isinner_ = false; 
-
+    
     if (extra_ and layer_==2) isinner_ = true;
     if (extra_ and layer_==3) isinner_ = false;
     // more special cases for triplets
@@ -109,250 +58,125 @@ public:
     
   }
   
-  bool addStub(std::pair<Stub*,L1TStub*> stub) {
-    int mask=-1;
-    if (layer_==1 || layer_==3 || layer_==5 || (extended_ && layer_==2))
-      mask=1023;
+  bool addVMStub(VMStubTE vmstub) {
 
-    int binlookup= -1;
-    if(!extended_){
-      binlookup=stub.first->getVMBits().value()&mask;
-      if (overlap_) {
-	binlookup=stub.first->getVMBitsOverlap().value();
-      }
-    } else{
-      binlookup=stub.first->getVMBitsExtended().value()&mask;
-      if (overlap_) {
-	binlookup=stub.first->getVMBitsOverlapExtended().value()&mask;
-      }
-    }
-    if (extra_) {
-      binlookup=stub.first->getVMBitsExtra().value();
-    }
-    if (binlookup<0) {
-      cout << getName() << " binlookup = "<<binlookup<<endl;
-    }
-    assert(binlookup>=0);
-    int bin=(binlookup/8);
+    FPGAWord binlookup=vmstub.vmbits();
+    
+    assert(binlookup.value()>=0);
+    int bin=(binlookup.value()/8);
 
-    bool pass=passbend(stub.first->bend().value());
+    //If the pt of the stub is consistent with the allowed pt of tracklets
+    //in that can be formed in this VM and the other VM used in the TE.
+    bool pass=passbend(vmstub.bend().value());
 
     if (!pass) {
-      if (debug1) cout << getName() << " Stub failed bend cut. bend = "<<Stub::benddecode(stub.first->bend().value(),stub.first->isPSmodule())<<endl;
+      if (debug1) cout << getName() << " Stub failed bend cut. bend = "<<Stub::benddecode(vmstub.bend().value(),vmstub.isPSmodule())<<endl;
       return false;
     }
+
+    bool negdisk=vmstub.stub().first->disk().value()<0.0;
 
     if(!extended_){
       if (overlap_) {
 	if (disk_==1) {
-	  bool negdisk=stub.first->disk().value()<0.0;
+	  //bool negdisk=vmstub.stub().first->disk().value()<0.0;
 	  assert(bin<4);
 	  if (negdisk) bin+=4;
-	  stubsbinned_[bin].push_back(stub);
-	  if (debug1) cout << getName()<<" Stub with lookup = "<<binlookup
+	  stubsbinnedvm_[bin].push_back(vmstub);
+	  if (debug1) cout << getName()<<" Stub with lookup = "<<binlookup.value()
 			   <<" in disk = "<<disk_<<"  in bin = "<<bin<<endl;
 	}
       } else {
-        if (stub.first->isBarrel()){
+        if (vmstub.stub().first->isBarrel()){
           if (!isinner_) {
-	    stubsbinned_[bin].push_back(stub);
+	    stubsbinnedvm_[bin].push_back(vmstub);
           }
 	
 	} else {
 
-	  bool negdisk=stub.first->disk().value()<0.0;
+	  //bool negdisk=vmstub.stub().first->disk().value()<0.0;
 
 	  if (disk_%2==0) {
 	    assert(bin<4);
 	    if (negdisk) bin+=4;
-	    stubsbinned_[bin].push_back(stub);
+	    stubsbinnedvm_[bin].push_back(vmstub);
 	  }
 		  
 	}
       }
     }
-    else {
+    else {  //extended
       if(!isinner_){
 	if(layer_>0){
-	  stubsbinned_[bin].push_back(stub);
+	  stubsbinnedvm_[bin].push_back(vmstub);
 	}
 	else{
 	  if(overlap_){
 	    assert(disk_==1); // D1 from L2L3D1
 
 	    //bin 0 is PS, 1 through 3 is 2S
-	    
-	    bin = stub.first->ir(); // 0 to 9
-	    bin = bin >> 2; // 0 to 2
-	    bin += 1;
-	    if(stub.first->isPSmodule())
+	    if(vmstub.stub().first->isPSmodule()) {
 	      bin = 0;
+	    } else {
+	      bin = vmstub.stub().first->ir(); // 0 to 9 //FIXME
+	      bin = bin >> 2; // 0 to 2
+	      bin += 1;
+	    }
+	    
 	  }
+	  //bool negdisk=vmstub.stub().first->disk().value()<0.0;
 	  assert(bin<4);
-	  bool negdisk=stub.first->disk().value()<0.0;
 	  if (negdisk) bin+=4;
-	  stubsbinned_[bin].push_back(stub);	  
+	  stubsbinnedvm_[bin].push_back(vmstub);	  
 	}
       }
     }
+
     if (debug1) cout << "Adding stubs to "<<getName()<<endl;
-    stubs_.push_back(stub);
+    stubsvm_.push_back(vmstub);
     return true;
   }
+    
+  unsigned int nVMStubs() const {return stubsvm_.size();}
 
-  unsigned int nStubs() const {return stubs_.size();}
-  unsigned int nStubsBinned(unsigned int bin) const {return stubsbinned_[bin].size();}
+  unsigned int nVMStubsBinned(unsigned int bin) const {return stubsbinnedvm_[bin].size();}
 
-  Stub* getFPGAStub(unsigned int i) const {return stubs_[i].first;}
-  L1TStub* getL1TStub(unsigned int i) const {return stubs_[i].second;}
-  std::pair<Stub*,L1TStub*> getStub(unsigned int i) const {return stubs_[i];}
+  VMStubTE getVMStubTE(unsigned int i) const {return stubsvm_[i];}
 
-  Stub* getFPGAStubBinned(unsigned int bin, unsigned int i) const {return stubsbinned_[bin][i].first;}
-  L1TStub* getL1TStubBinned(unsigned int bin, unsigned int i) const {return stubsbinned_[bin][i].second;}
-  std::pair<Stub*,L1TStub*> getStubBinned(unsigned int bin,unsigned int i) const {return stubsbinned_[bin][i];}
+  VMStubTE getVMStubTEBinned(unsigned int bin, unsigned int i) const {return stubsbinnedvm_[bin][i];}
 
 
-  
   void clean() {
-    stubs_.clear();
+    stubsvm_.clear();
     for (unsigned int i=0;i<NLONGVMBINS;i++){
-      stubsbinned_[i].clear();
+      stubsbinnedvm_[i].clear();
     }
   }
 
   void writeStubs(bool first) {
 
-    std::string fname="../data/MemPrints/VMStubsTE/VMStubs_";
-    fname+=getName();
 
-    fname+="_";
-    ostringstream oss;
-    oss << iSector_+1;
-    if (iSector_+1<10) fname+="0";
-    fname+=oss.str();
-    fname+=".dat";
-    if (first) {
-      bx_ = 0;
-      event_ = 1;
-      out_.open(fname.c_str());
-    } else {
-      out_.open(fname.c_str(),std::ofstream::app);
+    openFile(first,"../data/MemPrints/VMStubsTE/VMStubs_");
+    
+    if (isinner_) { // inner VM for TE purpose
+      for (unsigned int j=0;j<stubsvm_.size();j++){
+	out_<<"0x";
+	if (j<16) out_ <<"0";
+	out_ << hex << j << dec ;
+	string stub=stubsvm_[j].str();
+	out_ <<" "<<stub<<" "<<hexFormat(stub)<<endl;
+      }     
     }
-      
-    out_ << "BX = "<<(bitset<3>)bx_ << " Event : " << event_ << endl;
-
-    //if (layer_!=0) { // barrel
-    if (layer_!=0 or disk_!=0) { // same format for barrel and disk?
-      if (isinner_) { // inner VM for TE purpose
-        for (unsigned int j=0;j<stubs_.size();j++){
-          string stub=stubs_[j].first->stubindex().str();
-          stub+="|";
-          stub+=stubs_[j].first->bend().str();
-          stub+="|";	  
-          FPGAWord iphifinebins;
-	  if (overlap_) {
-	    iphifinebins.set(stubs_[j].first->iphivmFineBins(5,nfinephioverlapinner),
-			     nfinephioverlapinner,true,__LINE__,__FILE__);
-	  } else if (layer_>0) {
-	    iphifinebins.set(stubs_[j].first->iphivmFineBins(5,nfinephibarrelinner),
-			     nfinephibarrelinner,true,__LINE__,__FILE__);
-	  } else if (disk_>0) {
-	    iphifinebins.set(stubs_[j].first->iphivmFineBins(5,nfinephidiskinner),
-			     nfinephidiskinner,true,__LINE__,__FILE__);
-	  } else {
-	    assert(0);
-	  }
-
-          stub+=iphifinebins.str();
-          stub+="|";
-          FPGAWord tmp;
-	  if (overlap_) {
-	    assert(stubs_[j].first->getVMBitsOverlap().nbits()!=-1);
-	    stub+=stubs_[j].first->getVMBitsOverlap().str();
-	  } else if (extra_) {
-            assert(stubs_[j].first->getVMBitsExtra().nbits()!=-1);
-            stub+=stubs_[j].first->getVMBitsExtra().str();
-          } else {
-	    assert(stubs_[j].first->getVMBits().nbits()!=-1);
-	    stub+=stubs_[j].first->getVMBits().str();
-	  }
-	  out_<<"0x";
-          if (j<16) out_ <<"0";
-          out_ << hex << j << dec ;
-          out_ <<" "<<stub<<" "<<hexFormat(stub)<<endl;
-        }     
-      }
-      else { // outer VM for TE purpose
-        for (unsigned int i=0;i<NLONGVMBINS;i++) {
-      for (unsigned int j=0;j<stubsbinned_[i].size();j++){
-        string stub=stubsbinned_[i][j].first->stubindex().str();
-        stub+="|";
-        stub+=stubsbinned_[i][j].first->bend().str();
-        stub+="|";
-        FPGAWord iphifinebins;
-
-	if (overlap_) { 
-	  iphifinebins.set(stubsbinned_[i][j].first->iphivmFineBins(4,nfinephioverlapouter),
-			   nfinephioverlapouter,true,__LINE__,__FILE__);
-	} else if (layer_>0) {
-	  iphifinebins.set(stubsbinned_[i][j].first->iphivmFineBins(5,nfinephibarrelouter),
-			   nfinephibarrelouter,true,__LINE__,__FILE__);
-	} else if (disk_>0) {
-	  iphifinebins.set(stubsbinned_[i][j].first->iphivmFineBins(4,nfinephidiskouter),
-			   nfinephidiskouter,true,__LINE__,__FILE__);
-	} else {
-	  assert(0);
+    else { // outer VM for TE purpose
+      for (unsigned int i=0;i<NLONGVMBINS;i++) {
+	for (unsigned int j=0;j<stubsbinnedvm_[i].size();j++){
+	  string stub=stubsbinnedvm_[i][j].str();
+	  out_ << hex << i << " " << j << dec << " "<<stub<<" "<<hexFormat(stub)<<endl;
 	}
-        stub+=iphifinebins.str();
-        stub+="|";
-	int ifinezbin=-1;
-	if (overlap_) {
-	  ifinezbin=stubsbinned_[i][j].first->getVMBitsOverlap().value();
-	} else if (extra_) {
-          ifinezbin=stubsbinned_[i][j].first->getVMBitsExtra().value();
-	} else {  
-          ifinezbin=stubsbinned_[i][j].first->getVMBits().value();
-	}
-	assert(ifinezbin!=-1);
-        FPGAWord finezbin;
-	finezbin.set(ifinezbin&7,3,true,__LINE__,__FILE__);
-	stub+=finezbin.str();
-        out_ << hex << i << " " << j << dec << " "<<stub<<" "<<hexFormat(stub)<<endl;
-      }
-        }
       }
     }
-    /*  uncomment and modify below in case disk VMStubsTE have different format
-    else if (disk_!=0) { // disk
-      if (isinner_) { // inner disk VM for TE purpose
-        for (unsigned int j=0;j<stubs_.size();j++){
-          string stub=stubs_[j].first->stubindex().str();
-          stub+="|";
-          FPGAWord tmp;
-          tmp.set(stubs_[j].first->getVMBits().value(),10,true,__LINE__,__FILE__);
-          stub+=tmp.str();  
-          if (j<16) out_ <<"0";
-          out_ << hex << j << dec ;
-          out_ <<" "<<stub<< endl;
-        }
-      }
-      else { // outer disk VM for TE purpose
-        for (unsigned int i=0;i<NLONGVMBINS;i++) {
-      for (unsigned int j=0;j<stubsbinned_[i].size();j++){
-	    string stub=stubsbinned_[i][j].first->stubindex().str();
-	    out_ << hex << i << " " << j << dec << " "<<stub<<endl;
-	  }
-        }
-      }
-    }
-    */
-
     
     out_.close();
-
-    bx_++;
-    event_++;
-    if (bx_>7) bx_=0;
 
   }
 
@@ -387,7 +211,7 @@ public:
     double dphi=dphisectorHG/nvm;
     phimax=phibin()*dphi;
     phimin=phimax-dphi;
-    //if (iSector_==1) cout << "phiRange: "<<getName()<<" "<<phibin()<<" overlap "<<overlap_<<" phimin, max "<<phimin<<" "<<phimax<<endl;
+
     return;
     
   }
@@ -421,7 +245,6 @@ public:
     unsigned int vmbendtableSize = vmbendtable_.size();
     assert(vmbendtableSize==16||vmbendtableSize==8);
     for (unsigned int i=0;i<vmbendtableSize;i++){
-      //outvmbendcut << i << " " << vmbendtable_[i] << endl;
       outvmbendcut << vmbendtable_[i] << endl;
     }
     outvmbendcut.close();
@@ -441,9 +264,10 @@ private:
   double phimin_;
   double phimax_;
   std::vector<bool> vmbendtable_;
-  std::vector<std::pair<Stub*,L1TStub*> > stubs_;
-  std::vector<std::pair<Stub*,L1TStub*> > stubsbinned_[NLONGVMBINS];
 
+  std::vector<VMStubTE> stubsvm_;
+  std::vector<VMStubTE> stubsbinnedvm_[NLONGVMBINS];
+  
 };
 
 #endif

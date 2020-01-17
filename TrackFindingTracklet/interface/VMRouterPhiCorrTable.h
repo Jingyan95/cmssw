@@ -61,9 +61,12 @@ public:
   int getphiCorrValue(int ibend, int irbin){
 
     double bend=Stub::benddecode(ibend,layer_<=3);
-    
+
+    //for the rbin - calculate the distance to the nominal layer radius
     double Delta=(irbin+0.5)*dr_-drmax;
-    double dphi=Delta*bend*0.009/0.18/rmean_;
+
+    //calculate the phi correction - this is a somewhat approximate formula
+    double dphi=(Delta/0.18)*(bend*0.009)/rmean_;
 
     int idphi=0;
       
