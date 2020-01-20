@@ -315,13 +315,11 @@ public:
         std::vector<std::pair<Stub*,L1TStub*>> trackstublist = inputstublists_[itrk];
   
         //add phicrit cut to reduce duplicates
-        double phicrit=tracklet->phi0()-asin(0.5*rcrit*tracklet->rinv());
-        bool keep=(phicrit>phicritmin)&&(phicrit<phicritmax);
+        //double phicrit=tracklet->phi0()-asin(0.5*rcrit*tracklet->rinv());
+        //bool keep=(phicrit>phicritmin)&&(phicrit<phicritmax);
                           
-        if(keep){
           HybridFit hybridFitter(iSector_);
           hybridFitter.Fit(tracklet, trackstublist);
-        }
 
         // If the track was accepted (and thus fit), add to output
         if(tracklet->fit()) {

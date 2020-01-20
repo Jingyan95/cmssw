@@ -889,7 +889,7 @@ public:
     double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
     int phicritapprox=iphi0-2*irinv;
     bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
-         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
+         keepapprox=(phicritapprox>(phicritminmc/ITC->phi0_final.get_K()))&&(phicritapprox<(phicritmaxmc/ITC->phi0_final.get_K()));
     if (debug1)
       if (keep && !keepapprox)
         cout << "TrackletCalculator::barrelSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
@@ -1283,7 +1283,7 @@ public:
     double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
     int phicritapprox=iphi0-2*irinv;
     bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
-         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
+         keepapprox=(phicritapprox>(phicritminmc/ITC->phi0_final.get_K()))&&(phicritapprox<(phicritmaxmc/ITC->phi0_final.get_K()));
     if (debug1)
       if (keep && !keepapprox)
         cout << "TrackletCalculator::diskSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;
@@ -1669,7 +1669,7 @@ public:
     double phicrit=phi0approx-asin(0.5*rcrit*rinvapprox);
     int phicritapprox=iphi0-2*irinv;
     bool keep=(phicrit>phicritminmc)&&(phicrit<phicritmaxmc),
-         keepapprox=(phicritapprox>phicritapproxminmc)&&(phicritapprox<phicritapproxmaxmc);
+         keepapprox=(phicritapprox>(phicritminmc/ITC->phi0_final.get_K()))&&(phicritapprox<(phicritmaxmc/ITC->phi0_final.get_K()));
     if (debug1)
       if (keep && !keepapprox)
         cout << "TrackletCalculator::overlapSeeding tracklet kept with exact phicrit cut but not approximate, phicritapprox: " << phicritapprox << endl;

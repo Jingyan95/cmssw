@@ -319,6 +319,7 @@ static const double phicritmaxmc=phicritmax+dphicritmc;
 
 // these are tuned such that all tracklets passing the exact phicrit cut also
 // pass the approximate version in high-pileup events
+// these two numbers are not used in Jack's solution : search phicritmaxmc or phicritmaxmc in TC for more details 
 static const int phicritapproxminmc=9253;
 static const int phicritapproxmaxmc=56269;
 
