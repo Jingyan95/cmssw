@@ -11,7 +11,7 @@ process = cms.Process("L1TrackNtuple")
 # edit options here
 ############################################################
 
-GEOMETRY = "D21"
+GEOMETRY = "D17"
 #GEOMETRY = "D41" # <== to run on D41 samples, please change flag "geomTkTDR" to *false* in ../interface/FPGAConstants.hh 
 
 # Specify L1 tracking algo ('HYBRID', 'HYBRID_DISPLACED', 'TMTT','HYBRID_FLOAT', 'TRACKLET_FLOAT'),
