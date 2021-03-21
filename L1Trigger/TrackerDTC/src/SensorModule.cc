@@ -117,4 +117,10 @@ namespace trackerDTC {
     encodedLayerId_ = distance(encodingLayerId.begin(), pos);
   }
 
+  SensorModule::SensorModule(bool isbarrel, bool isPS, int numColumns, int layerid, double r, double z, double pitchCol, double tilt)
+      : barrel_(isbarrel), psModule_(isPS), numColumns_(numColumns), layerId_(layerid), r_(r), z_(z), pitchCol_(pitchCol),tilt_(tilt) {
+    sin_ = std::sin(tilt_);
+    cos_ = std::cos(tilt_);
+  }
+
 }  // namespace trackerDTC

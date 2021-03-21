@@ -94,6 +94,7 @@
 
 #include "L1Trigger/TrackTrigger/interface/StubPtConsistency.h"
 #include "L1Trigger/TrackTrigger/interface/TrackQuality.h"
+#include "L1Trigger/TrackerDTC/interface/SensorModule.h"
 
 //////////////
 // STD HEADERS
@@ -101,6 +102,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 
 //////////////
 // NAMESPACES
@@ -193,6 +195,11 @@ private:
   edm::EDGetTokenT<TTStubAssociationMap<Ref_Phase2TrackerDigi_>> ttStubMCTruthToken_;
   edm::EDGetTokenT<std::vector<TrackingParticle>> TrackingParticleToken_;
   edm::EDGetTokenT<std::vector<TrackingVertex>> TrackingVertexToken_;
+    
+  static constexpr double delta = 1.e-3;
+  static auto smallerR(trackerDTC::SensorModule lhs, trackerDTC::SensorModule rhs){ return lhs.r() < rhs.r(); }
+  static auto smallerZ(trackerDTC::SensorModule lhs, trackerDTC::SensorModule rhs){ return lhs.z() < rhs.z(); }
+  static auto equalRZ(trackerDTC::SensorModule lhs, trackerDTC::SensorModule rhs){ return abs(lhs.r() - rhs.r()) < delta && abs(lhs.z() - rhs.z()) < delta; }
 
   /// ///////////////// ///
   /// MANDATORY METHODS ///
@@ -433,6 +440,8 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
   bool firstPS = true;
   bool first2S = true;
+    
+  vector<trackerDTC::SensorModule> sensorModules;
 
   for (const auto& gd : theTrackerGeom->dets()) {
     DetId detid = (*gd).geographicalId();
@@ -450,8 +459,24 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
     const GeomDetUnit* det0 = theTrackerGeom->idToDetUnit(detid);
     const auto* theGeomDet = dynamic_cast<const PixelGeomDetUnit*>(det0);
     const PixelTopology* topol = dynamic_cast<const PixelTopology*>(&(theGeomDet->specificTopology()));
-
+    const GlobalPoint pos0 = det0->position();
+    const GlobalPoint pos1 = theTrackerGeom->idToDetUnit(tTopo->partnerDetId(detid))->position();
+    double r_ = pos0.perp();
+    double z_ = pos0.z();
+    
+    bool flipped_ = pos0.mag() > pos1.mag();
+    bool isBarrel = detid.subdetId() == StripSubdetector::TOB;
     bool isPSmodule = theTrackerGeom->getDetectorType(detid) == TrackerGeometry::ModuleType::Ph2PSP;
+    double tilt_ = flipped_ ? atan2(pos1.z() - pos0.z(), pos0.perp() - pos1.perp())
+      : atan2(pos0.z() - pos1.z(), pos1.perp() - pos0.perp());
+    
+    int layerId_ = isBarrel ? tTopo->layer(detid) : tTopo->layer(detid)+10;
+    int numColumns_ = topol->ncolumns();
+    double pitchCol_ = topol->pitch().second;
+    
+    //cout<<"isBarrel = "<<isBarrel<<" isPS = "<<isPSmodule<<" layerid = "<<layerId_<<" r = "<<r_<<" z = "<<z_<<" tilted = "<<tilt_<<endl;
+    sensorModules.emplace_back(isBarrel, isPSmodule, numColumns_, layerId_, r_, z_, pitchCol_, tilt_);
+    
 
     // set constants that are common for all modules/stubs of a given type (PS vs 2S)
     if (isPSmodule && firstPS) {
@@ -620,6 +645,10 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
       }
     }
   }
+    
+  sort(sensorModules.begin(), sensorModules.end(), smallerR);
+  sort(sensorModules.begin(), sensorModules.end(), smallerZ);
+  sensorModules.erase(unique(sensorModules.begin(), sensorModules.end(), equalRZ), sensorModules.end());
 
   //////////////////////////
   // NOW RUN THE L1 tracking
@@ -699,6 +728,7 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
     aTrack.setTrackWordBits();
 
     if (trackQuality_) {
+      trackQualityModel_->setSensorModule(sensorModules);
       trackQualityModel_->setTrackQuality(aTrack);
     }
 

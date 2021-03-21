@@ -183,8 +183,12 @@ void L1TrackNtuplePlot(TString type,
   vector<int>* trk_lhits;
   vector<int>* trk_dhits;
   vector<int>* trk_seed;
+  vector<int>* trk_seed_r;
   vector<int>* trk_hitpattern;
   vector<unsigned int>* trk_phiSector;
+  vector<unsigned int>* trk_etaSector;
+  vector<unsigned int>* trk_phiSector_r;
+  vector<unsigned int>* trk_etaSector_r;
   vector<int>* trk_injet;
   vector<int>* trk_injet_highpt;
   vector<int>* trk_injet_vhighpt;
@@ -233,7 +237,11 @@ void L1TrackNtuplePlot(TString type,
   TBranch* b_trk_lhits;
   TBranch* b_trk_dhits;
   TBranch* b_trk_phiSector;
+  TBranch* b_trk_etaSector;
+  TBranch* b_trk_phiSector_r;
+  TBranch* b_trk_etaSector_r;
   TBranch* b_trk_seed;
+  TBranch* b_trk_seed_r;
   TBranch* b_trk_hitpattern;
   TBranch* b_trk_injet;
   TBranch* b_trk_injet_highpt;
@@ -283,7 +291,11 @@ void L1TrackNtuplePlot(TString type,
   trk_lhits = 0;
   trk_dhits = 0;
   trk_phiSector = 0;
+  trk_etaSector = 0;
+  trk_phiSector_r = 0;
+  trk_etaSector_r = 0;
   trk_seed = 0;
+  trk_seed_r = 0;
   trk_hitpattern = 0;
   trk_injet = 0;
   trk_injet_highpt = 0;
@@ -359,7 +371,11 @@ void L1TrackNtuplePlot(TString type,
   tree->SetBranchAddress("trk_lhits", &trk_lhits, &b_trk_lhits);
   tree->SetBranchAddress("trk_dhits", &trk_dhits, &b_trk_dhits);
   tree->SetBranchAddress("trk_phiSector", &trk_phiSector, &b_trk_phiSector);
+  tree->SetBranchAddress("trk_etaSector", &trk_etaSector, &b_trk_etaSector);
   tree->SetBranchAddress("trk_seed", &trk_seed, &b_trk_seed);
+  tree->SetBranchAddress("trk_phiSector_r", &trk_phiSector_r, &b_trk_phiSector_r);
+  tree->SetBranchAddress("trk_etaSector_r", &trk_etaSector_r, &b_trk_etaSector_r);
+  tree->SetBranchAddress("trk_seed_r", &trk_seed_r, &b_trk_seed_r);
   tree->SetBranchAddress("trk_hitpattern", &trk_hitpattern, &b_trk_hitpattern);
   tree->SetBranchAddress("trk_fake", &trk_fake, &b_trk_fake);
   tree->SetBranchAddress("trk_genuine", &trk_genuine, &b_trk_genuine);
@@ -417,6 +433,9 @@ void L1TrackNtuplePlot(TString type,
       new TH1F("match_tp_eta_35", ";Tracking particle #eta; Tracking particles / 0.1", 50, -2.5, 2.5);
   TH1F* h_match_tp_eta_5 =
       new TH1F("match_tp_eta_5", ";Tracking particle #eta; Tracking particles / 0.1", 50, -2.5, 2.5);
+    
+  TH1F* h_trk_seed = new TH1F("trk_seed", ";Tracklet seed type; Tracks / 2.0 GeV", 16, 0, 16);
+  TH1F* h_trk_seed_r = new TH1F("trk_seed_r", ";Tracklet seed type; Tracks / 2.0 GeV", 16, 0, 16);
 
   // ----------------------------------------------------------------------------------------------------------------
   // Tracklet propogation efficiencies vs. eta for seeding layers
@@ -1101,6 +1120,24 @@ void L1TrackNtuplePlot(TString type,
         ntrkevt_pt2++;
         h_trk_all_vspt->Fill(trk_pt->at(it));
         if (trk_genuine->at(it) == 1) {
+//            if (trk_phiSector_r->at(it) == 0){
+                h_trk_seed_r->Fill(trk_seed->at(it));
+                if (trk_phiSector->at(it) == trk_phiSector_r->at(it)){
+                    h_trk_seed->Fill(trk_seed->at(it));
+                }
+//            }
+//            if (trk_etaSector_r->at(it) == 0){
+//                h_trk_seed_r->Fill(trk_seed_r->at(it));
+//                if (trk_etaSector->at(it) > 0){
+//                    h_trk_seed->Fill(trk_seed_r->at(it));
+//                }
+//            }
+//            if (trk_seed_r->at(it) == 0){
+//                h_trk_seed_r->Fill(9);
+//                if (trk_seed->at(it) > 0){
+//                    h_trk_seed->Fill(9);
+//                }
+//            }
           ntrkevt_genuine_pt2++;
           h_trk_genuine_vspt->Fill(trk_pt->at(it));
         } else
@@ -3393,6 +3430,14 @@ void L1TrackNtuplePlot(TString type,
   h_duplicatefrac_pt->Write();
   h_duplicatefrac_pt->Draw();
   c.SaveAs(DIR + type + "_duplicatefrac.pdf");
+    
+  h_trk_seed_r->Write();
+  h_trk_seed_r->Draw();
+  c.SaveAs(DIR + type + "_trk_seed_r.pdf");
+    
+  h_trk_seed->Write();
+  h_trk_seed->Draw();
+  c.SaveAs(DIR + type + "_trk_seed.pdf");
 
   // ---------------------------------------------------------------------------------------------------------
   // total track rates vs pt

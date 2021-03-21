@@ -5,6 +5,7 @@ C.Brown & C.Savard 07/2020
 */
 
 #include "L1Trigger/TrackTrigger/interface/TrackQuality.h"
+#include "L1Trigger/TrackTrigger/interface/HitPatternHelper.h"
 #include "PhysicsTools/ONNXRuntime/interface/ONNXRuntime.h"
 
 //Constructors
@@ -30,6 +31,7 @@ TrackQuality::TrackQuality(const edm::ParameterSet& qualityParams) {
                  qualityParams.getParameter<std::string>("ONNXInputName"),
                  qualityParams.getParameter<std::vector<std::string>>("featureNames"));
     ONNXInvRScaling_ = qualityParams.getParameter<double>("ONNXInvRScale");
+    useTiltedModule_ = qualityParams.getParameter<bool>("useTiltedModule");
   }
 }
 
@@ -66,6 +68,10 @@ std::vector<float> TrackQuality::featureTransform(TTTrack<Ref_Phase2TrackerDigi_
 
   // iterate through bits of the hitpattern and compare to 1 filling the hitpattern binary vector
   int tmp_trk_hitpattern = aTrack.hitPattern();
+  int tmp_trk_nlaymiss_interior = 0;
+  int tmp_trk_ltot = 0;
+  int tmp_trk_dtot = 0;
+    
   for (int i = 6; i >= 0; i--) {
     int k = tmp_trk_hitpattern >> i;
     if (k & 1)
@@ -75,7 +81,6 @@ std::vector<float> TrackQuality::featureTransform(TTTrack<Ref_Phase2TrackerDigi_
   // calculate number of missed interior layers from hitpattern
   int nbits = floor(log2(tmp_trk_hitpattern)) + 1;
   int lay_i = 0;
-  int tmp_trk_nlaymiss_interior = 0;
   bool seq = false;
   for (int i = 0; i < nbits; i++) {
     lay_i = ((1 << i) & tmp_trk_hitpattern) >> i;  //0 or 1 in ith bit (right to left)
@@ -85,7 +90,8 @@ std::vector<float> TrackQuality::featureTransform(TTTrack<Ref_Phase2TrackerDigi_
     if (!lay_i && seq)
       tmp_trk_nlaymiss_interior++;
   }
-
+    
+if (!useTiltedModule_||sensorModules_.empty()){
   float eta = abs(aTrack.eta());
   int eta_size = static_cast<int>(eta_bins.size());
   // First iterate through eta bins
@@ -99,18 +105,38 @@ std::vector<float> TrackQuality::featureTransform(TTTrack<Ref_Phase2TrackerDigi_
         hitpattern_expanded_binary[hitmap[j][k]] = hitpattern_binary[k];
     }
   }
-
-  int tmp_trk_ltot = 0;
+    float trk_cot=aTrack.tanL();
+    float trk_z0=aTrack.eta();
+    HitPatternHelper hph(sensorModules_, tmp_trk_hitpattern, trk_cot, trk_z0);
+    aTrack.setTrackSeedType(hph.getetaSector());
+}
+else{
+   
+    float trk_cot=aTrack.tanL();
+    float trk_z0=aTrack.eta();
+    HitPatternHelper hph(sensorModules_, tmp_trk_hitpattern, trk_cot, trk_z0);
+    hitpattern_expanded_binary=hph.getbinary();
+    
+    aTrack.setPhiSector(hph.getnumPS());
+    aTrack.setEtaSector(hph.getnum2S());
+    aTrack.setTrackSeedType(hph.getetaSector());
+}
+ //  aTrack.setPhiSector(hitpattern_expanded_binary[7]);
+ //  aTrack.setEtaSector(hitpattern_expanded_binary[8]);
+ //  aTrack.setTrackSeedType(hitpattern_expanded_binary[9]);
+    
   //calculate number of layer hits
   for (int i = 0; i < 6; ++i) {
     tmp_trk_ltot += hitpattern_expanded_binary[i];
   }
 
-  int tmp_trk_dtot = 0;
   //calculate number of disk hits
   for (int i = 6; i < 11; ++i) {
     tmp_trk_dtot += hitpattern_expanded_binary[i];
   }
+  //aTrack.setPhiSector(tmp_trk_ltot);
+  //aTrack.setEtaSector(tmp_trk_dtot);
+  //aTrack.setTrackSeedType(hph.getetaSector());
 
   // bin bendchi2 variable (bins from https://twiki.cern.ch/twiki/bin/viewauth/CMS/HybridDataFormat#Fitted_Tracks_written_by_KalmanF)
   float tmp_trk_bendchi2 = aTrack.stubPtConsistency();
@@ -302,4 +328,8 @@ void TrackQuality::setONNXModel(std::string const& AlgorithmString,
   ONNXmodel_ = ONNXmodel;
   ONNXInputName_ = ONNXInputName;
   featureNames_ = featureNames;
+}
+
+void TrackQuality::setSensorModule(std::vector<trackerDTC::SensorModule> const& sensorModules){
+  sensorModules_ = sensorModules;
 }

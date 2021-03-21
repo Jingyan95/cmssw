@@ -158,8 +158,12 @@ private:
   std::vector<int>* m_trk_lhits;
   std::vector<int>* m_trk_dhits;
   std::vector<int>* m_trk_seed;
+  std::vector<int>* m_trk_seed_r;
   std::vector<int>* m_trk_hitpattern;
   std::vector<unsigned int>* m_trk_phiSector;
+  std::vector<unsigned int>* m_trk_etaSector;
+  std::vector<unsigned int>* m_trk_phiSector_r;
+  std::vector<unsigned int>* m_trk_etaSector_r;
   std::vector<int>* m_trk_genuine;
   std::vector<int>* m_trk_loose;
   std::vector<int>* m_trk_unknown;
@@ -326,8 +330,12 @@ void L1TrackNtupleMaker::beginJob() {
   m_trk_lhits = new std::vector<int>;
   m_trk_dhits = new std::vector<int>;
   m_trk_seed = new std::vector<int>;
+  m_trk_seed_r = new std::vector<int>;
   m_trk_hitpattern = new std::vector<int>;
   m_trk_phiSector = new std::vector<unsigned int>;
+  m_trk_etaSector = new std::vector<unsigned int>;
+  m_trk_phiSector_r = new std::vector<unsigned int>;
+  m_trk_etaSector_r = new std::vector<unsigned int>;
   m_trk_genuine = new std::vector<int>;
   m_trk_loose = new std::vector<int>;
   m_trk_unknown = new std::vector<int>;
@@ -423,8 +431,13 @@ void L1TrackNtupleMaker::beginJob() {
     eventTree->Branch("trk_lhits", &m_trk_lhits);
     eventTree->Branch("trk_dhits", &m_trk_dhits);
     eventTree->Branch("trk_seed", &m_trk_seed);
+    eventTree->Branch("trk_seed_r", &m_trk_seed_r);
     eventTree->Branch("trk_hitpattern", &m_trk_hitpattern);
     eventTree->Branch("trk_phiSector", &m_trk_phiSector);
+    eventTree->Branch("trk_etaSector", &m_trk_etaSector);
+    eventTree->Branch("trk_hitpattern", &m_trk_hitpattern);
+    eventTree->Branch("trk_phiSector_r", &m_trk_phiSector_r);
+    eventTree->Branch("trk_etaSector_r", &m_trk_etaSector_r);
     eventTree->Branch("trk_genuine", &m_trk_genuine);
     eventTree->Branch("trk_loose", &m_trk_loose);
     eventTree->Branch("trk_unknown", &m_trk_unknown);
@@ -549,8 +562,12 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
     m_trk_lhits->clear();
     m_trk_dhits->clear();
     m_trk_seed->clear();
+    m_trk_seed_r->clear();
     m_trk_hitpattern->clear();
     m_trk_phiSector->clear();
+    m_trk_etaSector->clear();
+    m_trk_phiSector_r->clear();
+    m_trk_etaSector_r->clear();
     m_trk_genuine->clear();
     m_trk_loose->clear();
     m_trk_unknown->clear();
@@ -881,6 +898,7 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
       tmp_trk_hitpattern = (int)iterL1Track->hitPattern();
 
       unsigned int tmp_trk_phiSector = iterL1Track->phiSector();
+      unsigned int tmp_trk_etaSector = iterL1Track->etaSector();
 
       // ----------------------------------------------------------------------------------------------
       // loop over stubs on tracks
@@ -888,6 +906,10 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
       //float tmp_trk_bend_chi2 = 0;
       int tmp_trk_dhits = 0;
       int tmp_trk_lhits = 0;
+        
+      unsigned int tmp_trk_phiSector_r = 0;
+      unsigned int tmp_trk_etaSector_r = 0;
+      int tmp_trk_seed_r = 0;
 
       if (true) {
         // loop over stubs
@@ -902,16 +924,31 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
           double x = posStub.x();
           double y = posStub.y();
           double z = posStub.z();
+            
+          if ((theTrackerGeom->getDetectorType(detIdStub)==TrackerGeometry::ModuleType::Ph2PSP)){
+              tmp_trk_phiSector_r++;
+          }
+          else{
+              tmp_trk_etaSector_r++;
+          }
 
           int layer = -999999;
           if (detIdStub.subdetId() == StripSubdetector::TOB) {
             layer = static_cast<int>(tTopo->layer(detIdStub));
+            //tmp_trk_phiSector_r++;
+          //  if (layer==4) tmp_trk_phiSector_r = 1;
+            //if (layer==6) tmp_trk_etaSector_r = 1;
+            //if (layer==3) tmp_trk_seed_r = 1;
             if (DebugMode)
               edm::LogVerbatim("Tracklet")
                   << "   stub in layer " << layer << " at position x y z = " << x << " " << y << " " << z;
             tmp_trk_lhits += pow(10, layer - 1);
           } else if (detIdStub.subdetId() == StripSubdetector::TID) {
             layer = static_cast<int>(tTopo->layer(detIdStub));
+            //tmp_trk_etaSector_r++;
+            //if (layer==2) tmp_trk_phiSector_r = 1;
+            //if (layer==3) tmp_trk_etaSector_r = 1;
+            //if (layer==4) tmp_trk_seed_r = 1;
             if (DebugMode)
               edm::LogVerbatim("Tracklet")
                   << "   stub in disk " << layer << " at position x y z = " << x << " " << y << " " << z;
@@ -966,8 +1003,12 @@ void L1TrackNtupleMaker::analyze(const edm::Event& iEvent, const edm::EventSetup
       m_trk_dhits->push_back(tmp_trk_dhits);
       m_trk_lhits->push_back(tmp_trk_lhits);
       m_trk_seed->push_back(tmp_trk_seed);
+      m_trk_seed_r->push_back(tmp_trk_seed_r);
       m_trk_hitpattern->push_back(tmp_trk_hitpattern);
       m_trk_phiSector->push_back(tmp_trk_phiSector);
+      m_trk_etaSector->push_back(tmp_trk_etaSector);
+      m_trk_phiSector_r->push_back(tmp_trk_phiSector_r);
+      m_trk_etaSector_r->push_back(tmp_trk_etaSector_r);
       m_trk_genuine->push_back(tmp_trk_genuine);
       m_trk_loose->push_back(tmp_trk_loose);
       m_trk_unknown->push_back(tmp_trk_unknown);

@@ -10,7 +10,10 @@ namespace trackerDTC {
   // representation of an outer tracker sensormodule
   class SensorModule {
   public:
+    //Default constructor
     SensorModule(const Setup& setup, const DetId& detId, int dtcId, int modId);
+    //Constructor used to study hitpattern
+    SensorModule(bool isbarrel, bool isPS, int numColumns, int layerid, double r, double z, double pitchCol, double tilt);
     ~SensorModule() {}
 
     enum Type { BarrelPS, Barrel2S, DiskPS, Disk2S, NumTypes };

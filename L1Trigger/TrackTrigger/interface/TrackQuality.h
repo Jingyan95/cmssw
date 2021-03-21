@@ -26,6 +26,8 @@ C.Brown 28/07/20
 #include "DataFormats/L1TrackTrigger/interface/TTTrack.h"
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
 
+#include "L1Trigger/TrackerDTC/interface/SensorModule.h"
+
 class TrackQuality {
 public:
   // Enum class used for determining prediction behaviour in setTrackQuality
@@ -59,6 +61,8 @@ public:
                     edm::FileInPath const& ONNXmodel,
                     std::string const& ONNXInputName,
                     std::vector<std::string> const& featureNames);
+    
+  void setSensorModule(std::vector<trackerDTC::SensorModule> const& sensorModules);
 
 private:
   // Private Member Data
@@ -66,6 +70,8 @@ private:
   edm::FileInPath ONNXmodel_;
   std::string ONNXInputName_;
   std::vector<std::string> featureNames_;
+  std::vector<trackerDTC::SensorModule> sensorModules_;
+    
   float maxZ0_;
   float maxEta_;
   float chi2dofMax_;
@@ -73,5 +79,6 @@ private:
   float minPt_;
   int nStubsmin_;
   float ONNXInvRScaling_;
+  bool useTiltedModule_;
 };
 #endif
