@@ -94,6 +94,7 @@
 
 #include "L1Trigger/TrackTrigger/interface/StubPtConsistency.h"
 #include "L1Trigger/TrackTrigger/interface/TrackQuality.h"
+#include "L1Trigger/TrackTrigger/interface/HitPatternHelper.h"
 
 //////////////
 // STD HEADERS
@@ -185,9 +186,11 @@ private:
 
   // helper class to store DTC configuration
   trackerDTC::Setup setup_;
+  const HPH::Setup* HPHsetup_;
 
   // Setup token
   edm::ESGetToken<trackerDTC::Setup, trackerDTC::SetupRcd> esGetToken_;
+  edm::ESGetToken<HPH::Setup, HPH::SetupRcd> esGetTokenHPH_;
 
   /// ///////////////// ///
   /// MANDATORY METHODS ///
@@ -233,6 +236,7 @@ L1FPGATrackProducer::L1FPGATrackProducer(edm::ParameterSet const& iConfig)
 
   // book ES product
   esGetToken_ = esConsumes<trackerDTC::Setup, trackerDTC::SetupRcd, edm::Transition::BeginRun>();
+  esGetTokenHPH_ = esConsumes<HPH::Setup, HPH::SetupRcd, edm::Transition::BeginRun>();
 
   // --------------------------------------------------------------------------------
   // set options in Settings based on inputs from configuration files
@@ -302,6 +306,7 @@ void L1FPGATrackProducer::beginRun(const edm::Run& run, const edm::EventSetup& i
   settings.setBfield(mMagneticFieldStrength);
 
   setup_ = iSetup.getData(esGetToken_);
+  HPHsetup_ = &iSetup.getData(esGetTokenHPH_);
 
   // initialize the tracklet event processing (this sets all the processing & memory modules, wiring, etc)
   eventProcessor.init(settings);
@@ -628,6 +633,7 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
     if (trackQuality_) {
       trackQualityModel_->setTrackQuality(aTrack);
+      trackQualityModel_->setHPHsetup(HPHsetup_);
     }
 
     // test track word

@@ -11,7 +11,7 @@ C.Brown & C.Savard 07/2020
 
 TrackQuality::TrackQuality() {}
 
-TrackQuality::TrackQuality(const edm::ParameterSet& qualityParams) {
+TrackQuality::TrackQuality(const edm::ParameterSet& qualityParams):Setup_(),useHPH(false) {
   std::string AlgorithmString = qualityParams.getParameter<std::string>("qualityAlgorithm");
   // Unpacks EDM parameter set itself to save unecessary processing within TrackProducers
   if (AlgorithmString == "Cut") {
@@ -46,31 +46,10 @@ std::vector<float> TrackQuality::featureTransform(TTTrack<Ref_Phase2TrackerDigi_
   // Define feature map, filled as features are generated
   std::map<std::string, float> feature_map;
 
-  // The following converts the 7 bit hitmask in the TTTrackword to an expected
   // 11 bit hitmask based on the eta of the track
-  std::vector<int> hitpattern_binary = {0, 0, 0, 0, 0, 0, 0};
   std::vector<int> hitpattern_expanded_binary = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  std::vector<float> eta_bins = {0.0, 0.2, 0.41, 0.62, 0.9, 1.26, 1.68, 2.08, 2.4};
 
-  // Expected hitmap table, each row corresponds to an eta bin, each value corresponds to
-  // the expected layer in the expanded hit pattern. The expanded hit pattern should be
-  // 11 bits but contains a 12th element so this hitmap table is symmetric
-  int hitmap[8][7] = {{0, 1, 2, 3, 4, 5, 11},
-                      {0, 1, 2, 3, 4, 5, 11},
-                      {0, 1, 2, 3, 4, 5, 11},
-                      {0, 1, 2, 3, 4, 5, 11},
-                      {0, 1, 2, 3, 4, 5, 11},
-                      {0, 1, 2, 6, 7, 8, 9},
-                      {0, 1, 7, 8, 9, 10, 11},
-                      {0, 6, 7, 8, 9, 10, 11}};
-
-  // iterate through bits of the hitpattern and compare to 1 filling the hitpattern binary vector
   int tmp_trk_hitpattern = aTrack.hitPattern();
-  for (int i = 6; i >= 0; i--) {
-    int k = tmp_trk_hitpattern >> i;
-    if (k & 1)
-      hitpattern_binary[i] = 1;
-  }
 
   // calculate number of missed interior layers from hitpattern
   int nbits = floor(log2(tmp_trk_hitpattern)) + 1;
@@ -85,20 +64,14 @@ std::vector<float> TrackQuality::featureTransform(TTTrack<Ref_Phase2TrackerDigi_
     if (!lay_i && seq)
       tmp_trk_nlaymiss_interior++;
   }
-
-  float eta = abs(aTrack.eta());
-  int eta_size = static_cast<int>(eta_bins.size());
-  // First iterate through eta bins
-
-  for (int j = 0; j < eta_size; j++) {
-    if (eta >= eta_bins[j] && eta < eta_bins[j + 1])  // if track in eta bin
-    {
-      // Iterate through hitpattern binary
-      for (int k = 0; k <= 6; k++)
-        // Fill expanded binary entries using the expected hitmap table positions
-        hitpattern_expanded_binary[hitmap[j][k]] = hitpattern_binary[k];
-    }
+    
+  if (useHPH){
+      double tmp_trk_tanL = aTrack.tanL();
+      double tmp_trk_z0 = aTrack.z0();
+      HPH::HitPatternHelper hph(Setup_, tmp_trk_hitpattern, tmp_trk_tanL, tmp_trk_z0);
+      hitpattern_expanded_binary=hph.getbinary();
   }
+
 
   int tmp_trk_ltot = 0;
   //calculate number of layer hits
@@ -302,4 +275,9 @@ void TrackQuality::setONNXModel(std::string const& AlgorithmString,
   ONNXmodel_ = ONNXmodel;
   ONNXInputName_ = ONNXInputName;
   featureNames_ = featureNames;
+}
+
+void TrackQuality::setHPHsetup(const HPH::Setup* Setup){
+    Setup_ = Setup;
+    useHPH = true;
 }
