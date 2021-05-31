@@ -79,6 +79,7 @@ namespace HPH {
         std::vector<SensorModule> SensorModules() const {return SensorModules_;}
         
         bool HPHdebug() const { return iConfig_.getParameter<bool>("HPHdebug"); }
+        bool useNewKF() const { return iConfig_.getParameter<bool>("useNewKF"); }
         double chosenRofZ() const { return iConfig_.getParameter<double>("chosenRofZ"); }
        
        private:
@@ -136,6 +137,7 @@ namespace HPH {
         std::vector<SensorModule> layers_;
         std::vector<int> binary_;
         bool HPHdebug_;
+        bool useNewKF_;
         float chosenRofZ_;
         std::vector<float> etaRegions_ = {-2.4, -2.08, -1.68, -1.26, -0.90, -0.62, -0.41, -0.20, 0.0, 0.20, 0.41, 0.62, 0.90, 1.26, 1.68, 2.08, 2.4};
         std::vector<int> hitmap_[8][7] = {

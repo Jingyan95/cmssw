@@ -3,6 +3,8 @@
 //
 
 #include "L1Trigger/TrackTrigger/interface/HitPatternHelper.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
+
 #include <algorithm>
 #include <cmath>
 
@@ -93,6 +95,7 @@ namespace HPH {
     layers_(),
     binary_(11,0),
     HPHdebug_(Setup_->HPHdebug()),
+    useNewKF_(Setup_->useNewKF()),
     chosenRofZ_(Setup_->chosenRofZ())
     {
         
@@ -125,73 +128,105 @@ namespace HPH {
         
      numExpLayer_= layers_.size();
         
-    int nbits = floor(log2(hitpattern_)) + 1;
-    int lay_i = 0;
-    bool seq = false;
-    for (int i = 0; i < nbits; i++) {
-        lay_i = ((1 << i) & hitpattern_) >> i;  //0 or 1 in ith bit (right to left)
+     int nbits = floor(log2(hitpattern_)) + 1;
+     int lay_i = 0;
+     bool seq = false;
+     for (int i = 0; i < nbits; i++) {
+         lay_i = ((1 << i) & hitpattern_) >> i;  //0 or 1 in ith bit (right to left)
 
-        if (lay_i && !seq)
-            seq = true;  //sequence starts when first 1 found
-        if (!lay_i && seq){
-            numMissingInterior1_++;
-            bool realhit=false;
-            for (int j : hitmap_[kf_eta_reg][i]){
-                if (j<1) continue;
-                int k = findLayer(j);
-                if (k>0) realhit=true;
-            }
-            if (realhit) numMissingInterior2_++;
-        }
-    }
-        
-     for (int i=0;i<7;i++){
-         if (HPHdebug_){
-         std::cout<<"KF Layer = "<<i<<std::endl;
-         }
-         for (int j : hitmap_[kf_eta_reg][i]){
-             if (HPHdebug_){
-             std::cout<<" KF expects = "<<j<<std::endl;
+         if (lay_i && !seq)
+             seq = true;  //sequence starts when first 1 found
+         if (!lay_i && seq){
+             numMissingInterior1_++;
+             bool realhit=false;
+             for (int j : hitmap_[kf_eta_reg][i]){
+                 if (j<1) continue;
+                 int k = findLayer(j);
+                 if (k>0) realhit=true;
              }
-             if (j<1) continue;
-             int k = findLayer(j);
-             if (k<0) continue;
-             if (HPHdebug_){
-             std::cout<<" Confirmed by layermap"<<std::endl;
-             }
-             if (((1<<i)&hitpattern_)>>i){
-                 if (HPHdebug_){
-                 std::cout<<" Layer Found in HitPattern"<<std::endl;
-                 }
-                 binary_[ReducedId(j)] = 1;
-                 if (layers_[k].isPS()){
-                     numPS_++;
-                 }
-                 else{
-                     num2S_++;
-                 }
-             }
-             else{
-                 if (HPHdebug_){
-                 std::cout<<" Layer Missing in HitPattern"<<std::endl;
-                 }
-                 if (layers_[k].isPS()){
-                     numMissingPS_++;
-                 }
-                 else{
-                     numMissing2S_++;
-                 }
-             }
+             if (realhit) numMissingInterior2_++;
          }
      }
-        if (HPHdebug_){
-            if (HPHdebug_){
-            std::cout<<"=================================================="<<std::endl;
-            std::cout<<"hitpattern = "<<hitpattern_<<", numPS = "<<numPS_<<", num2S = "<<num2S_<<", missingPS = "<<numMissingPS_<<", missing2S = "<<numMissing2S_<<std::endl;
-            std::cout<<"=================================================="<<std::endl;
-            }
-        std::cout<<"////////////////////////////////////////////////////////////////////////////////////////////////////////////////////"<<std::endl;
-        }
+        
+     if (useNewKF_){
+      for (int i=0;i<numExpLayer_;i++){
+          if (HPHdebug_){
+              edm::LogVerbatim("TrackTriggerHPH")<<"KF Layer = "<<i;
+              edm::LogVerbatim("TrackTriggerHPH")<<"KF expects = "<<layers_[i].layerid();
+           }
+          if (((1<<i)&hitpattern_)>>i){
+              if (HPHdebug_){
+              edm::LogVerbatim("TrackTriggerHPH")<<" Layer Found in HitPattern";
+              }
+              binary_[ReducedId(layers_[i].layerid())] = 1;
+              if (layers_[i].isPS()){
+                  numPS_++;
+              }
+              else{
+                  num2S_++;
+              }
+          }
+          else{
+              if (HPHdebug_){
+              edm::LogVerbatim("TrackTriggerHPH")<<" Layer Missing in HitPattern";
+              }
+              if (layers_[i].isPS()){
+                  numMissingPS_++;
+              }
+              else{
+                  numMissing2S_++;
+              }
+          }
+      }
+     }else{
+      for (int i=0;i<7;i++){
+          if (HPHdebug_){
+          edm::LogVerbatim("TrackTriggerHPH")<<"KF Layer = "<<i;
+          }
+          for (int j : hitmap_[kf_eta_reg][i]){
+              if (HPHdebug_){
+              edm::LogVerbatim("TrackTriggerHPH")<<" KF expects = "<<j;
+              }
+              if (j<1) continue;
+              int k = findLayer(j);
+              if (k<0) continue;
+              if (HPHdebug_){
+              edm::LogVerbatim("TrackTriggerHPH")<<" Confirmed by layermap";
+              }
+              if (((1<<i)&hitpattern_)>>i){
+                  if (HPHdebug_){
+                  edm::LogVerbatim("TrackTriggerHPH")<<" Layer Found in HitPattern";
+                  }
+                  binary_[ReducedId(j)] = 1;
+                  if (layers_[k].isPS()){
+                      numPS_++;
+                  }
+                  else{
+                      num2S_++;
+                  }
+              }
+              else{
+                  if (HPHdebug_){
+                  edm::LogVerbatim("TrackTriggerHPH")<<" Layer Missing in HitPattern";
+                  }
+                  if (layers_[k].isPS()){
+                      numMissingPS_++;
+                  }
+                  else{
+                      numMissing2S_++;
+                  }
+              }
+          }
+      }
+     }
+        
+     if (HPHdebug_){
+     edm::LogVerbatim("TrackTriggerHPH")<<"==================================================";
+     edm::LogVerbatim("TrackTriggerHPH")<<"hitpattern = "<<hitpattern_<<", numPS = "<<numPS_<<", num2S = "<<num2S_<<", missingPS = "<<numMissingPS_<<", missing2S = "<<numMissing2S_;
+     edm::LogVerbatim("TrackTriggerHPH")<<"==================================================";
+     edm::LogVerbatim("TrackTriggerHPH")<<"////////////////////////////////////////////////////////////////////////////////////////////////////////////////////";
+     }
+        
     }
 
     int HitPatternHelper::ReducedId(int layerid){

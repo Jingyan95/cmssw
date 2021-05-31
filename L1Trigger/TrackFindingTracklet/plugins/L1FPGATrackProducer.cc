@@ -307,6 +307,9 @@ void L1FPGATrackProducer::beginRun(const edm::Run& run, const edm::EventSetup& i
 
   setup_ = iSetup.getData(esGetToken_);
   HPHsetup_ = &iSetup.getData(esGetTokenHPH_);
+  if (trackQuality_) {
+    trackQualityModel_->setHPHsetup(HPHsetup_);
+  }
 
   // initialize the tracklet event processing (this sets all the processing & memory modules, wiring, etc)
   eventProcessor.init(settings);
@@ -633,7 +636,6 @@ void L1FPGATrackProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSe
 
     if (trackQuality_) {
       trackQualityModel_->setTrackQuality(aTrack);
-      trackQualityModel_->setHPHsetup(HPHsetup_);
     }
 
     // test track word
