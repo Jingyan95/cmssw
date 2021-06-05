@@ -96,7 +96,8 @@ namespace HPH {
     binary_(11,0),
     HPHdebug_(Setup_->HPHdebug()),
     useNewKF_(Setup_->useNewKF()),
-    chosenRofZ_(Setup_->chosenRofZ())
+    chosenRofZ_(Setup_->chosenRofZ()),
+    deltaTanL_(Setup_->deltaTanL())
     {
         
      float kfzRef = z0_ + chosenRofZ_ * cot_;
@@ -118,7 +119,12 @@ namespace HPH {
        
      for (SensorModule sm : Setup_->SensorModules()) {
          double d = (z0_ - sm.z() + sm.r() * cot_) / (sm.cos() - sm.sin() * cot_);
-         if (abs(d) < sm.numColumns() * sm.pitchCol() / 2.){
+         double d_p = (z0_ - sm.z() + sm.r() * (cot_+deltaTanL_/2)) / (sm.cos() - sm.sin() * (cot_+deltaTanL_/2));
+         double d_m = (z0_ - sm.z() + sm.r() * (cot_-deltaTanL_/2)) / (sm.cos() - sm.sin() * (cot_-deltaTanL_/2));
+         if (useNewKF_ && (abs(d_p) < sm.numColumns() * sm.pitchCol() / 2. || abs(d_m) < sm.numColumns() * sm.pitchCol() / 2.)) {
+             layers_.push_back(sm);
+         }
+         if (!useNewKF_ && abs(d) < sm.numColumns() * sm.pitchCol() / 2.){
              layers_.push_back(sm);
          }
      }
