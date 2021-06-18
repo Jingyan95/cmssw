@@ -5,7 +5,12 @@
 import FWCore.ParameterSet.Config as cms
 import FWCore.Utilities.FileUtils as FileUtils
 import os
+import FWCore.ParameterSet.VarParsing as VarParsing ##parsing argument
 process = cms.Process("L1TrackNtuple")
+
+options = VarParsing.VarParsing ('analysis')
+# get and parse the command line arguments
+options.parseArguments()
 
 ############################################################
 # edit options here
@@ -53,7 +58,7 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 # input and output
 ############################################################
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
 
 #--- To use MCsamples scripts, defining functions get*data*(), 
 #--- follow instructions https://cernbox.cern.ch/index.php/s/enCnnfUZ4cpK7mT
@@ -82,9 +87,9 @@ elif GEOMETRY == "D76":
 else:
   print "this is not a valid geometry!!!"    
     
-process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(*inputMC))
+process.source = cms.Source("PoolSource", fileNames = cms.untracked.vstring(options.inputFiles))
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string('TTbar_PU200_'+GEOMETRY+'.root'), closeFileFast = cms.untracked.bool(True))
+process.TFileService = cms.Service("TFileService", fileName = cms.string(options.outputFile), closeFileFast = cms.untracked.bool(True))
 process.Timing = cms.Service("Timing", summaryOnly = cms.untracked.bool(True))
 
 
